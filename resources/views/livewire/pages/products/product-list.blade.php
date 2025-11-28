@@ -1,0 +1,359 @@
+@section('title', 'Gestion des Produits')
+
+@section('breadcrumb')
+    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+    <li class="breadcrumb-item active">Produits</li>
+@endsection
+
+<div class="products-management">
+    @if (session()->has('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>{{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if (session()->has('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    <div class="header-actions">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input wire:model.live="search" type="text" placeholder="Rechercher un produit...">
+        </div>
+        <a href="{{ route('products.create') }}" class="btn-add">
+            <i class="fas fa-plus"></i> Nouveau Produit
+        </a>
+    </div>
+
+    <div class="products-grid">
+        @forelse($produits as $produit)
+            <div class="product-card">
+                <div class="product-image">
+                    @if($produit->image)
+                        <img src="{{ asset('public/' . $produit->image) }}" alt="{{ $produit->nom }}">
+                    @else
+                        <div class="placeholder-image">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                    @endif
+                    <div class="category-badge">{{ $produit->categorie->nom ?? 'Sans catégorie' }}</div>
+                </div>
+
+                <div class="product-details">
+                    <h3>{{ $produit->nom }}</h3>
+                    <p class="description">{{ Str::limit($produit->description, 50) }}</p>
+                    <div class="price-row">
+                        <span class="price">€{{ number_format($produit->prix_vente, 2) }}</span>
+                        <span class="status {{ $produit->disponible ? 'active' : 'inactive' }}">
+                            {{ $produit->disponible ? 'Disponible' : 'Indisponible' }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="product-actions">
+                    <a href="{{ route('products.edit', $produit->id) }}" class="btn-edit">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <button wire:click="delete({{ $produit->id }})"
+                        wire:confirm="Êtes-vous sûr de vouloir supprimer ce produit ?" class="btn-delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        @empty
+            <div class="empty-state">
+                <i class="fas fa-box-open"></i>
+                <p>Aucun produit trouvé</p>
+            </div>
+        @endforelse
+    </div>
+
+    <div class="pagination-container">
+        {{ $produits->links() }}
+    </div>
+    <style>
+        .products-management {
+            padding: 0;
+        }
+
+        .header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .search-box {
+            position: relative;
+            width: 300px;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            border-color: #ff9f43;
+            box-shadow: 0 0 0 3px rgba(255, 159, 67, 0.1);
+        }
+
+        .btn-add {
+            background: linear-gradient(135deg, #ff9f43, #ee5253);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 159, 67, 0.3);
+        }
+
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 159, 67, 0.4);
+            color: white;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-image {
+            height: 180px;
+            position: relative;
+            background: #f3f4f6;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .placeholder-image {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #d1d5db;
+            font-size: 3rem;
+        }
+
+        .category-badge {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #1f2937;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-details {
+            padding: 1.25rem;
+        }
+
+        .product-details h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #1f2937;
+        }
+
+        .description {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            height: 2.7em;
+            overflow: hidden;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #ff9f43;
+        }
+
+        .status {
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .status.active {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status.inactive {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .product-actions {
+            padding: 1rem 1.25rem;
+            border-top: 1px solid #f3f4f6;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+
+        .btn-edit,
+        .btn-delete {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-edit {
+            background: #eff6ff;
+            color: #3b82f6;
+        }
+
+        .btn-edit:hover {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #fef2f2;
+            color: #ef4444;
+        }
+
+        .btn-delete:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 4rem;
+            color: #9ca3af;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Pagination Styles */
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        :deep(.pagination) {
+            display: flex;
+            gap: 0.5rem;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            align-items: center;
+        }
+
+        :deep(.page-item) {
+            display: inline-block;
+        }
+
+        :deep(.page-link) {
+            min-width: 40px;
+            height: 40px;
+            padding: 0.5rem 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            color: #6b7280;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            background: white;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        :deep(.page-link:hover) {
+            background: #fff7ed;
+            border-color: #ff9f43;
+            color: #ff9f43;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(255, 159, 67, 0.2);
+        }
+
+        :deep(.page-item.active .page-link) {
+            background: linear-gradient(135deg, #ff9f43, #ee5253);
+            border-color: #ff9f43;
+            color: white;
+            box-shadow: 0 4px 12px rgba(255, 159, 67, 0.4);
+        }
+
+        :deep(.page-item.disabled .page-link) {
+            opacity: 0.4;
+            cursor: not-allowed;
+            background: #f9fafb;
+        }
+
+        :deep(.page-item.disabled .page-link:hover) {
+            transform: none;
+            box-shadow: none;
+            border-color: #e5e7eb;
+        }
+    </style>
+</div>
