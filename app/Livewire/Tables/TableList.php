@@ -10,6 +10,15 @@ class TableList extends Component
 {
     use WithPagination;
 
+    public $search = '';
+    public $filterStatus = 'tous';
+
+    public function setFilter($status)
+    {
+        $this->filterStatus = $status;
+        $this->resetPage();
+    }
+
     public function delete($id)
     {
         $table = Table::find($id);
@@ -41,8 +50,18 @@ class TableList extends Component
 
     public function render()
     {
+        $query = Table::query();
+
+        if ($this->search) {
+            $query->where('numero', 'like', '%' . $this->search . '%');
+        }
+
+        if ($this->filterStatus !== 'tous') {
+            $query->where('statut', $this->filterStatus);
+        }
+
         return view('livewire.pages.tables.table-list', [
-            'tables' => Table::orderBy('numero')->paginate(12)
+            'tables' => $query->orderBy('numero')->paginate(12)
         ])->layout('layouts.dashboard');
     }
 }

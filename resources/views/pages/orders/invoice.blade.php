@@ -98,17 +98,17 @@
                 <tr>
                     <td>{{ $item->quantite }}x</td>
                     <td>{{ $item->produit->nom }}</td>
-                    <td style="text-align: right">{{ number_format($item->sous_total, 2) }}€</td>
+                    <td style="text-align: right">{{ number_format($item->sous_total, 2) }}CFA</td>
                 </tr>
             @endforeach
         </tbody>
     </table>
 
     <div class="totals">
-        <div>Sous-total: {{ number_format($commande->sous_total, 2) }}€</div>
-        <div>TVA (10%): {{ number_format($commande->montant_taxes, 2) }}€</div>
+        <div>Sous-total: {{ number_format($commande->sous_total, 2) }}CFA</div>
+        <div>TVA (10%): {{ number_format($commande->montant_taxes, 2) }}CFA</div>
         <div style="font-weight: bold; font-size: 16px; margin-top: 5px">
-            TOTAL: {{ number_format($commande->total, 2) }}€
+            TOTAL: {{ number_format($commande->total, 2) }}CFA
         </div>
     </div>
 

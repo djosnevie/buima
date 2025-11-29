@@ -21,7 +21,20 @@
     @endif
 
     <div class="header-actions">
-        <h1>Tables</h1>
+        <div class="left-actions">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input wire:model.live="search" type="text" placeholder="Rechercher une table (N°)...">
+            </div>
+            <div class="filter-group">
+                <button wire:click="setFilter('tous')"
+                    class="filter-btn {{ $filterStatus === 'tous' ? 'active' : '' }}">Toutes</button>
+                <button wire:click="setFilter('libre')"
+                    class="filter-btn {{ $filterStatus === 'libre' ? 'active' : '' }}">Libres</button>
+                <button wire:click="setFilter('occupee')"
+                    class="filter-btn {{ $filterStatus === 'occupee' ? 'active' : '' }}">Occupées</button>
+            </div>
+        </div>
         <a href="{{ route('tables.create') }}" class="btn-add">
             <i class="fas fa-plus"></i> Nouvelle Table
         </a>
@@ -54,6 +67,11 @@
                 </div>
 
                 <div class="table-footer">
+                    @if($table->statut === 'libre')
+                        <a href="{{ route('orders.create', ['table' => $table->id]) }}" class="btn-order">
+                            <i class="fas fa-shopping-cart"></i> Commander
+                        </a>
+                    @endif
                     <button wire:click="toggleStatus({{ $table->id }})"
                         class="btn-toggle {{ $table->statut === 'libre' ? 'btn-occupy' : 'btn-free' }}">
                         @if($table->statut === 'libre')
@@ -81,6 +99,65 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 2rem;
+        }
+
+        .left-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .search-box {
+            position: relative;
+            width: 300px;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            border-color: #ff9f43;
+            box-shadow: 0 0 0 3px rgba(255, 159, 67, 0.1);
+        }
+
+        .filter-group {
+            display: flex;
+            background: #f3f4f6;
+            padding: 0.25rem;
+            border-radius: 10px;
+            gap: 0.25rem;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: none;
+            border-radius: 8px;
+            color: #6b7280;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-btn.active {
+            background: white;
+            color: #ff9f43;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         }
 
         .btn-add {
@@ -241,6 +318,33 @@
             margin-top: 1rem;
             padding-top: 1rem;
             border-top: 1px solid #f3f4f6;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .btn-order {
+            width: 100%;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            background: linear-gradient(135deg, #ff9f43, #ee5253);
+            color: white;
+            text-decoration: none;
+            border: none;
+        }
+
+        .btn-order:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 159, 67, 0.4);
+            color: white;
         }
 
         .btn-toggle {

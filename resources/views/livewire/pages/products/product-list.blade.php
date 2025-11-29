@@ -21,13 +21,26 @@
     @endif
 
     <div class="header-actions">
-        <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input wire:model.live="search" type="text" placeholder="Rechercher un produit...">
+        <div class="left-actions">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input wire:model.live="search" type="text" placeholder="Rechercher un produit...">
+            </div>
+            <div class="filter-group">
+                <button wire:click="setFilter('tous')" class="filter-btn {{ $typeFilter === 'tous' ? 'active' : '' }}">Tous</button>
+                <button wire:click="setFilter('boisson')" class="filter-btn {{ $typeFilter === 'boisson' ? 'active' : '' }}">Boissons</button>
+                <button wire:click="setFilter('plat')" class="filter-btn {{ $typeFilter === 'plat' ? 'active' : '' }}">Plats</button>
+            </div>
         </div>
-        <a href="{{ route('products.create') }}" class="btn-add">
-            <i class="fas fa-plus"></i> Nouveau Produit
-        </a>
+        
+        <div class="right-actions">
+            <button wire:click="toggleCategoryManager" class="btn-secondary">
+                <i class="fas fa-tags"></i> Catégories
+            </button>
+            <a href="{{ route('products.create') }}" class="btn-add">
+                <i class="fas fa-plus"></i> Nouveau Produit
+            </a>
+        </div>
     </div>
 
     <div class="products-grid">
@@ -48,7 +61,7 @@
                     <h3>{{ $produit->nom }}</h3>
                     <p class="description">{{ Str::limit($produit->description, 50) }}</p>
                     <div class="price-row">
-                        <span class="price">€{{ number_format($produit->prix_vente, 2) }}</span>
+                        <span class="price">CFA {{ number_format($produit->prix_vente, 2) }}</span>
                         <span class="status {{ $produit->disponible ? 'active' : 'inactive' }}">
                             {{ $produit->disponible ? 'Disponible' : 'Indisponible' }}
                         </span>
@@ -355,5 +368,91 @@
             box-shadow: none;
             border-color: #e5e7eb;
         }
+
+        /* New Styles */
+        .left-actions, .right-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .filter-group {
+            display: flex;
+            background: #f3f4f6;
+            padding: 0.25rem;
+            border-radius: 10px;
+            gap: 0.25rem;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: none;
+            border-radius: 8px;
+            color: #6b7280;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-btn.active {
+            background: white;
+            color: #ff9f43;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .btn-secondary {
+            background: white;
+            border: 1px solid #e5e7eb;
+            color: #374151;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            border-color: #ff9f43;
+            color: #ff9f43;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: flex;
+            justify-content: flex-end;
+            backdrop-filter: blur(2px);
+        }
+
+        .modal-panel {
+            width: 450px;
+            height: 100%;
+            background: white;
+            box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
     </style>
+
+    @if($showCategoryManager)
+        <div class="modal-overlay" wire:click.self="toggleCategoryManager">
+            <div class="modal-panel">
+                <livewire:products.category-manager />
+            </div>
+        </div>
+    @endif
 </div>

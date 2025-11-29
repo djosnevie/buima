@@ -12,6 +12,19 @@ class ProductList extends Component
     use WithPagination;
 
     public $search = '';
+    public $typeFilter = 'tous';
+    public $showCategoryManager = false;
+
+    public function setFilter($filter)
+    {
+        $this->typeFilter = $filter;
+        $this->resetPage();
+    }
+
+    public function toggleCategoryManager()
+    {
+        $this->showCategoryManager = !$this->showCategoryManager;
+    }
 
     public function delete($id)
     {
@@ -41,6 +54,17 @@ class ProductList extends Component
 
         if ($this->search) {
             $query->where('nom', 'like', '%' . $this->search . '%');
+        }
+
+        if ($this->typeFilter !== 'tous') {
+            $query->whereHas('categorie', function ($q) {
+                if ($this->typeFilter === 'plat') {
+                    // Include all food types if filter is 'plat'
+                    $q->whereIn('type', ['plat', 'entree', 'dessert']);
+                } else {
+                    $q->where('type', $this->typeFilter);
+                }
+            });
         }
 
         return view('livewire.pages.products.product-list', [

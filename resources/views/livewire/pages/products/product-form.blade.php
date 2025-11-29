@@ -52,7 +52,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Prix de vente (€)</label>
+                        <label>Prix de vente (CFA)</label>
                         <input type="number" step="0.01" wire:model="prix_vente" class="form-control"
                             placeholder="0.00">
                         @error('prix_vente') <span class="error-msg">{{ $message }}</span> @enderror

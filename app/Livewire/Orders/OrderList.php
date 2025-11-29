@@ -19,6 +19,29 @@ class OrderList extends Component
         $this->resetPage();
     }
 
+    public $selectedOrderId = null;
+
+    public function selectOrder($id)
+    {
+        $this->selectedOrderId = $id;
+    }
+
+    public function closeSideView()
+    {
+        $this->selectedOrderId = null;
+    }
+
+    public function deleteOrder($id)
+    {
+        $commande = Commande::find($id);
+        if ($commande) {
+            $commande->items()->delete(); // Delete items first
+            $commande->delete();
+            $this->closeSideView();
+            session()->flash('success', 'Commande supprimée avec succès.');
+        }
+    }
+
     public function updateStatus($commandeId, $newStatus)
     {
         $commande = Commande::find($commandeId);
@@ -50,7 +73,8 @@ class OrderList extends Component
         }
 
         return view('livewire.pages.orders.order-list', [
-            'commandes' => $query->paginate(10)
+            'commandes' => $query->paginate(10),
+            'selectedOrder' => $this->selectedOrderId ? Commande::with(['items.produit', 'table'])->find($this->selectedOrderId) : null,
         ])->layout('layouts.dashboard');
     }
 }

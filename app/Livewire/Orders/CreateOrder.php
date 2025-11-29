@@ -21,10 +21,16 @@ class CreateOrder extends Component
     public $notes = '';
     public $selectedCategory = null;
 
-    public function mount()
+    public function mount($table = null)
     {
         $firstCategory = Categorie::active()->first();
         $this->selectedCategory = $firstCategory?->id;
+
+        // Pre-fill table if coming from table list
+        if ($table) {
+            $this->selectedTable = $table;
+            $this->orderType = 'sur_place';
+        }
     }
 
     public function selectCategory($categoryId)
@@ -148,6 +154,10 @@ class CreateOrder extends Component
             DB::commit();
 
             session()->flash('success', 'Commande créée avec succès !');
+
+            // Reset form
+            $this->reset(['cart', 'clientName', 'clientPhone', 'clientAddress', 'notes', 'selectedTable', 'orderType']);
+            $this->mount(); // Re-initialize default values like selectedCategory
 
         } catch (\Exception $e) {
             DB::rollBack();
