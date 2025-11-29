@@ -1,0 +1,115 @@
+.btn-category {
+    border: 1px solid #e5e7eb;
+    background: white;
+    color: #4b5563;
+    padding: 0.5rem 1.25rem;
+    border-radius: 50px;
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+
+.btn-category:hover {
+    background: #f3f4f6;
+}
+
+.btn-category.active {
+    background: #ff9f43;
+    color: white;
+    border-color: #ff9f43;
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1rem;
+}
+
+.product-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid #f3f4f6;
+}
+
+.product-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-color: #ff9f43;
+}
+
+.product-image {
+    height: 120px;
+    background: #f9fafb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.placeholder-image {
+    color: #d1d5db;
+    font-size: 2rem;
+}
+
+.product-info {
+    padding: 0.75rem;
+}
+
+.product-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.product-price {
+    color: #ff9f43;
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.cart-items {
+    max-height: 400px;
+}
+
+.quantity-controls .btn {
+    padding: 0.25rem 0.5rem;
+}
+
+/* Order Type Buttons - Orange Theme */
+.btn-order-type {
+    border: 2px solid #e5e7eb;
+    background: white;
+    color: #6b7280;
+    font-weight: 600;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.btn-order-type:hover {
+    border-color: #ff9f43;
+    background: #fff7ed;
+    color: #ff9f43;
+}
+
+.btn-check:checked+.btn-order-type {
+    background: linear-gradient(135deg, #ff9f43, #ee5253);
+    border-color: #ff9f43;
+    color: white;
+    box-shadow: 0 4px 12px rgba(255, 159, 67, 0.3);
+}
+
+.btn-check:checked+.btn-order-type:hover {
+    background: linear-gradient(135deg, #f59e0b, #dc2626);
+    border-color: #f59e0b;
+}
