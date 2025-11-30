@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu - O'Menu Restaurant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary-orange: #ff6b35;
+            --dark-orange: #e85d2a;
+            --light-orange: #ff8555;
+            --cream: #fef8f4;
+            --dark: #1a1a1a;
+            --gray: #6b6b6b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--dark);
+            background: var(--cream);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--primary-orange);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .nav-menu a:hover {
+            color: var(--primary-orange);
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            position: sticky;
+            top: 80px;
+            background: white;
+            padding: 2rem 5%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            z-index: 100;
+            margin-top: 80px;
+        }
+
+        .filter-container {
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+        }
+
+        .filter-container::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .filter-container::-webkit-scrollbar-track {
+            background: var(--cream);
+        }
+
+        .filter-container::-webkit-scrollbar-thumb {
+            background: var(--primary-orange);
+            border-radius: 2px;
+        }
+
+        .filter-btn {
+            background: var(--cream);
+            border: 2px solid transparent;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: all 0.3s;
+            color: var(--dark);
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: var(--primary-orange);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 107, 53, 0.3);
+        }
+
+        /* Menu Container */
+        .menu-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 5%;
+        }
+
+        .menu-section {
+            margin-bottom: 5rem;
+        }
+
+        .section-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid var(--primary-orange);
+        }
+
+        .section-badge {
+            display: inline-block;
+            background: var(--primary-orange);
+            color: white;
+            padding: 0.4rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.8rem;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 4vw, 2.8rem);
+            font-weight: 900;
+            color: var(--dark);
+        }
+
+        /* Menu List */
+        .menu-list {
+            list-style: none;
+        }
+
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+        }
+
+        .menu-item:hover {
+            padding-left: 1rem;
+            background: rgba(255, 107, 53, 0.02);
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .item-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .item-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary-orange), var(--light-orange));
+            color: white;
+            padding: 0.2rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .item-description {
+            color: var(--gray);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .item-price {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: var(--primary-orange);
+            white-space: nowrap;
+            margin-left: 2rem;
+        }
+
+        /* Special Sections */
+        .combos-section {
+            background: linear-gradient(135deg, var(--dark), #2a2a2a);
+            padding: 4rem;
+            border-radius: 30px;
+            margin-bottom: 4rem;
+            color: white;
+        }
+
+        .combos-section .section-title {
+            color: white;
+        }
+
+        .combos-section .menu-item {
+            border-bottom-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .combos-section .item-name {
+            color: white;
+        }
+
+        .combos-section .item-price {
+            color: var(--primary-orange);
+        }
+
+        .combos-section .item-description {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Pack Midi */
+        .pack-midi-section {
+            background: var(--primary-orange);
+            padding: 4rem;
+            border-radius: 30px;
+            margin-bottom: 4rem;
+            color: white;
+        }
+
+        .pack-midi-section .section-title {
+            color: white;
+        }
+
+        .pack-midi-section .menu-item {
+            border-bottom-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .pack-midi-section .item-name {
+            color: white;
+        }
+
+        .pack-midi-section .item-price {
+            color: white;
+        }
+
+        .time-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.6rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 4rem 5% 2rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--primary-orange);
+            margin-bottom: 1rem;
+        }
+
+        .footer-description {
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.7;
+        }
+
+        .footer-section h3 {
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.6rem;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-orange);
+        }
+
+        .footer-bottom {
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .nav-menu {
+                display: none;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+
+            .combos-section,
+            .pack-midi-section {
+                padding: 2.5rem 2rem;
+            }
+
+            .item-price {
+                margin-left: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo">O'Menu</div>
+        <ul class="nav-menu">
+            <li><a href="landing.html">Accueil</a></li>
+            <li><a href="#menu">Menu</a></li>
+            <li><a href="landing.html#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+        <div class="filter-container">
+            <button class="filter-btn active" onclick="filterMenu('all')">Tous les plats</button>
+            <button class="filter-btn" onclick="filterMenu('pizzas')">Pizzas</button>
+            <button class="filter-btn" onclick="filterMenu('africain')">Plats Africains</button>
+            <button class="filter-btn" onclick="filterMenu('burgers')">Burgers & Fast-Food</button>
+            <button class="filter-btn" onclick="filterMenu('poisson')">Poissons</button>
+            <button class="filter-btn" onclick="filterMenu('europeen')">Plats Européens</button>
+            <button class="filter-btn" onclick="filterMenu('pates')">Pâtes</button>
+        </div>
+    </div>
+
+    <!-- Menu Container -->
+    <div class="menu-container" id="menu">
+
+        <!-- Combos -->
+        <div class="combos-section">
+            <div class="section-header">
+                <span class="section-badge">Offres Spéciales</span>
+                <h2 class="section-title">Nos Combos Populaires</h2>
+            </div>
+            <ul class="menu-list">
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Combo Pizza + Jus</h3>
+                        </div>
+                    </div>
+                    <span class="item-price">7 000 CFA</span>
+                </li>
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Combo Burger + Frites + Jus</h3>
+                        </div>
+                    </div>
+                    <span class="item-price">5 500 CFA</span>
+                </li>
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Combo Tacos + Frite + Jus</h3>
+                        </div>
+                    </div>
+                    <span class="item-price">6 000 CFA</span>
+                </li>
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Combo Shawarma + Frite + Jus</h3>
+                        </div>
+                    </div>
+                    <span class="item-price">4 500 CFA</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Pizzas -->
+        <section class="menu-section" data-category="pizzas">
+            <div class="section-header">
+                <span class="section-badge">Spécialité Italienne</span>
+                <h2 class="section-title">Nos Pizzas Artisanales</h2>
+            </div>
+            <ul class="menu-list">
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Pizza O'Menu Blanche</h3>
+                            <span class="item-badge">Signature</span>
+                        </div>
+                        <p class="item-description">Crème fraîche, viande hachée poulet, herbes de provence, basilic et
+                            fromage mozzarella</p>
+                    </div>
+                    <span class="item-price">8 000 CFA</span>
+                </li>
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Pizza O'Menu Magistrale</h3>
+                            <span class="item-badge">Géante</span>
+                        </div>
+                        <p class="item-description">Géante à partager en famille</p>
+                    </div>
+                    <span class="item-price">12 000 CFA</span>
+                </li>
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Pizza Hawaïenne</h3>
+                        </div>
+                        <p class="item-description">Crème fraîche, jambon, ananas, champignon et fromage mozzarella</p>
+                    </div>
+                    <span class="item-price">5 000 CFA</span>
+                </li>
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Pizza Américaine</h3>
+                        </div>
+                        <p class="item-description">Sauce tomate, viande hachée, poivron vert, mozzarella</p>
+                    </div>
+                    <span class="item-price">5 000 CFA</span>
+                </li>
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Pizza Chorizo</h3>
+                        </div>
+                        <p class="item-description">Sauce tomate, chorizo, mozzarella et herbes de provence</p>
+                    </div>
+                    <span class="item-price">6 000 CFA</span>
+                </li>
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Pizza Calzone</h3>
+                        </div>
+                        <p class="item-description">Sauce tomate, jambon, lardons fumée, champignon, fromage et origan
+                        </p>
+                    </div>
+                    <span class="item-price">6 000 CFA</span>
+                </li>
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Margherita</h3>
+                        </div>
+                        <p class="item-description">Sauce tomate, basilique frais, fromage mozzarella et olive noir</p>
+                    </div>
+                    <span class="item-price">2 500 CFA</span>
+                </li>
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Pizza Végétarien</h3>
+                        </div>
+                        <p class="item-description">Carotte, haricot vert, sauce tomate, olive noir</p>
+                    </div>
+                    <span class="item-price">3 500 CFA</span>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Plats Africains -->
+        <section class="menu-section" data-category="africain">
+            <div class="section-header">
+                <span class="section-badge">Authenticité</span>
+                <h2 class="section-title">Plats Africains</h2>
+            </div>
+            <ul class="menu-list">
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Poulet DG</h3>
+                            <span class="item-badge">Populaire</span>
+                        </div>
+                        <p class="item-description">Spécialité camerounaise avec accompagnement</p>
+                    </div>
+                    <span class="item-price">5 000 CFA</span>
+                </li>
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Poulet Yassa</h3>
+                        </div>
+                        <p class="item-description">Spécialité sénégalaise avec accompagnement</p>
+                    </div>
+                    <span class="item-price">5 000 CFA</span>
+                </li>
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Mouton à la Kinois</h3>
+                        </div>
+                        <p class="item-description">Spécialité congolaise avec accompagnement</p>
+                    </div>
+                    <span class="item-price">8 000 CFA</span>
+                </li>
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Thiep poulet / Viande / Poisson</h3>
+                        </div>
+                        <p class="item-description">Riz thiéboudienne avec accompagnement</p>
+                    </div>
+                    <span class="item-price">5 000 CFA</span>
+                </li>
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Maffé poulet / Viande / Poisson</h3>
+                        </div>
+                        <p class="item-description">Sauce d'arachide avec accompagnement</p>
+                    </div>
+                    <span class="item-price">4 500 CFA</span>
+                </li>
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Bouillon sauvage</h3>
+                        </div>
+                        <p class="item-description">Bouillon traditionnel avec accompagnement</p>
+                    </div>
+                    <span class="item-price">3 500 / 5 000 CFA</span>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Burgers & Fast-Food -->
+        <section class="menu-section" data-category="burgers">
+            <div class="section-header">
+                <span class="section-badge">Fast-Food</span>
+                <h2 class="section-title">Burgers & Tacos</h2>
+            </div>
+            <ul class="menu-list">
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Burger Ubuntu</h3>
+                            <span class="item-badge">Signature</span>
+                        </div>
+                        <p class="item-description">Garniture renforcée</p>
+                    </div>
+                    <span class="item-price">7 000 CFA</span>
+                </li>
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Bacon Burger</h3>
+                        </div>
+                    </div>
+                    <span class="item-price">5 000 CFA</span>
+                </li>
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Burger Double Cheese</h3>
+                        </div>
+                    </div>
+                    <span class="item-price">5 000 CFA</span>
+                </li>
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Tacos Extrême 2 Kilos</h3>
+                            <span class="item-badge">Extrême</span>
+                        </div>
+                    </div>
+                    <span class="item-price">10 000 CFA</span>
+                </li>
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Tacos L</h3>
+                        </div>
+                        <p class="item-description">Viande et poulet</p>
+                    </div>
+                    <span class="item-price">8 000 CFA</span>
+                </li>
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Kebab à la Viande</h3>
+                        </div>
+                    </div>
+                    <span class="item-price">5 000 CFA</span>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Poissons -->
+        <section class="menu-section" data-category="poisson">
+            <div class="section-header">
+                <span class="section-badge">Fraîcheur</span>
+                <h2 class="section-title">Poissons</h2>
+            </div>
+            <ul class="menu-list">
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Likoff</h3>
+                        </div>
+                        <p class="item-description">Poisson de mer avec accompagnement</p>
+                    </div>
+                    <span class="item-price">9 000 CFA</span>
+                </li>
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Bar</h3>
+                        </div>
+                        <p class="item-description">Poisson de mer avec accompagnement</p>
+                    </div>
+                    <span class="item-price">9 000 CFA</span>
+                </li>
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Machoiron</h3>
+                        </div>
+                        <p class="item-description">Braisé ou bouillon avec accompagnement</p>
+                    </div>
+                    <span class="item-price">7 000 CFA</span>
+                </li>
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Mbesse</h3>
+                        </div>
+                        <p class="item-description">Braisé ou bouillon avec accompagnement</p>
+                    </div>
+                    <span class="item-price">6 000 CFA</span>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Plats Européens -->
+        <section class="menu-section" data-category="europeen">
+            <div class="section-header">
+                <span class="section-badge">Gastronomie</span>
+                <h2 class="section-title">Plats Européens</h2>
+            </div>
+            <ul class="menu-list">
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Filet de bœuf</h3>
+                        </div>
+                        <p class="item-description">Sauce au choix avec accompagnement</p>
+                    </div>
+                    <span class="item-price">7 000 CFA</span>
+                </li>
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Steak de bœuf</h3>
+                        </div>
+                        <p class="item-description">Avec accompagnement</p>
+                    </div>
+                    <span class="item-price">7 000 CFA</span>
+                </li>
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Ragoût de bœuf poivre</h3>
+                        </div>
+                        <p class="item-description">Avec accompagnement</p>
+                    </div>
+                    <span class="item-price">7 000 CFA</span>
+                </li>
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Bœuf aux oignons</h3>
+                        </div>
+                        <p class="item-description">Avec accompagnement</p>
+                    </div>
+                    <span class="item-price">6 000 CFA</span>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Pâtes -->
+        <section class="menu-section" data-category="pates">
+            <div class="section-header">
+                <span class="section-badge">Pasta</span>
+                <h2 class="section-title">Spaghetti</h2>
+            </div>
+            <ul class="menu-list">
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Spaghetti Carbonara</h3>
+                        </div>
+                    </div>
+                    <span class="item-price">5 000 CFA</span>
+                </li>
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Spaghetti Bolognaise</h3>
+                        </div>
+                    </div>
+                    <span class="item-price">5 000 CFA</span>
+                </li>
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Spaghetti à la viande hachée</h3>
+                        </div>
+                    </div>
+                    <span class="item-price">3 500 CFA</span>
+                </li>
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Spaghetti Napolitaine</h3>
+                        </div>
+                    </div>
+                    <span class="item-price">2 500 CFA</span>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Pack Midi -->
+        <div class="pack-midi-section">
+            <div class="section-header">
+                <div class="time-badge">⏰ 11h30 - 14h30</div>
+                <h2 class="section-title">Pack Midi Travailleurs</h2>
+            </div>
+            <ul class="menu-list">
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Riz Tchiep + Poulet</h3>
+                        </div>
+                    </div>
+                    <span class="item-price">1 500 CFA</span>
+                </li>
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Bouillon sauvage + Manioc</h3>
+                        </div>
+                    </div>
+                    <span class="item-price">2 500 CFA</span>
+                </li>
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Cuisse sautée + Manioc</h3>
+                        </div>
+                    </div>
+                    <span class="item-price">2 500 CFA</span>
+                </li>
+                <li class="menu-item">
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">Légume + Poisson + Manioc</h3>
+                        </div>
+                    </div>
+                    <span class="item-price">2 500 CFA</span>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div>
+                <div class="footer-brand">O'Menu</div>
+                <p class="footer-description">Restaurant gastronomique offrant une expérience culinaire unique à
+                    Brazzaville.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Navigation</h3>
+                <ul class="footer-links">
+                    <li><a href="landing.html">Accueil</a></li>
+                    <li><a href="#menu">Menu</a></li>
+                    <li><a href="landing.html#contact">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <ul class="footer-links">
+                    <li>54 Félix Eboué</li>
+                    <li>Brazzaville</li>
+                    <li>067737037</li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Horaires</h3>
+                <ul class="footer-links">
+                    <li>Lun - Dim</li>
+                    <li>11h30 - 22h00</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 O'Menu Restaurant. Tous droits réservés.</p>
+        </div>
+    </footer>
+
+    <script>
+        function filterMenu(category) {
+            const sections = document.querySelectorAll('.menu-section');
+            const buttons = document.querySelectorAll('.filter-btn');
+
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if (category === 'all') {
+                sections.forEach(section => section.style.display = 'block');
+            } else {
+                sections.forEach(section => {
+                    if (section.dataset.category === category) {
+                        section.style.display = 'block';
+                    } else {
+                        section.style.display = 'none';
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+
+</html>

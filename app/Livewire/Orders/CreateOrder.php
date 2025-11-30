@@ -20,15 +20,15 @@ class CreateOrder extends Component
     public $clientAddress = '';
     public $notes = '';
     public $selectedCategory = null;
+    public $search = '';
 
     public function mount($table = null)
     {
-        $firstCategory = Categorie::active()->first();
-        $this->selectedCategory = $firstCategory?->id;
+        $this->selectedCategory = null; // Default to 'Tous'
 
         // Pre-fill table if coming from table list
         if ($table) {
-            $this->selectedTable = $table;
+            $this->selectedTable = (int) $table;
             $this->orderType = 'sur_place';
         }
     }
@@ -36,6 +36,14 @@ class CreateOrder extends Component
     public function selectCategory($categoryId)
     {
         $this->selectedCategory = $categoryId;
+    }
+
+    public function updatedSearch()
+    {
+        if ($this->search) {
+            $this->selectedCategory = null;
+        }
+        // If search is cleared, we stay on 'Tous' (null) which is the default now
     }
 
     public function addToCart($produitId)
@@ -172,12 +180,18 @@ class CreateOrder extends Component
             ->select('id', 'nom')
             ->get();
 
-        $produits = $this->selectedCategory
-            ? Produit::select('id', 'nom', 'prix_vente')
-                ->where('categorie_id', $this->selectedCategory)
-                ->available()
-                ->get()
-            : collect();
+        $produitsQuery = Produit::select('id', 'nom', 'prix_vente', 'image', 'categorie_id')
+            ->available();
+
+        if ($this->selectedCategory) {
+            $produitsQuery->where('categorie_id', $this->selectedCategory);
+        }
+
+        if ($this->search) {
+            $produitsQuery->where('nom', 'like', '%' . $this->search . '%');
+        }
+
+        $produits = $produitsQuery->get();
 
         $tables = Table::select('id', 'numero', 'zone', 'capacite')
             ->available()

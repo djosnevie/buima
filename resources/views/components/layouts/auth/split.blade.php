@@ -10,14 +10,21 @@
         class="relative grid h-dvh flex-col items-center justify-center px-8 sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
         <div
             class="bg-muted relative hidden h-full flex-col p-10 text-white lg:flex dark:border-e dark:border-neutral-800">
-            <div class="absolute inset-0 bg-neutral-900"></div>
+            <div class="absolute inset-0 bg-gradient-to-br from-orange-500 via-orange-600 to-red-600">
+                <!-- Background image overlay -->
+                <div class="absolute inset-0 bg-black/40"></div>
+                <div
+                    class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=2070')] bg-cover bg-center opacity-30">
+                </div>
+            </div>
 
             <!-- Logo du restaurant centré -->
             <div class="relative z-20 flex h-full items-center justify-center">
                 <a href="{{ route('home') }}" class="flex flex-col items-center gap-4" wire:navigate>
                     <img src="{{ asset('images/logo.webp') }}" alt="{{ config('app.name', 'Laravel') }}"
-                        class="w-64 h-auto object-contain">
-                    <span class="text-2xl font-bold text-white">{{ config('app.name', 'Laravel') }}</span>
+                        class="w-64 h-auto object-contain drop-shadow-2xl">
+                    <span
+                        class="text-2xl font-bold text-white drop-shadow-lg">{{ config('app.name', 'Laravel') }}</span>
                 </a>
             </div>
         </div>

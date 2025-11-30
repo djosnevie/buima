@@ -91,7 +91,7 @@
     </div>
 
     <div class="pagination-container">
-        {{ $tables->links() }}
+        {{ $tables->links('livewire.custom-pagination') }}
     </div>
     <!-- Table List Styles -->
     <link rel="stylesheet" href="{{ asset('css/livewire/pages/tables/table-list.css') }}">

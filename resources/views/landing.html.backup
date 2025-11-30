@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>O'Menu - Restaurant Gastronomique à Brazzaville</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary-orange: #ff6b35;
+            --dark-orange: #e85d2a;
+            --light-orange: #ff8555;
+            --cream: #fef8f4;
+            --dark: #1a1a1a;
+            --gray: #6b6b6b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--dark);
+            overflow-x: hidden;
+            background: var(--cream);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 1.5rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            background: transparent;
+        }
+
+        .navbar.scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+            padding: 1rem 5%;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--primary-orange);
+            letter-spacing: -1px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 0.95rem;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .nav-menu a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-orange);
+            transition: width 0.3s;
+        }
+
+        .nav-menu a:hover {
+            color: var(--primary-orange);
+        }
+
+        .nav-menu a:hover::after {
+            width: 100%;
+        }
+
+        .cta-nav {
+            background: var(--primary-orange);
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            herbes de provence,
+            basilic et fromage mozzarella</p></div><div class="menu-card"><div class="menu-card-header"><h3 class="menu-card-title">Poulet DG</h3><span class="menu-card-price">5 000 CFA</span></div><p class="menu-card-description">Spécialité camerounaise avec accompagnement au choix</p></div><div class="menu-card"><div class="menu-card-header"><h3 class="menu-card-title">Burger Ubuntu</h3><span class="menu-card-price">7 000 CFA</span></div><p class="menu-card-description">Notre burger signature avec garniture renforcée</p></div></div><div style="text-align: center; margin-top: 4rem;"><a href="menu.html" class="btn-primary">Voir le Menu Complet</a></div></section><div class="section-separator"></div>< !-- Testimonials --><section class="testimonials"><div class="section-header"><p class="section-subtitle">Témoignages</p><h2 class="section-title">Ce Que Disent Nos Clients</h2></div><div class="testimonials-grid"><div class="testimonial-card"><div class="testimonial-rating">⭐⭐⭐⭐⭐</div><p class="testimonial-text">"La meilleure pizza de Brazzaville ! La qualité des ingrédients et le
+ service sont exceptionnels. Je recommande vivement."</p>
+ <div class="testimonial-author"><div class="author-avatar">JD</div><div class="author-info"><h4>Jean Dupont</h4><p>Client régulier</p></div></div></div><div class="testimonial-card"><div class="testimonial-rating">⭐⭐⭐⭐⭐</div><p class="testimonial-text">"Un vrai voyage culinaire ! Les plats africains sont authentiques et
+ délicieux. L'ambiance est chaleureuse."</p>
+ <div class="testimonial-author"><div class="author-avatar">MK</div><div class="author-info"><h4>Marie Kongo</h4><p>Amatrice de cuisine</p></div></div></div><div class="testimonial-card"><div class="testimonial-rating">⭐⭐⭐⭐⭐</div><p class="testimonial-text">"Service impeccable et plats savoureux. Le pack midi est parfait pour les
+ travailleurs. Excellent rapport qualité-prix."</p>
+ <div class="testimonial-author"><div class="author-avatar">PT</div><div class="author-info"><h4>Pierre Tchicaya</h4><p>Professionnel</p></div></div></div></div></section><div class="section-separator"></div>< !-- Location --><section class="location" id="contact"><div class="section-header"><p class="section-subtitle">Nous Trouver</p><h2 class="section-title">Visitez-Nous à Brazzaville</h2></div><div class="location-content"><div class="location-info"><div class="info-item"><div class="info-icon">📍</div><div class="info-text"><h3>Adresse</h3><p>54 Félix Eboué,
+            Centre-Ville,
+            Brazzaville<br>(En face du Kempinski Hotel, à côté d'Ecobank)
+ </p> </div> </div> <div class="info-item" > <div class="info-icon" >📞</div> <div class="info-text" > <h3>Téléphone</h3> <p>067737037</p> </div> </div> <div class="info-item" > <div class="info-icon" >🕐</div> <div class="info-text" > <h3>Horaires</h3> <p>Lundi - Dimanche: 11h30 - 22h00<br>Pack Midi: 11h30 - 14h30</p> </div> </div> </div> <div class="map-placeholder" > 🗺️ </div> </div> </section> < !-- Footer --> <footer> <div class="footer-content" > <div> <div class="footer-brand" >O'Menu</div>
+ <p class="footer-description" >Restaurant gastronomique offrant une expérience culinaire unique à Brazzaville avec des plats africains, européens et internationaux.</p> <div class="social-links" > <a href="#" class="social-link" >📘</a> <a href="#" class="social-link" >📷</a> <a href="#" class="social-link" >🎵</a> </div> </div> <div class="footer-section" > <h3>Navigation</h3> <ul class="footer-links" > <li><a href="#accueil" >Accueil</a></li> <li><a href="menu.html" >Menu</a></li> <li><a href="#specialites" >Spécialités</a></li> <li><a href="#contact" >Contact</a></li> </ul> </div> <div class="footer-section" > <h3>Services</h3> <ul class="footer-links" > <li><a href="#" >Sur Place</a></li> <li><a href="#" >À Emporter</a></li> <li><a href="#" >Livraison</a></li> <li><a href="#" >Pack Midi</a></li> </ul> </div> <div class="footer-section" > <h3>Légal</h3> <ul class="footer-links" > <li><a href="#" >Mentions Légales</a></li> <li><a href="#" >Politique de Confidentialité</a></li> <li><a href="#" >CGV</a></li> </ul> </div> </div> <div class="footer-bottom" > <p>&copy; 2025 O'Menu Restaurant. Tous droits réservés. Conçu avec ❤️ à Brazzaville</p>
+ </div> </footer> <script> // Navbar scroll effect
+
+                window.addEventListener('scroll', ()=> {
+                        const navbar=document.getElementById('navbar');
+
+                        if (window.scrollY > 100) {
+                            navbar.classList.add('scrolled');
+                        }
+
+                        else {
+                            navbar.classList.remove('scrolled');
+                        }
+                    });
+
+                // Category filter (simple demo)
+                document.querySelectorAll('.category-btn').forEach(btn=> {
+                        btn.addEventListener('click', function () {
+                                document.querySelectorAll('.category-btn').forEach(b=> b.classList.remove('active'));
+                                this.classList.add('active');
+                            });
+                    });
+                </script> </body> </html>

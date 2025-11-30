@@ -90,7 +90,7 @@
     </div>
 
     <div class="pagination-container">
-        {{ $produits->links() }}
+        {{ $produits->links('livewire.custom-pagination') }}
     </div>
 
     <!-- Product List Styles -->

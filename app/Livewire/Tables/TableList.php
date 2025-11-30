@@ -61,7 +61,7 @@ class TableList extends Component
         }
 
         return view('livewire.pages.tables.table-list', [
-            'tables' => $query->orderBy('numero')->paginate(12)
+            'tables' => $query->orderBy('numero')->paginate(14)
         ])->layout('layouts.dashboard');
     }
 }

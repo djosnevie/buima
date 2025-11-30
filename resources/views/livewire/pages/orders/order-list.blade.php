@@ -153,6 +153,11 @@
         @endforelse
     </div>
 
+    <!-- Pagination -->
+    <div class="d-flex justify-content-center mt-4">
+        {{ $commandes->links('livewire.custom-pagination') }}
+    </div>
+
     <!-- Side Panel for Details -->
     @if($selectedOrder)
         <div class="side-panel-overlay" wire:click="closeSideView">

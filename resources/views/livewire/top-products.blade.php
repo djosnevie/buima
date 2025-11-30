@@ -25,7 +25,7 @@
                             {{ $item->total_quantity }} vendus
                         </span>
                         <span class="stat-revenue">
-                            <i class="fas fa-euro-sign"></i>
+                            <i class="fas fa-xfa-sign"></i>
                             {{ number_format($item->total_revenue, 2) }}
                         </span>
                     </div>

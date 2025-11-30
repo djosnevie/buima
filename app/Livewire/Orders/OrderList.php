@@ -50,6 +50,10 @@ class OrderList extends Component
 
             if ($newStatus === 'payee') {
                 $this->dispatch('print-invoice', url: route('orders.invoice', $commande->id));
+
+                if ($commande->table) {
+                    $commande->table->markAsFree();
+                }
             }
 
             session()->flash('success', 'Statut mis à jour avec succès.');
@@ -73,7 +77,7 @@ class OrderList extends Component
         }
 
         return view('livewire.pages.orders.order-list', [
-            'commandes' => $query->paginate(10),
+            'commandes' => $query->paginate(8),
             'selectedOrder' => $this->selectedOrderId ? Commande::with(['items.produit', 'table'])->find($this->selectedOrderId) : null,
         ])->layout('layouts.dashboard');
     }
