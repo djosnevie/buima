@@ -1,4 +1,12 @@
 <div class="row g-4 mb-4" wire:poll.30s>
+    <style>
+        .stat-card .icon.orange {
+            background: rgba(var(--primary-color-rgb), 0.1) !important;
+            color: var(--primary-color) !important;
+        }
+
+        /* Optional: Tint others if desired, or leave semantic */
+    </style>
     <div class="col-md-4">
         <div class="stat-card">
             <div class="icon orange">

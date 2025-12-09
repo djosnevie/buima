@@ -20,6 +20,24 @@
         </div>
     </div>
 
+    <style>
+        .filter-btn.active {
+            background: var(--primary-color) !important;
+            border-color: var(--primary-color) !important;
+            color: white !important;
+        }
+
+        .filter-btn:hover:not(.active) {
+            color: var(--primary-color) !important;
+        }
+
+        /* New Style for Stat Items */
+        .stat-item .stat-icon {
+            background: rgba(var(--primary-color-rgb), 0.1) !important;
+            color: var(--primary-color) !important;
+        }
+    </style>
+
     <div class="chart-stats">
         <div class="stat-item">
             <div class="stat-icon">
@@ -63,6 +81,18 @@
                 const ctx = document.getElementById('orderChart');
                 if (!ctx) return;
 
+                const getCssVar = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+                const primaryColor = getCssVar('--primary-color') || '#ff9f43';
+                const secondaryColor = getCssVar('--secondary-color') || '#ee5253';
+
+                // Helper to add opacity to hex/rgb
+                const addOpacity = (color, opacity) => {
+                    // Simple heuristic or use canvas gradient if needed. 
+                    // For now, assuming standard Chart.js behavior or using the var directly if it's hex.
+                    // If var(--primary-color) is provided, we use it directly.
+                    return color;
+                };
+
                 const chartData = @json($chartData);
                 const chartLabels = @json($chartLabels);
 
@@ -77,17 +107,17 @@
                         datasets: [{
                             label: 'Commandes',
                             data: chartData,
-                            borderColor: '#ff9f43',
-                            backgroundColor: 'rgba(255, 159, 67, 0.1)',
+                            borderColor: primaryColor,
+                            backgroundColor: 'rgba(0,0,0,0)', // Simplified or need logic for gradient
                             borderWidth: 3,
                             fill: true,
                             tension: 0.4,
                             pointRadius: 4,
                             pointHoverRadius: 6,
-                            pointBackgroundColor: '#ff9f43',
+                            pointBackgroundColor: primaryColor,
                             pointBorderColor: '#fff',
                             pointBorderWidth: 2,
-                            pointHoverBackgroundColor: '#ee5253',
+                            pointHoverBackgroundColor: secondaryColor,
                             pointHoverBorderColor: '#fff',
                         }]
                     },
@@ -102,7 +132,7 @@
                                 backgroundColor: 'rgba(31, 41, 55, 0.95)',
                                 titleColor: '#fff',
                                 bodyColor: '#fff',
-                                borderColor: '#ff9f43',
+                                borderColor: primaryColor,
                                 borderWidth: 1,
                                 padding: 12,
                                 displayColors: false,

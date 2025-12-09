@@ -39,7 +39,7 @@ class ProductForm extends Component
             'nom' => 'required|min:3',
             'description' => 'nullable',
             'prix_vente' => 'required|numeric|min:0',
-            'categorie_id' => 'required|exists:categories,id',
+            'categorie_id' => 'nullable|exists:categories,id',
             'newImage' => 'nullable|image|max:1024', // 1MB Max
             'disponible' => 'boolean',
         ];
@@ -53,9 +53,9 @@ class ProductForm extends Component
             'nom' => $this->nom,
             'description' => $this->description,
             'prix_vente' => $this->prix_vente,
-            'categorie_id' => $this->categorie_id,
+            'categorie_id' => $this->categorie_id ?: null,
             'disponible' => $this->disponible,
-            'etablissement_id' => 1, // Default establishment
+            'etablissement_id' => auth()->user()->etablissement_id,
         ];
 
         if ($this->newImage) {
@@ -76,7 +76,7 @@ class ProductForm extends Component
     public function render()
     {
         return view('livewire.pages.products.product-form', [
-            'categories' => Categorie::all()
+            'categories' => Categorie::where('etablissement_id', auth()->user()->etablissement_id)->get()
         ])->layout('layouts.dashboard');
     }
 }

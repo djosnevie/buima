@@ -7,6 +7,50 @@
 @endsection
 
 <div class="create-order-page">
+    <style>
+        /* Dynamic Theme Overrides */
+        .btn-category.active {
+            background: var(--primary-color) !important;
+            border-color: var(--primary-color) !important;
+        }
+
+        .product-card:hover {
+            border-color: var(--primary-color) !important;
+        }
+
+        .product-price {
+            color: var(--primary-color) !important;
+        }
+
+        .btn-order-type:hover {
+            border-color: var(--primary-color) !important;
+            color: var(--primary-color) !important;
+            background: rgba(255, 159, 67, 0.05); /* Light tint fallback */
+        }
+
+        .btn-check:checked+.btn-order-type {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+            border-color: var(--primary-color) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        .btn-check:checked+.btn-order-type:hover {
+            opacity: 0.9;
+        }
+
+        .input-group.shadow-sm:focus-within {
+            border-color: var(--primary-color) !important;
+            box-shadow: 0 0 0 0.25rem rgba(var(--primary-color-rgb), 0.15) !important; /* Note: requires RGB var or approx */
+        }
+
+        .input-group .input-group-text i {
+            color: var(--primary-color) !important;
+        }
+        
+        .text-primary {
+            color: var(--primary-color) !important;
+        }
+    </style>
     @if (session()->has('error'))
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <i class="fas fa-exclamation-circle me-2"></i>{{ session('error') }}

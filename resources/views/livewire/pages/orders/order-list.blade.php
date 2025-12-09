@@ -6,6 +6,47 @@
 @endsection
 
 <div class="orders-management">
+    <style>
+        /* Dynamic Theme Overrides for Orders List */
+        .filter-btn.active {
+            background: var(--primary-color) !important;
+            border-color: var(--primary-color) !important;
+            color: white !important;
+        }
+
+        .filter-btn:hover:not(.active) {
+            color: var(--primary-color) !important;
+            background: rgba(255, 159, 67, 0.05);
+            /* Fallback tint */
+        }
+
+        .order-card:hover {
+            border-left-color: var(--primary-color) !important;
+        }
+
+        .hash {
+            color: var(--secondary-color) !important;
+        }
+
+        .status-option.active {
+            border-color: var(--primary-color) !important;
+            background-color: rgba(var(--primary-color-rgb), 0.05) !important;
+            /* Requires RGB var if available, else standard tint */
+        }
+
+        .status-option.active .status-icon {
+            color: var(--primary-color) !important;
+        }
+
+        .btn-print:hover {
+            border-color: var(--primary-color) !important;
+            color: var(--primary-color) !important;
+        }
+
+        .panel-title .hash {
+            color: var(--secondary-color) !important;
+        }
+    </style>
     @if (session()->has('error'))
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <i class="fas fa-exclamation-circle me-2"></i>{{ session('error') }}

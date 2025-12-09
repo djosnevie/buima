@@ -126,7 +126,7 @@ class CreateOrder extends Component
         try {
             // Create order
             $commande = Commande::create([
-                'etablissement_id' => auth()->user()->etablissement_id ?? 1,
+                'etablissement_id' => auth()->user()->etablissement_id,
                 'table_id' => $this->orderType === 'sur_place' ? $this->selectedTable : null,
                 'numero_commande' => Commande::generateOrderNumber(),
                 'type_commande' => $this->orderType,
@@ -176,11 +176,13 @@ class CreateOrder extends Component
     public function render()
     {
         // Optimiser toutes les requêtes
-        $categories = Categorie::active()
+        $categories = Categorie::where('etablissement_id', auth()->user()->etablissement_id)
+            ->active()
             ->select('id', 'nom')
             ->get();
 
-        $produitsQuery = Produit::select('id', 'nom', 'prix_vente', 'image', 'categorie_id')
+        $produitsQuery = Produit::where('etablissement_id', auth()->user()->etablissement_id)
+            ->select('id', 'nom', 'prix_vente', 'image', 'categorie_id')
             ->available();
 
         if ($this->selectedCategory) {
@@ -193,7 +195,8 @@ class CreateOrder extends Component
 
         $produits = $produitsQuery->get();
 
-        $tables = Table::select('id', 'numero', 'zone', 'capacite')
+        $tables = Table::where('etablissement_id', auth()->user()->etablissement_id)
+            ->select('id', 'numero', 'zone', 'capacite')
             ->available()
             ->orderBy('numero')
             ->get();

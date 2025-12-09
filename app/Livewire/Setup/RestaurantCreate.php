@@ -47,7 +47,7 @@ class RestaurantCreate extends Component
             'logo' => 'nullable|image|max:1024',
         ];
 
-        if (!Auth::check()) {
+        if (!Auth::check() || (Auth::check() && Auth::user()->isSuperAdmin())) {
             $rules = array_merge($rules, [
                 'nom_admin' => 'required|string|max:255',
                 'email_admin' => 'required|email|unique:users,email',
@@ -60,7 +60,8 @@ class RestaurantCreate extends Component
 
     public function mount()
     {
-        if (Auth::check() && Auth::user()->etablissement_id) {
+        // Redirect if user has establishment and is NOT Super Admin
+        if (Auth::check() && Auth::user()->etablissement_id && !Auth::user()->isSuperAdmin()) {
             return redirect()->route('dashboard');
         }
     }
@@ -92,21 +93,27 @@ class RestaurantCreate extends Component
                 'actif' => true,
             ]);
 
-            if (Auth::check()) {
+            if (Auth::check() && !Auth::user()->isSuperAdmin()) {
+                // If logged in and NOT Super Admin (e.g. converting a user to an admin of a new place?)
+                // Or maybe this case shouldn't happen often if we enforce 1 app 1 resto normally.
+                // But let's keep existing logic for non-super admins.
                 $user = Auth::user();
                 $user->etablissement_id = $etablissement->id;
-                $user->role = 'admin'; // Promote to admin of this restaurant
+                $user->role = 'admin';
                 $user->save();
             } else {
+                // Guest OR Super Admin creating a NEW user for this restaurant
                 $user = User::create([
                     'name' => $this->nom_admin,
                     'email' => $this->email_admin,
                     'password' => Hash::make($this->password),
                     'role' => 'admin',
+                    'etablissement_id' => $etablissement->id,
                 ]);
-                $user->etablissement_id = $etablissement->id;
-                $user->save();
-                Auth::login($user);
+
+                if (!Auth::check()) {
+                    Auth::login($user);
+                }
             }
 
             DB::commit();

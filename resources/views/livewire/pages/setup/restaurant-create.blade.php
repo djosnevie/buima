@@ -27,7 +27,7 @@
 
                     <!-- Type & Devise Row -->
                     <div class="row g-3 mb-3">
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <label for="type_restaurant" class="form-label">Type d'Établissement</label>
                             <select wire:model="type_restaurant"
                                 class="form-select @error('type_restaurant') is-invalid @enderror" id="type_restaurant">
@@ -37,7 +37,7 @@
                             </select>
                             @error('type_restaurant') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <label for="devise" class="form-label">Devise Principale</label>
                             <select wire:model="devise" class="form-select @error('devise') is-invalid @enderror"
                                 id="devise">
@@ -47,11 +47,27 @@
                             </select>
                             @error('devise') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
                         <div class="col-md-4">
-                            <label for="theme_color" class="form-label">Couleur du Thème</label>
+                            <label for="theme_color" class="form-label">Couleur Principale</label>
                             <input wire:model="theme_color" type="color" class="form-control form-control-color w-100"
                                 id="theme_color" title="Choisir une couleur">
                             @error('theme_color') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+                        <div class="col-md-4">
+                            <label for="secondary_color" class="form-label">Couleur Secondaire</label>
+                            <input wire:model="secondary_color" type="color"
+                                class="form-control form-control-color w-100" id="secondary_color"
+                                title="Choisir une couleur">
+                            @error('secondary_color') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+                        <div class="col-md-4">
+                            <label for="button_color" class="form-label">Couleur Boutons</label>
+                            <input wire:model="button_color" type="color" class="form-control form-control-color w-100"
+                                id="button_color" title="Choisir une couleur">
+                            @error('button_color') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
                     </div>
 
@@ -95,8 +111,8 @@
                         <textarea wire:model="adresse" class="form-control" id="adresse" rows="2"></textarea>
                     </div>
 
-                    @guest
-                        <h5 class="mb-3 border-bottom pb-2 mt-4">Compte Administrateur</h5>
+                    @if(!auth()->check() || auth()->user()->isSuperAdmin())
+                        <h5 class="mb-3 border-bottom pb-2 mt-4">Compte Administrateur (Gérant)</h5>
 
                         <!-- Admin Name & Email -->
                         <div class="mb-3">
@@ -127,7 +143,7 @@
                                     id="password_confirmation">
                             </div>
                         </div>
-                    @endguest
+                    @endif
 
                     <div class="d-grid">
                         <button type="submit" class="btn btn-primary btn-lg"

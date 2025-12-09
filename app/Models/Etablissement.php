@@ -49,4 +49,14 @@ class Etablissement extends Model
     {
         return $this->hasMany(Table::class);
     }
+
+    public function sections(): HasMany
+    {
+        return $this->hasMany(Section::class);
+    }
+
+    public function commandes(): HasMany
+    {
+        return $this->hasMany(Commande::class);
+    }
 }

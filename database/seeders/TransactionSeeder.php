@@ -11,7 +11,8 @@ class TransactionSeeder extends Seeder
     {
         $etablissementId = DB::table('etablissements')->first()->id;
         $sessionCaisseId = DB::table('sessions_caisse')->where('statut', 'fermee')->first()->id;
-        $userId = DB::table('users')->where('role', 'cashier')->first()->id;
+        // Use 'admin' or 'user' (Employee) instead of 'cashier'
+        $userId = DB::table('users')->where('role', '!=', 'super_admin')->first()->id;
         $factures = DB::table('factures')->get();
 
         foreach ($factures as $facture) {

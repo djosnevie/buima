@@ -1,4 +1,19 @@
 <div class="top-products-container">
+    <style>
+        .top-products-container .products-title i {
+            color: var(--primary-color) !important;
+        }
+
+        .rank-badge.rank-1 {
+            background: var(--primary-color) !important;
+            color: white !important;
+        }
+
+        .product-icon {
+            color: var(--primary-color) !important;
+            background: rgba(var(--primary-color-rgb), 0.1) !important;
+        }
+    </style>
     <div class="products-header">
         <div class="products-title">
             <i class="fas fa-fire me-2"></i>

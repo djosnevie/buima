@@ -7,6 +7,22 @@
 @endsection
 
 <div class="table-form-container">
+    <style>
+        /* Dynamic Theme Overrides for Table Form */
+        .btn-save {
+            background: var(--primary-color) !important;
+            border: none !important;
+        }
+
+        .btn-save:hover {
+            opacity: 0.9;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color) !important;
+            box-shadow: 0 0 0 0.25rem rgba(var(--primary-color-rgb), 0.15) !important;
+        }
+    </style>
     <div class="form-card">
         <form wire:submit="save">
             <div class="form-group">

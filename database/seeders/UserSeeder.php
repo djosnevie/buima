@@ -10,47 +10,48 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        $etablissementId = DB::table('etablissements')->first()->id;
+        // Ensure at least one restaurant exists
+        $etablissementId = DB::table('etablissements')->first()->id ?? DB::table('etablissements')->insertGetId([
+            'nom' => 'Restaurant BelOne',
+            'type' => 'mixte',
+            'devise' => 'XAF',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
         $users = [
             [
-                'name' => 'Admin System',
+                'name' => 'Super Admin',
+                'email' => 'superadmin@omenu.com',
+                'role' => 'super_admin',
+                'password' => Hash::make('password'),
+                'etablissement_id' => null,
+            ],
+            [
+                'name' => 'Admin Restaurant',
                 'email' => 'admin@omenu.com',
                 'role' => 'admin',
                 'password' => Hash::make('password'),
+                'etablissement_id' => $etablissementId,
             ],
             [
-                'name' => 'Jean Gérant',
-                'email' => 'gerant@omenu.com',
-                'role' => 'manager',
+                'name' => 'Serveur Pierre',
+                'email' => 'serveur@omenu.com',
+                'role' => 'user',
                 'password' => Hash::make('password'),
-            ],
-            [
-                'name' => 'Sophie Serveuse',
-                'email' => 'service@omenu.com',
-                'role' => 'server',
-                'password' => Hash::make('password'),
-            ],
-            [
-                'name' => 'Marc Cuisine',
-                'email' => 'cuisine@omenu.com',
-                'role' => 'kitchen',
-                'password' => Hash::make('password'),
-            ],
-            [
-                'name' => 'Lucie Caisse',
-                'email' => 'caisse@omenu.com',
-                'role' => 'cashier',
-                'password' => Hash::make('password'),
+                'etablissement_id' => $etablissementId,
             ],
         ];
 
         foreach ($users as $user) {
-            DB::table('users')->insert(array_merge($user, [
-                'email_verified_at' => now(),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]));
+            DB::table('users')->updateOrInsert(
+                ['email' => $user['email']],
+                array_merge($user, [
+                    'email_verified_at' => now(),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ])
+            );
         }
     }
 }

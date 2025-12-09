@@ -25,7 +25,7 @@
                 {{ auth()->user()->etablissement->theme_color ?? '#ff6b35' }}
             ;
             --secondary-color:
-                {{ auth()->user()->etablissement->secondary_color ?? '#ffffff' }}
+                {{ auth()->user()->etablissement->secondary_color ?? '#ff9f43' }}
             ;
             --button-color:
                 {{ auth()->user()->etablissement->button_color ?? '#ff6b35' }}
@@ -74,7 +74,7 @@
         <div class="sidebar-brand text-center">
             @if(auth()->user()->etablissement && auth()->user()->etablissement->logo)
                 <img src="{{ asset('storage/' . auth()->user()->etablissement->logo) }}" alt="Logo" class="mb-2"
-                    style="width: 50px; height: 50px; object-fit: cover; mix-blend-mode: multiply;">
+                    style="width: 50px; height: 50px; object-fit: cover;">
                 <h5 class="text-white mb-0 fw-bold">{{ auth()->user()->etablissement->nom }}</h5>
             @else
                 <h3 class="text-white mb-0">
@@ -83,54 +83,86 @@
             @endif
         </div>
         <nav class="nav flex-column">
-            <div class="nav-item">
-                <a href="{{ route('dashboard') }}"
-                    class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                    <i class="fas fa-home"></i>
-                    <span>Tableau de bord</span>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="{{ route('orders.create') }}"
-                    class="nav-link {{ request()->routeIs('orders.create') ? 'active' : '' }}">
-                    <i class="fas fa-plus-circle"></i>
-                    <span>Nouvelle Commande</span>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="{{ route('orders.index') }}"
-                    class="nav-link {{ request()->routeIs('orders.index') ? 'active' : '' }}">
-                    <i class="fas fa-list-alt"></i>
-                    <span>Commandes</span>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="{{ route('products.index') }}"
-                    class="nav-link {{ request()->routeIs('products.*') ? 'active' : '' }}">
-                    <i class="fas fa-box"></i>
-                    <span>Produits</span>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="{{ route('tables.index') }}"
-                    class="nav-link {{ request()->routeIs('tables.*') ? 'active' : '' }}">
-                    <i class="fas fa-table"></i>
-                    <span>Tables</span>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a class="nav-link" href="#">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Rapports</span>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a class="nav-link {{ request()->routeIs('settings.*') ? 'active' : '' }}"
-                    href="{{ route('settings.restaurant') }}">
-                    <i class="fas fa-cog"></i>
-                    <span>Paramètres</span>
-                </a>
-            </div>
+            @if(!auth()->user()->isSuperAdmin())
+                <div class="nav-item">
+                    <a href="{{ route('dashboard') }}"
+                        class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                        <i class="fas fa-home"></i>
+                        <span>Tableau de bord</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ route('orders.create') }}"
+                        class="nav-link {{ request()->routeIs('orders.create') ? 'active' : '' }}">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Nouvelle Commande</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ route('orders.index') }}"
+                        class="nav-link {{ request()->routeIs('orders.index') ? 'active' : '' }}">
+                        <i class="fas fa-list-alt"></i>
+                        <span>Commandes</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ route('products.index') }}"
+                        class="nav-link {{ request()->routeIs('products.*') ? 'active' : '' }}">
+                        <i class="fas fa-box"></i>
+                        <span>Produits</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ route('tables.index') }}"
+                        class="nav-link {{ request()->routeIs('tables.*') ? 'active' : '' }}">
+                        <i class="fas fa-table"></i>
+                        <span>Tables</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Rapports</span>
+                    </a>
+                </div>
+            @endif
+            @if(auth()->user()->isSuperAdmin())
+                <div class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('super_admin.dashboard') ? 'active' : '' }}"
+                        href="{{ route('super_admin.dashboard') }}">
+                        <i class="fas fa-store"></i>
+                        <span>Restaurants</span>
+                    </a>
+                </div>
+            @endif
+            @if(auth()->user()->isAdmin())
+                <div class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('settings.*') && !request()->routeIs('settings.sections') && !request()->routeIs('settings.users') ? 'active' : '' }}"
+                        href="{{ route('settings.restaurant') }}">
+                        <i class="fas fa-cog"></i>
+                        <span>Paramètres</span>
+                    </a>
+                </div>
+            @endif
+
+            @if(auth()->user()->isAdmin())
+
+                <div class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('settings.sections') ? 'active' : '' }}"
+                        href="{{ route('settings.sections') }}">
+                        <i class="fas fa-layer-group"></i>
+                        <span>Sections</span>
+                    </a>
+                </div>
+
+                <div class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('settings.users') ? 'active' : '' }}"
+                        href="{{ route('settings.users') }}">
+                        <i class="fas fa-users"></i>
+                        <span>Personnel</span>
+                    </a>
+                </div>
+            @endif
         </nav>
     </div>
 
@@ -165,7 +197,9 @@
                         <i class="fas fa-chevron-down text-muted small ms-1"></i>
                     </div>
                     <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2">
-                        <li><a class="dropdown-item py-2" href="#"><i class="fas fa-user me-2 text-muted"></i>Profil</a>
+                        <li><a class="dropdown-item py-2" href="#"
+                                onclick="Livewire.dispatch('open-profile-modal'); return false;"><i
+                                    class="fas fa-user me-2 text-muted"></i>Profil</a>
                         </li>
                         <li><a class="dropdown-item py-2" href="{{ route('settings.restaurant') }}"><i
                                     class="fas fa-cog me-2 text-muted"></i>Paramètres</a></li>
@@ -192,6 +226,15 @@
                     </ol>
                 </nav>
             @endif
+
+            @if (session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+
             {{ $slot ?? '' }}
             @yield('content')
         </div>
@@ -200,6 +243,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     @livewireScripts
+    <livewire:profile.edit-profile />
 </body>
 
 </html>

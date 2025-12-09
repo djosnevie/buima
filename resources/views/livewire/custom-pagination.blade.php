@@ -104,18 +104,18 @@
     }
 
     .page-link:hover {
-        background: #fff7ed;
-        border-color: #ff9f43;
-        color: #ff9f43;
+        background: #fdfdfd;
+        border-color: var(--primary-color);
+        color: var(--primary-color);
         transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(255, 159, 67, 0.2);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
     .page-item.active .page-link {
-        background: linear-gradient(135deg, #ff9f43, #ee5253);
-        border-color: #ff9f43;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        border-color: var(--primary-color);
         color: white;
-        box-shadow: 0 4px 12px rgba(255, 159, 67, 0.4);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
     .page-item.disabled .page-link {

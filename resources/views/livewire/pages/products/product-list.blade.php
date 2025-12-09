@@ -6,6 +6,48 @@
 @endsection
 
 <div class="products-management">
+    <style>
+        /* Dynamic Theme Overrides for Product List */
+        .filter-btn.active {
+            background: var(--primary-color) !important;
+            border-color: var(--primary-color) !important;
+            color: white !important;
+        }
+
+        .filter-btn:hover:not(.active) {
+            color: var(--primary-color) !important;
+            background: rgba(255, 159, 67, 0.05);
+        }
+
+        .btn-add {
+            background: var(--primary-color) !important;
+            border: none !important;
+        }
+
+        .btn-add:hover {
+            opacity: 0.9;
+        }
+
+        .price {
+            color: var(--primary-color) !important;
+        }
+
+        .category-badge {
+            background: var(--secondary-color) !important;
+            color: white !important;
+            /* Ensure contrast */
+        }
+
+        .btn-edit {
+            color: var(--primary-color) !important;
+            background: rgba(var(--primary-color-rgb), 0.1) !important;
+        }
+
+        .btn-edit:hover {
+            background: var(--primary-color) !important;
+            color: white !important;
+        }
+    </style>
     @if (session()->has('error'))
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <i class="fas fa-exclamation-circle me-2"></i>{{ session('error') }}

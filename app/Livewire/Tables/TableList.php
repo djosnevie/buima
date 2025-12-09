@@ -50,7 +50,7 @@ class TableList extends Component
 
     public function render()
     {
-        $query = Table::query();
+        $query = Table::where('etablissement_id', auth()->user()->etablissement_id);
 
         if ($this->search) {
             $query->where('numero', 'like', '%' . $this->search . '%');

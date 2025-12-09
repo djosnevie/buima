@@ -7,6 +7,35 @@
 @endsection
 
 <div class="product-form-container">
+    <style>
+        /* Dynamic Theme Overrides for Product Form */
+        .btn-save {
+            background: var(--primary-color) !important;
+            border: none !important;
+        }
+
+        .btn-save:hover {
+            opacity: 0.9;
+        }
+
+        .upload-btn {
+            color: var(--primary-color) !important;
+            border-color: var(--primary-color) !important;
+        }
+
+        .upload-btn:hover {
+            background: rgba(var(--primary-color-rgb), 0.05) !important;
+        }
+
+        .switch input:checked+.slider {
+            background-color: var(--primary-color) !important;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color) !important;
+            box-shadow: 0 0 0 0.25rem rgba(var(--primary-color-rgb), 0.15) !important;
+        }
+    </style>
     <div class="form-card">
         <form wire:submit="save">
             <div class="form-grid">
@@ -43,7 +72,7 @@
                     <div class="form-group">
                         <label>Catégorie</label>
                         <select wire:model="categorie_id" class="form-control">
-                            <option value="">Sélectionner une catégorie</option>
+                            <option value="">Aucune catégorie</option>
                             @foreach($categories as $category)
                                 <option value="{{ $category->id }}">{{ $category->nom }}</option>
                             @endforeach

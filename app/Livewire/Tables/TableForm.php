@@ -39,7 +39,7 @@ class TableForm extends Component
             'numero' => $this->numero,
             'capacite' => $this->capacite,
             'statut' => $this->statut,
-            'etablissement_id' => 1, // Default establishment
+            'etablissement_id' => auth()->user()->etablissement_id,
         ];
 
         if ($this->table) {

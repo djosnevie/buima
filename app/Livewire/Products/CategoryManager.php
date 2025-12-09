@@ -27,7 +27,9 @@ class CategoryManager extends Component
 
     public function loadCategories()
     {
-        $this->categories = Categorie::orderBy('ordre')->get();
+        $this->categories = Categorie::where('etablissement_id', auth()->user()->etablissement_id)
+            ->orderBy('ordre')
+            ->get();
     }
 
     public function save()
@@ -38,7 +40,7 @@ class CategoryManager extends Component
             'nom' => $this->nom,
             'type' => $this->type,
             'couleur' => $this->couleur,
-            'etablissement_id' => 1, // Default
+            'etablissement_id' => auth()->user()->etablissement_id,
         ];
 
         if ($this->editingId) {

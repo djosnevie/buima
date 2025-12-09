@@ -1,4 +1,28 @@
 <div class="category-manager">
+    <style>
+        /* Dynamic Theme Overrides for Category Manager */
+        .btn-save {
+            background: var(--primary-color) !important;
+            border: none !important;
+        }
+
+        .btn-save:hover {
+            opacity: 0.9;
+        }
+
+        .btn-icon.edit:hover {
+            color: var(--primary-color) !important;
+        }
+
+        .color-input:checked {
+            border-color: var(--primary-color) !important;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color) !important;
+            box-shadow: 0 0 0 0.25rem rgba(var(--primary-color-rgb), 0.15) !important;
+        }
+    </style>
     <div class="manager-header">
         <h3>Gérer les Catégories</h3>
         <button wire:click="$parent.toggleCategoryManager" class="btn-close-modal">

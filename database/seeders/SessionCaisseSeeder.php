@@ -10,7 +10,9 @@ class SessionCaisseSeeder extends Seeder
     public function run(): void
     {
         $caisseId = DB::table('caisses')->first()->id;
-        $userId = DB::table('users')->where('role', 'cashier')->first()->id;
+        // Use 'admin' or 'user' (Employee) instead of 'cashier' which doesn't exist anymore
+        // We pick the first user who is NOT a super admin
+        $userId = DB::table('users')->where('role', '!=', 'super_admin')->first()->id;
 
         // Session fermée hier
         DB::table('sessions_caisse')->insert([

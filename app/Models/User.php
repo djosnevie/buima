@@ -23,6 +23,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'etablissement_id',
+        'section_id',
     ];
 
     /**
@@ -65,5 +68,34 @@ class User extends Authenticatable
     public function etablissement(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Etablissement::class);
+    }
+
+    public function section(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Section::class);
+    }
+
+    // Role Helpers
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'super_admin';
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin' || $this->isSuperAdmin();
+    }
+
+    public function isUser(): bool
+    {
+        return $this->role === 'user';
+    }
+
+    public function hasAccessToSection($sectionId): bool
+    {
+        if ($this->isAdmin()) {
+            return true;
+        }
+        return $this->section_id == $sectionId;
     }
 }

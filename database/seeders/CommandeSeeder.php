@@ -10,7 +10,8 @@ class CommandeSeeder extends Seeder
     public function run(): void
     {
         $etablissementId = DB::table('etablissements')->first()->id;
-        $userId = DB::table('users')->where('role', 'server')->first()->id;
+        // Use 'admin' or 'user' (Employee) instead of 'server'
+        $userId = DB::table('users')->where('role', '!=', 'super_admin')->first()->id;
         $tableId = DB::table('tables')->first()->id;
         $produits = DB::table('produits')->limit(3)->get();
 
@@ -59,9 +60,9 @@ class CommandeSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-        
+
         foreach ($produits as $p) {
-             DB::table('commande_items')->insert([
+            DB::table('commande_items')->insert([
                 'commande_id' => $commandeId,
                 'produit_id' => $p->id,
                 'quantite' => 1,

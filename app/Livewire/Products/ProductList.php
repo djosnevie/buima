@@ -50,6 +50,7 @@ class ProductList extends Component
     public function render()
     {
         $query = Produit::with('categorie')
+            ->where('etablissement_id', auth()->user()->etablissement_id)
             ->latest();
 
         if ($this->search) {

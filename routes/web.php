@@ -51,19 +51,32 @@ Route::get('/setup/restaurant', \App\Livewire\Setup\RestaurantCreate::class)->na
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 
-    Volt::route('settings/profile', 'settings.profile')->name('profile.edit');
-    Volt::route('settings/password', 'settings.password')->name('user-password.edit');
-    Volt::route('settings/appearance', 'settings.appearance')->name('appearance.edit');
-    Route::get('settings/restaurant', \App\Livewire\Admin\Settings\RestaurantSettings::class)->name('settings.restaurant');
+    Route::middleware(['is_admin'])->group(function () {
+        Volt::route('settings/profile', 'settings.profile')->name('profile.edit');
+        Volt::route('settings/password', 'settings.password')->name('user-password.edit');
+        Volt::route('settings/appearance', 'settings.appearance')->name('appearance.edit');
+        Route::get('settings/restaurant', \App\Livewire\Admin\Settings\RestaurantSettings::class)->name('settings.restaurant');
 
-    Volt::route('settings/two-factor', 'settings.two-factor')
-        ->middleware(
-            when(
-                Features::canManageTwoFactorAuthentication()
-                && Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword'),
-                ['password.confirm'],
-                [],
-            ),
-        )
-        ->name('two-factor.show');
+        Volt::route('settings/two-factor', 'settings.two-factor')
+            ->middleware(
+                when(
+                    Features::canManageTwoFactorAuthentication()
+                    && Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword'),
+                    ['password.confirm'],
+                    [],
+                ),
+            )
+            ->name('two-factor.show');
+
+        // Section Management
+        Route::get('settings/sections', \App\Livewire\Admin\Sections\SectionManager::class)->name('settings.sections');
+
+        // User Management
+        Route::get('settings/users', \App\Livewire\Admin\Users\UserManager::class)->name('settings.users');
+    });
+
+    // Super Admin Dashboard
+    Route::get('/admin/dashboard', \App\Livewire\Admin\Dashboard\SuperAdminDashboard::class)
+        ->middleware(['is_super_admin'])
+        ->name('super_admin.dashboard');
 });

@@ -6,6 +6,48 @@
 @endsection
 
 <div class="tables-management">
+    <style>
+        /* Dynamic Theme Overrides for Table List */
+        .filter-btn.active {
+            background: var(--primary-color) !important;
+            border-color: var(--primary-color) !important;
+            color: white !important;
+        }
+
+        .filter-btn:hover:not(.active) {
+            color: var(--primary-color) !important;
+            background: rgba(255, 159, 67, 0.05);
+        }
+
+        .btn-add {
+            background: var(--primary-color) !important;
+            border: none !important;
+        }
+
+        .btn-add:hover {
+            opacity: 0.9;
+        }
+
+        .btn-order {
+            color: var(--primary-color) !important;
+            border-color: var(--primary-color) !important;
+        }
+
+        .btn-order:hover {
+            background: var(--primary-color) !important;
+            color: white !important;
+        }
+
+        .btn-icon.edit {
+            color: var(--primary-color) !important;
+            background: rgba(255, 159, 67, 0.1) !important;
+        }
+
+        .btn-icon.edit:hover {
+            background: var(--primary-color) !important;
+            color: white !important;
+        }
+    </style>
     @if (session()->has('error'))
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <i class="fas fa-exclamation-circle me-2"></i>{{ session('error') }}

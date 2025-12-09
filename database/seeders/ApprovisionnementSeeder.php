@@ -11,7 +11,8 @@ class ApprovisionnementSeeder extends Seeder
     {
         $etablissementId = DB::table('etablissements')->first()->id;
         $fournisseurId = DB::table('fournisseurs')->first()->id;
-        $userId = DB::table('users')->where('role', 'manager')->first()->id;
+        // Use 'admin' or 'user' (Employee) instead of 'manager'
+        $userId = DB::table('users')->where('role', '!=', 'super_admin')->first()->id;
         $ingredientId = DB::table('ingredients')->first()->id;
 
         $approId = DB::table('approvisionnements')->insertGetId([
