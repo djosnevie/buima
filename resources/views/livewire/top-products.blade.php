@@ -25,8 +25,9 @@
                             {{ $item->total_quantity }} vendus
                         </span>
                         <span class="stat-revenue">
-                            <i class="fas fa-xfa-sign"></i>
-                            {{ number_format($item->total_revenue, 2) }}
+                            <i class="fas fa-money-bill-wave"></i>
+                            {{ number_format($item->total_revenue, 2, ',', ' ') }}
+                            {{ auth()->user()->etablissement->devise ?? 'XAF' }}
                         </span>
                     </div>
                 </div>

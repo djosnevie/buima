@@ -47,6 +47,11 @@ class Commande extends Model
         return $this->belongsTo(Table::class);
     }
 
+    public function etablissement(): BelongsTo
+    {
+        return $this->belongsTo(Etablissement::class);
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

@@ -113,7 +113,7 @@
                         </div>
                         <div class="product-info">
                             <h6 class="product-title">{{ $produit->nom }}</h6>
-                            <div class="product-price">CFA{{ number_format($produit->prix_vente, 2) }}</div>
+                            <div class="product-price">{{ number_format($produit->prix_vente, 0, ',', ' ') }} {{ auth()->user()->etablissement->devise ?? 'XAF' }}</div>
                         </div>
                     </div>
                 @empty
@@ -169,12 +169,12 @@
                                     </div>
                                     <div class="item-details ms-2">
                                         <div class="fw-bold">{{ $item['nom'] }}</div>
-                                        <div class="text-muted small">CFA{{ number_format($item['prix_unitaire'], 2) }}</div>
+                                        <div class="text-muted small">{{ number_format($item['prix_unitaire'], 0, ',', ' ') }} {{ auth()->user()->etablissement->devise ?? 'XAF' }}</div>
                                     </div>
                                 </div>
                                 <div class="text-end">
                                     <div class="fw-bold">
-                                        CFA{{ number_format($item['prix_unitaire'] * $item['quantite'], 2) }}
+                                        {{ number_format($item['prix_unitaire'] * $item['quantite'], 0, ',', ' ') }} {{ auth()->user()->etablissement->devise ?? 'XAF' }}
                                     </div>
                                     <button class="btn btn-link text-danger p-0 small text-decoration-none"
                                         wire:click="removeFromCart({{ $item['produit_id'] }})">
@@ -194,15 +194,15 @@
                     <div class="p-3 bg-light border-top">
                         <div class="d-flex justify-content-between mb-2">
                             <span class="text-muted">Sous-total</span>
-                            <span class="fw-bold">CFA{{ number_format($this->subtotal, 2) }}</span>
+                            <span class="fw-bold">{{ number_format($this->subtotal, 0, ',', ' ') }} {{ auth()->user()->etablissement->devise ?? 'XAF' }}</span>
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <span class="text-muted">TVA (10%)</span>
-                            <span>CFA{{ number_format($this->taxes, 2) }}</span>
+                            <span>{{ number_format($this->taxes, 0, ',', ' ') }} {{ auth()->user()->etablissement->devise ?? 'XAF' }}</span>
                         </div>
                         <div class="d-flex justify-content-between mb-3 pt-2 border-top">
                             <span class="h5 mb-0">Total</span>
-                            <span class="h5 mb-0 text-primary">CFA{{ number_format($this->total, 2) }}</span>
+                            <span class="h5 mb-0 text-primary">{{ number_format($this->total, 0, ',', ' ') }} {{ auth()->user()->etablissement->devise ?? 'XAF' }}</span>
                         </div>
 
                         <div class="mb-3">

@@ -45,12 +45,16 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/tables/{table}/edit', \App\Livewire\Tables\TableForm::class)->name('tables.edit');
 });
 
+// Restaurant Setup
+Route::get('/setup/restaurant', \App\Livewire\Setup\RestaurantCreate::class)->name('setup.restaurant');
+
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 
     Volt::route('settings/profile', 'settings.profile')->name('profile.edit');
     Volt::route('settings/password', 'settings.password')->name('user-password.edit');
     Volt::route('settings/appearance', 'settings.appearance')->name('appearance.edit');
+    Route::get('settings/restaurant', \App\Livewire\Admin\Settings\RestaurantSettings::class)->name('settings.restaurant');
 
     Volt::route('settings/two-factor', 'settings.two-factor')
         ->middleware(

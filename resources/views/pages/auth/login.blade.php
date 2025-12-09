@@ -4,21 +4,33 @@
     </div>
 
     <form wire:submit.prevent="login">
-        <div class="form-floating mb-4">
-            <input wire:model="email" type="email" class="form-control @error('email') is-invalid @enderror" id="emailInput" placeholder="name@example.com">
+        <div class="form-floating mb-3">
+            <input wire:model="email" type="email" class="form-control @error('email') is-invalid @enderror"
+                id="emailInput" placeholder="nom@exemple.com">
             <label for="emailInput"><i class="fas fa-user me-2"></i> Email</label>
             @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>
 
-        <div class="form-floating mb-5">
-            <input wire:model="password" type="password" class="form-control @error('password') is-invalid @enderror" id="passwordInput" placeholder="Password">
-            <label for="passwordInput"><i class="fas fa-lock me-2"></i> Password</label>
+        <div class="form-floating mb-4">
+            <input wire:model="password" type="password" class="form-control @error('password') is-invalid @enderror"
+                id="passwordInput" placeholder="Mot de passe">
+            <label for="passwordInput"><i class="fas fa-lock me-2"></i> Mot de passe</label>
             @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>
 
-        <button type="submit" class="btn btn-primary mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="form-check">
+                <input wire:model="remember" class="form-check-input" type="checkbox" id="rememberCheck">
+                <label class="form-check-label" for="rememberCheck">
+                    Se souvenir de moi
+                </label>
+            </div>
+            <a href="#" class="text-decoration-none small">Mot de passe oublié ?</a>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">
             <span wire:loading.remove>Se connecter</span>
-            <span wire:loading>Loading...</span>
+            <span wire:loading><i class="fas fa-spinner fa-spin"></i> Connexion...</span>
         </button>
     </form>
 </div>

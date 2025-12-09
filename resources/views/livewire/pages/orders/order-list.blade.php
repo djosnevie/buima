@@ -114,7 +114,9 @@
                 </div>
 
                 <div class="order-footer">
-                    <div class="total">€{{ number_format($commande->total, 2) }}</div>
+                    <div class="total">{{ number_format($commande->total, 0, ',', ' ') }}
+                        {{ auth()->user()->etablissement->devise ?? 'XAF' }}
+                    </div>
                     <div class="actions">
                         @if($commande->statut === 'en_attente')
                             <button wire:click="updateStatus({{ $commande->id }}, 'en_preparation')" class="btn-action btn-cook"
@@ -209,8 +211,9 @@
                                         <span class="item-qty">{{ $item->quantite }}</span>
                                         <span class="item-name">{{ $item->produit->nom }}</span>
                                     </div>
-                                    <span class="item-price">{{ number_format($item->prix_unitaire * $item->quantite, 2) }}
-                                        €</span>
+                                    <span
+                                        class="item-price">{{ number_format($item->prix_unitaire * $item->quantite, 0, ',', ' ') }}
+                                        {{ auth()->user()->etablissement->devise ?? 'XAF' }}</span>
                                 </div>
                             @endforeach
                         </div>
@@ -227,7 +230,8 @@
                 <div class="panel-footer">
                     <div class="total-row">
                         <span>Total</span>
-                        <span>{{ number_format($selectedOrder->total, 2) }} €</span>
+                        <span>{{ number_format($selectedOrder->total, 0, ',', ' ') }}
+                            {{ auth()->user()->etablissement->devise ?? 'XAF' }}</span>
                     </div>
 
                     <div class="panel-section">

@@ -51,7 +51,7 @@
             <div class="product-card">
                 <div class="product-image">
                     @if($produit->image)
-                        <img src="{{ asset('public/' . $produit->image) }}" alt="{{ $produit->nom }}">
+                        <img src="{{ asset('storage/' . $produit->image) }}" alt="{{ $produit->nom }}">
                     @else
                         <div class="placeholder-image">
                             <i class="fas fa-utensils"></i>
@@ -64,7 +64,8 @@
                     <h3>{{ $produit->nom }}</h3>
                     <p class="description">{{ Str::limit($produit->description, 50) }}</p>
                     <div class="price-row">
-                        <span class="price">CFA {{ number_format($produit->prix_vente, 2) }}</span>
+                        <span class="price">{{ number_format($produit->prix_vente, 0, ',', ' ') }}
+                            {{ auth()->user()->etablissement->devise ?? 'XAF' }}</span>
                         <span class="status {{ $produit->disponible ? 'active' : 'inactive' }}">
                             {{ $produit->disponible ? 'Disponible' : 'Indisponible' }}
                         </span>

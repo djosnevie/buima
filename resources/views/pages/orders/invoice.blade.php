@@ -123,12 +123,22 @@
 </head>
 
 <body>
+    @php
+        $etablissement = auth()->user()->etablissement ?? $commande->etablissement;
+    @endphp
     <div class="ticket">
         <div class="header">
-            <h2>O'Menu</h2>
-            <p>54 Félix Eboué, Centre-Ville, Brazzaville</p>
-            <p>(En face du Kempinski Hotel, à côté d'Ecobank)</p>
-            <p>Tél: 067737037</p>
+            @if($etablissement && $etablissement->logo)
+                <img src="{{ asset('storage/' . $etablissement->logo) }}" alt="Logo"
+                    style="max-width: 80px; max-height: 80px; margin-bottom: 10px; border-radius: 50%;">
+            @endif
+
+            <h2 style="{{ $etablissement && $etablissement->logo ? 'margin-top: 5px;' : '' }}">
+                {{ $etablissement->nom ?? "O'Menu" }}
+            </h2>
+
+            <p>{{ $etablissement->adresse ?? 'Adresse non configurée' }}</p>
+            <p>Tél: {{ $etablissement->telephone ?? 'Non spécifié' }}</p>
         </div>
 
         <div class="invoice-content">
@@ -136,6 +146,12 @@
                 <div>Date: {{ $commande->created_at->format('d/m/Y H:i') }}</div>
                 <div>Commande: #{{ substr($commande->numero_commande, -4) }}</div>
                 <div>Serveur: {{ $commande->user->name }}</div>
+                @if($commande->client_nom)
+                    <div>Client: {{ $commande->client_nom }}</div>
+                @endif
+                @if($commande->client_telephone)
+                    <div>Tél Client: {{ $commande->client_telephone }}</div>
+                @endif
                 @if($commande->table)
                     <div>Table: {{ $commande->table->numero }}</div>
                 @endif
@@ -154,17 +170,24 @@
                         <tr>
                             <td>{{ $item->quantite }}x</td>
                             <td>{{ $item->produit->nom }}</td>
-                            <td class="text-right">{{ number_format($item->sous_total, 0, ',', ' ') }} CFA</td>
+                            <td class="text-right">{{ number_format($item->sous_total, 0, ',', ' ') }}
+                                {{ $etablissement->devise ?? 'XAF' }}
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
 
             <div class="totals">
-                <div>Sous-total: {{ number_format($commande->sous_total, 0, ',', ' ') }} CFA</div>
-                <div>TVA (10%): {{ number_format($commande->montant_taxes, 0, ',', ' ') }} CFA</div>
+                <div>Sous-total: {{ number_format($commande->sous_total, 0, ',', ' ') }}
+                    {{ $etablissement->devise ?? 'XAF' }}
+                </div>
+                <div>TVA (10%): {{ number_format($commande->montant_taxes, 0, ',', ' ') }}
+                    {{ $etablissement->devise ?? 'XAF' }}
+                </div>
                 <div class="grand-total">
-                    TOTAL: {{ number_format($commande->total, 0, ',', ' ') }} CFA
+                    TOTAL: {{ number_format($commande->total, 0, ',', ' ') }}
+                    {{ $etablissement->devise ?? 'XAF' }}
                 </div>
             </div>
 
