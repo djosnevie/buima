@@ -75,8 +75,9 @@
     <div class="sidebar">
         <div class="sidebar-brand text-center">
             @if(auth()->user()->etablissement && auth()->user()->etablissement->logo)
-                <img src="{{ asset('storage/' . auth()->user()->etablissement->logo) }}" alt="Logo" class="mb-2"
-                    style="width: 50px; height: 50px; object-fit: cover;">
+                <img src="{{ asset('images/' . auth()->user()->etablissement->logo) }}"
+                    onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->etablissement->nom) }}&background=random';"
+                    alt="Logo" class="mb-2" style="width: 50px; height: 50px; object-fit: cover;">
                 <h5 class="text-white mb-0 fw-bold">{{ auth()->user()->etablissement->nom }}</h5>
             @else
                 <h3 class="text-white mb-0">

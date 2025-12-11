@@ -93,7 +93,9 @@
             <div class="product-card">
                 <div class="product-image">
                     @if($produit->image)
-                        <img src="{{ asset('storage/' . $produit->image) }}" alt="{{ $produit->nom }}">
+                        <img src="{{ asset('images/' . $produit->image) }}"
+                            onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'placeholder-image\'><i class=\'fas fa-utensils\'></i></div>';"
+                            alt="{{ $produit->nom }}">
                     @else
                         <div class="placeholder-image">
                             <i class="fas fa-utensils"></i>

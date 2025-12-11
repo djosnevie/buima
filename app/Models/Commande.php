@@ -70,6 +70,11 @@ class Commande extends Model
         $this->save();
     }
 
+    public function updateTotal(): void
+    {
+        $this->calculateTotal();
+    }
+
     public static function generateOrderNumber(): string
     {
         return 'CMD-' . now()->format('Ymd') . '-' . str_pad(static::whereDate('created_at', today())->count() + 1, 4, '0', STR_PAD_LEFT);

@@ -45,7 +45,12 @@
                         @if($newImage)
                             <img src="{{ $newImage->temporaryUrl() }}">
                         @elseif($image)
-                            <img src="{{ asset('storage/' . $image) }}">
+                            <img src="{{ asset('images/' . $image) }}"
+                                onerror="this.onerror=null; this.nextElementSibling.style.display='flex'; this.style.display='none';">
+                            <div class="placeholder" style="display: none;">
+                                <i class="fas fa-camera"></i>
+                                <span>Image indisponible</span>
+                            </div>
                         @else
                             <div class="placeholder">
                                 <i class="fas fa-camera"></i>
@@ -81,7 +86,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Prix de vente (CFA)</label>
+                        <label>Prix de vente ({{ auth()->user()->etablissement->devise ?? 'XAF' }})</label>
                         <input type="number" step="0.01" wire:model="prix_vente" class="form-control"
                             placeholder="0.00">
                         @error('prix_vente') <span class="error-msg">{{ $message }}</span> @enderror

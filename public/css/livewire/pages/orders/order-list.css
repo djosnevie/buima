@@ -593,3 +593,122 @@
         transform: translateX(0);
     }
 }
+/* Edit Mode Styles */
+.edit-form {
+    background: #f8fafc;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.edit-form .form-group {
+    margin-bottom: 1.25rem;
+}
+
+.edit-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #4b5563;
+    font-size: 0.9rem;
+}
+
+.edit-form .form-control {
+    width: 100%;
+    padding: 0.625rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+}
+
+.edit-form .form-control:focus {
+    border-color: #ff9f43;
+    box-shadow: 0 0 0 3px rgba(255, 159, 67, 0.1);
+    outline: none;
+}
+
+.order-item.editing {
+    background: white;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 0.5rem;
+    transition: all 0.2s;
+}
+
+.order-item.editing:hover {
+    border-color: #ff9f43;
+    transform: translateX(2px);
+}
+
+.qty-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.qty-display {
+    font-weight: 600;
+    min-width: 20px;
+    text-align: center;
+}
+
+.btn-qty {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    color: #4b5563;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-qty:hover {
+    background: #ff9f43;
+    color: white;
+    border-color: #ff9f43;
+}
+
+.btn-remove-item {
+    background: none;
+    border: none;
+    color: #ef4444;
+    cursor: pointer;
+    padding: 0.25rem;
+    opacity: 0.7;
+    transition: all 0.2s;
+}
+
+.btn-remove-item:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.header-actions-panel {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: none;
+    background: #f3f4f6;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-icon:hover {
+    background: #ff9f43;
+    color: white;
+}
+

@@ -19,9 +19,10 @@
     <div class="col-md-4">
         <div class="stat-card">
             <div class="icon blue">
-                <i class="fas fa-euro-sign"></i>
+                <i class="fas fa-coins"></i>
             </div>
-            <div class="stat-value">€{{ number_format($revenueToday, 2) }}</div>
+            <div class="stat-value">{{ number_format($revenueToday, 0, ',', ' ') }}
+                {{ auth()->user()->etablissement->devise ?? 'XAF' }}</div>
             <div class="stat-label">Chiffre d'affaires</div>
         </div>
     </div>

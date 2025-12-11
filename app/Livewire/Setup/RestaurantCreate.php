@@ -75,7 +75,7 @@ class RestaurantCreate extends Component
         try {
             $logoPath = null;
             if ($this->logo) {
-                $logoPath = $this->logo->store('logos', 'public');
+                $logoPath = $this->logo->store('logos', 'public_uploads');
             }
 
             $etablissement = Etablissement::create([

@@ -145,7 +145,7 @@
             <div class="info">
                 <div>Date: {{ $commande->created_at->format('d/m/Y H:i') }}</div>
                 <div>Commande: #{{ substr($commande->numero_commande, -4) }}</div>
-                <div>Serveur: {{ $commande->user->name }}</div>
+                <div>Serveur: {{ auth()->user()->name }}</div>
                 @if($commande->client_nom)
                     <div>Client: {{ $commande->client_nom }}</div>
                 @endif

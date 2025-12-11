@@ -33,7 +33,7 @@
                     </div>
                 </div>
                 <div class="product-info">
-                    <div class="product-name">{{ $item->produit->nom }}</div>
+                    <div class="product-name">{{ $item->produit->nom ?? 'Produit inconnu' }}</div>
                     <div class="product-stats">
                         <span class="stat-quantity">
                             <i class="fas fa-shopping-cart"></i>

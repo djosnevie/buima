@@ -74,14 +74,6 @@
                     class="filter-btn {{ $filterStatus === 'en_attente' ? 'active' : '' }}">
                     En attente
                 </button>
-                <button wire:click="setFilter('en_preparation')"
-                    class="filter-btn {{ $filterStatus === 'en_preparation' ? 'active' : '' }}">
-                    En cuisine
-                </button>
-                <button wire:click="setFilter('prete')"
-                    class="filter-btn {{ $filterStatus === 'prete' ? 'active' : '' }}">
-                    Prêt
-                </button>
                 <button wire:click="setFilter('servie')"
                     class="filter-btn {{ $filterStatus === 'servie' ? 'active' : '' }}">
                     Servie
@@ -106,14 +98,12 @@
                         <span class="status-badge-header status-{{ $commande->statut }}">
                             @if($commande->statut === 'en_attente')
                                 En attente
-                            @elseif($commande->statut === 'en_preparation')
-                                En cuisine
-                            @elseif($commande->statut === 'prete')
-                                Prête
                             @elseif($commande->statut === 'servie')
                                 Servie
                             @elseif($commande->statut === 'payee')
                                 Payée
+                            @elseif($commande->statut === 'annulee')
+                                Annulée
                             @endif
                         </span>
                         <div class="order-time">
@@ -160,23 +150,13 @@
                     </div>
                     <div class="actions">
                         @if($commande->statut === 'en_attente')
-                            <button wire:click="updateStatus({{ $commande->id }}, 'en_preparation')" class="btn-action btn-cook"
-                                title="Mettre en cuisine">
-                                <i class="fas fa-fire"></i>
-                            </button>
-                        @elseif($commande->statut === 'en_preparation')
-                            <button wire:click="updateStatus({{ $commande->id }}, 'prete')" class="btn-action btn-ready"
-                                title="Marquer comme prête">
-                                <i class="fas fa-check"></i>
-                            </button>
-                        @elseif($commande->statut === 'prete')
-                            <button wire:click="updateStatus({{ $commande->id }}, 'servie')" class="btn-action btn-serve"
+                            <button wire:click.stop="updateStatus({{ $commande->id }}, 'servie')" class="btn-action btn-serve"
                                 title="Marquer comme servie">
                                 <i class="fas fa-concierge-bell"></i>
                             </button>
                         @elseif($commande->statut === 'servie')
-                            <button wire:click="updateStatus({{ $commande->id }}, 'payee')" class="btn-action btn-pay"
-                                title="Marquer comme payée">
+                            <button wire:click.stop="updateStatus({{ $commande->id }}, 'payee')" class="btn-action btn-pay"
+                                title="Encaisser">
                                 <i class="fas fa-euro-sign"></i>
                             </button>
                         @endif
@@ -208,115 +188,268 @@
                 <div class="panel-header">
                     <div class="panel-title">
                         <span class="hash">#</span>{{ substr($selectedOrder->numero_commande, -4) }}
+                        @if($isEditing)
+                            <span class="badge bg-warning text-dark ms-2">Édition</span>
+                        @endif
                     </div>
-                    <button wire:click="closeSideView" class="btn-close-panel">
-                        <i class="fas fa-times"></i>
-                    </button>
+                    <div class="header-actions-panel">
+                        @if(!$isEditing && $selectedOrder->statut !== 'payee')
+                            <button wire:click="enableEdit" class="btn-icon" title="Modifier">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        @endif
+                        <button wire:click="closeSideView" class="btn-close-panel">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="panel-content">
-                    <div class="panel-section">
-                        <div class="section-title">Informations Client</div>
-                        <div class="detail-row">
-                            <span class="detail-label">Client:</span>
-                            <span class="detail-value">{{ $selectedOrder->client_nom ?: 'N/A' }}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Type:</span>
-                            <span class="detail-value">
-                                @if($selectedOrder->type_commande === 'sur_place')
-                                    Sur Place (Table {{ $selectedOrder->table->numero ?? '?' }})
-                                @else
-                                    {{ ucfirst($selectedOrder->type_commande) }}
-                                @endif
-                            </span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Statut:</span>
-                            <span class="detail-value status-text-{{ $selectedOrder->statut }}">
-                                {{ ucfirst(str_replace('_', ' ', $selectedOrder->statut)) }}
-                            </span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Date:</span>
-                            <span class="detail-value">{{ $selectedOrder->created_at->format('d/m/Y H:i') }}</span>
-                        </div>
-                    </div>
-
-                    <div class="panel-section">
-                        <div class="section-title">Articles</div>
-                        <div class="order-items-list">
-                            @foreach($selectedOrder->items as $item)
-                                <div class="order-item">
-                                    <div class="item-info">
-                                        <span class="item-qty">{{ $item->quantite }}</span>
-                                        <span class="item-name">{{ $item->produit->nom }}</span>
+                    @if($isEditing)
+                        <!-- Edit Form -->
+                        <div class="edit-form space-y-4">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Client</label>
+                                        <input type="text" wire:model="editForm.client_nom" class="form-control">
                                     </div>
-                                    <span
-                                        class="item-price">{{ number_format($item->prix_unitaire * $item->quantite, 0, ',', ' ') }}
-                                        {{ auth()->user()->etablissement->devise ?? 'XAF' }}</span>
                                 </div>
-                            @endforeach
-                        </div>
-                    </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Contact</label>
+                                        <input type="text" wire:model="editForm.client_telephone" class="form-control" placeholder="Tél...">
+                                    </div>
+                                </div>
+                            </div>
 
-                    @if($selectedOrder->notes)
-                        <div class="panel-section">
-                            <div class="section-title">Notes</div>
-                            <p class="text-gray-600 italic">{{ $selectedOrder->notes }}</p>
+                            <div class="form-group">
+                                <label>Type</label>
+                                <select wire:model.live="editForm.type_commande" class="form-control">
+                                    <option value="sur_place">Sur Place</option>
+                                    <option value="emporter">À Emporter</option>
+                                    <option value="livraison">Livraison</option>
+                                </select>
+                            </div>
+
+                            @if($editForm['type_commande'] === 'sur_place')
+                                <div class="form-group">
+                                    <label>Table</label>
+                                    <select wire:model="editForm.table_id" class="form-control">
+                                        <option value="">Choisir...</option>
+                                        @foreach($tables as $table)
+                                            <option value="{{ $table->id }}">Table {{ $table->numero }} ({{ $table->places }} pl.)</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            @endif
+
+                            <div class="form-group">
+                                <label>Notes</label>
+                                <textarea wire:model="editForm.notes" class="form-control" rows="2"></textarea>
+                            </div>
+
+                            <!-- Add Product Section -->
+                             <div class="form-group relative">
+                                <label>Ajouter un produit</label>
+                                <div class="search-container relative">
+                                    <input type="text" 
+                                           wire:model.live="productSearch" 
+                                           class="form-control" 
+                                           placeholder="Rechercher pour ajouter...">
+                                    @if(!empty($searchResults))
+                                        <div class="search-results absolute w-full bg-white shadow-lg rounded-lg mt-1 border border-gray-200 z-50">
+                                            @foreach($searchResults as $result)
+                                                <div wire:click="addProductToOrder({{ $result->id }})" 
+                                                     class="p-2 hover:bg-orange-50 cursor-pointer flex justify-between items-center border-b last:border-0 transition-colors">
+                                                    <div class="flex flex-col">
+                                                        <span class="font-medium">{{ $result->nom }}</span>
+                                                        <span class="text-xs text-gray-500">{{ $result->categorie->nom ?? 'Sans catégorie' }}</span>
+                                                    </div>
+                                                    <span class="font-bold text-orange-500">{{ number_format($result->prix_vente, 0, ',', ' ') }}</span>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
                         </div>
+
+                        <div class="panel-section mt-4">
+                            <div class="section-title">Articles (Édition)</div>
+                            <div class="order-items-list">
+                                @foreach($selectedOrder->items as $item)
+                                    <div class="order-item editing">
+                                        <div class="item-image-container me-3" style="width: 40px; height: 40px; overflow: hidden; border-radius: 8px;">
+                                            @if($item->produit->image)
+                                                <img src="{{ asset('images/' . $item->produit->image) }}" 
+                                                     onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode($item->produit->nom) }}&background=random';"
+                                                     class="w-100 h-100 object-fit-cover">
+                                            @else
+                                                <div class="w-100 h-100 bg-secondary d-flex align-items-center justify-content-center text-white">
+                                                    <i class="fas fa-utensils"></i>
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <div class="item-info flex-grow-1">
+                                            <span class="item-name">{{ $item->produit->nom }}</span>
+                                        </div>
+                                        <div class="qty-controls">
+                                            <button wire:click="updateItemQuantity({{ $item->id }}, {{ $item->quantite - 1 }})" class="btn-qty">-</button>
+                                            <span class="qty-display">{{ $item->quantite }}</span>
+                                            <button wire:click="updateItemQuantity({{ $item->id }}, {{ $item->quantite + 1 }})" class="btn-qty">+</button>
+                                            <button wire:click="removeItem({{ $item->id }})" class="btn-remove-item text-red-500 ms-2"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <div class="panel-actions mt-4 flex justify-end gap-2">
+                            <button wire:click="cancelEdit" class="btn btn-secondary btn-sm">Annuler</button>
+                            <button wire:click="saveOrder" class="btn btn-primary btn-sm">Enregistrer</button>
+                        </div>
+
+                    @else
+                        <!-- Read-only Mode -->
+                        <div class="panel-section">
+                            <div class="section-title">Informations Client</div>
+                            <div class="detail-row">
+                                <span class="detail-label">Client:</span>
+                                <span class="detail-value">{{ $selectedOrder->client_nom ?: 'N/A' }}</span>
+                            </div>
+                            @if($selectedOrder->client_telephone)
+                                <div class="detail-row">
+                                    <span class="detail-label">Contact:</span>
+                                    <span class="detail-value">{{ $selectedOrder->client_telephone }}</span>
+                                </div>
+                            @endif
+                            <div class="detail-row">
+                                <span class="detail-label">Type:</span>
+                                <span class="detail-value">
+                                    @if($selectedOrder->type_commande === 'sur_place')
+                                        Sur Place (Table {{ $selectedOrder->table->numero ?? '?' }})
+                                    @else
+                                        {{ ucfirst($selectedOrder->type_commande) }}
+                                    @endif
+                                </span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Statut:</span>
+                                <span class="detail-value status-text-{{ $selectedOrder->statut }}">
+                                    {{ ucfirst(str_replace('_', ' ', $selectedOrder->statut)) }}
+                                </span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Date:</span>
+                                <span class="detail-value">{{ $selectedOrder->created_at->format('d/m/Y H:i') }}</span>
+                            </div>
+                        </div>
+
+                        <div class="panel-section">
+                            <div class="section-title">Articles</div>
+                            <div class="order-items-list">
+                                @foreach($selectedOrder->items as $item)
+                                    <div class="order-item">
+                                        <div class="item-image-container me-3" style="width: 40px; height: 40px; overflow: hidden; border-radius: 8px;">
+                                            @if($item->produit->image)
+                                                <img src="{{ asset('images/' . $item->produit->image) }}" 
+                                                     onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode($item->produit->nom) }}&background=random';"
+                                                     class="w-100 h-100 object-fit-cover">
+                                            @else
+                                                <div class="w-100 h-100 bg-secondary d-flex align-items-center justify-content-center text-white">
+                                                    <i class="fas fa-utensils"></i>
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <div class="item-info">
+                                            <span class="item-qty">{{ $item->quantite }}</span>
+                                            <span class="item-name">{{ $item->produit->nom }}</span>
+                                        </div>
+                                        <span class="item-price">{{ number_format($item->prix_unitaire * $item->quantite, 0, ',', ' ') }} {{ auth()->user()->etablissement->devise ?? 'XAF' }}</span>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        @if($selectedOrder->notes)
+                            <div class="panel-section">
+                                <div class="section-title">Notes</div>
+                                <p class="text-gray-600 italic">{{ $selectedOrder->notes }}</p>
+                            </div>
+                        @endif
                     @endif
                 </div>
 
-                <div class="panel-footer">
-                    <div class="total-row">
-                        <span>Total</span>
-                        <span>{{ number_format($selectedOrder->total, 0, ',', ' ') }}
-                            {{ auth()->user()->etablissement->devise ?? 'XAF' }}</span>
-                    </div>
+                @if(!$isEditing)
+                    <div class="panel-footer">
+                        <div class="total-row">
+                            <span>Total</span>
+                            <span>{{ number_format($selectedOrder->total, 0, ',', ' ') }} {{ auth()->user()->etablissement->devise ?? 'XAF' }}</span>
+                        </div>
 
-                    <div class="panel-section">
-                        <div class="section-title">Changer le statut</div>
-                        <div class="status-grid">
-                            @php
-                                $statuses = [
-                                    'en_attente' => ['label' => 'En attente', 'icon' => 'clock', 'color' => 'text-orange-500 bg-orange-50 border-orange-200'],
-                                    'en_preparation' => ['label' => 'En cuisine', 'icon' => 'fire', 'color' => 'text-amber-500 bg-amber-50 border-amber-200'],
-                                    'prete' => ['label' => 'Prête', 'icon' => 'bell', 'color' => 'text-emerald-500 bg-emerald-50 border-emerald-200'],
-                                    'servie' => ['label' => 'Servie', 'icon' => 'concierge-bell', 'color' => 'text-violet-500 bg-violet-50 border-violet-200'],
-                                    'payee' => ['label' => 'Payée', 'icon' => 'check-circle', 'color' => 'text-blue-500 bg-blue-50 border-blue-200'],
-                                    'annulee' => ['label' => 'Annulée', 'icon' => 'ban', 'color' => 'text-red-500 bg-red-50 border-red-200'],
-                                ];
-                            @endphp
+                        <div class="panel-section">
+                            <div class="section-title">Changer le statut</div>
+                            
+                            @if($selectedOrder->statut === 'payee')
+                                <div class="alert alert-info py-2 text-sm">
+                                    <i class="fas fa-lock me-2"></i> Commande verrouillée (Payée)
+                                </div>
+                            @endif
 
-                            @foreach($statuses as $key => $status)
-                                <button wire:click="updateStatus({{ $selectedOrder->id }}, '{{ $key }}')"
-                                    class="status-option {{ $selectedOrder->statut === $key ? 'active' : '' }}">
-                                    <div class="status-icon">
-                                        <i class="fas fa-{{ $status['icon'] }}"></i>
-                                    </div>
-                                    <span>{{ $status['label'] }}</span>
+                            <div class="status-grid">
+                                @php
+                                    $statuses = [
+                                        'en_attente' => ['label' => 'En attente', 'icon' => 'clock', 'color' => 'text-orange-500 bg-orange-50 border-orange-200'],
+                                        'servie' => ['label' => 'Servie', 'icon' => 'concierge-bell', 'color' => 'text-violet-500 bg-violet-50 border-violet-200'],
+                                        'payee' => ['label' => 'Payée', 'icon' => 'check-circle', 'color' => 'text-blue-500 bg-blue-50 border-blue-200'],
+                                        'annulee' => ['label' => 'Annulée', 'icon' => 'ban', 'color' => 'text-red-500 bg-red-50 border-red-200'],
+                                    ];
+                                @endphp
+
+                                @foreach($statuses as $key => $status)
+                                    @php
+                                        $isDisabled = false;
+                                        // Lock logic: if payee, everything disabled except annulee (for admins)
+                                        if ($selectedOrder->statut === 'payee') {
+                                            if ($key === 'annulee') {
+                                                if (!auth()->user()->isAdmin() && !auth()->user()->isSuperAdmin()) {
+                                                    $isDisabled = true;
+                                                }
+                                            } else {
+                                                $isDisabled = true;
+                                            }
+                                        }
+                                    @endphp
+                                    
+                                    <button wire:click="updateStatus({{ $selectedOrder->id }}, '{{ $key }}')"
+                                        {{ $isDisabled ? 'disabled' : '' }}
+                                        class="status-option {{ $selectedOrder->statut === $key ? 'active' : '' }} {{ $isDisabled ? 'opacity-50 cursor-not-allowed' : '' }}">
+                                        <div class="status-icon">
+                                            <i class="fas fa-{{ $status['icon'] }}"></i>
+                                        </div>
+                                        <span>{{ $status['label'] }}</span>
+                                    </button>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button onclick="printInvoice('{{ route('orders.invoice', $selectedOrder->id) }}')" class="btn-panel btn-print">
+                                <i class="fas fa-print"></i> Imprimer Facture
+                            </button>
+                            @if($selectedOrder->statut !== 'payee' || auth()->user()->isAdmin() || auth()->user()->isSuperAdmin())
+                                <button wire:click="deleteOrder({{ $selectedOrder->id }})" wire:confirm="Êtes-vous sûr de vouloir supprimer cette commande ?" class="btn-panel btn-delete-order">
+                                    <i class="fas fa-trash"></i> Supprimer
                                 </button>
-                            @endforeach
+                            @endif
                         </div>
                     </div>
-
-                    <div class="action-buttons">
-                        <button onclick="printInvoice('{{ route('orders.invoice', $selectedOrder->id) }}')"
-                            class="btn-panel btn-print">
-                            <i class="fas fa-print"></i> Imprimer Facture
-                        </button>
-                        <button wire:click="deleteOrder({{ $selectedOrder->id }})"
-                            wire:confirm="Êtes-vous sûr de vouloir supprimer cette commande ?"
-                            class="btn-panel btn-delete-order">
-                            <i class="fas fa-trash"></i> Supprimer
-                        </button>
-                    </div>
-                </div>
+                @endif
             </div>
         </div>
     @endif
-
+    
     <iframe id="printFrame" style="display:none;"></iframe>
     <script>
         function printInvoice(url) {

@@ -59,7 +59,7 @@ class ProductForm extends Component
         ];
 
         if ($this->newImage) {
-            $data['image'] = $this->newImage->store('products', 'public');
+            $data['image'] = $this->newImage->store('products', 'public_uploads');
         }
 
         if ($this->produit) {

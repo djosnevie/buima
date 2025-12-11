@@ -148,7 +148,8 @@
                     <div class="product-card" wire:click="addToCart({{ $produit->id }})">
                         <div class="product-image">
                             @if($produit->image)
-                                <img src="{{ asset('storage/' . $produit->image) }}" alt="{{ $produit->nom }}">
+                                <img src="{{ asset('images/' . $produit->image) }}" alt="{{ $produit->nom }}"
+                                     onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'placeholder-image\'><i class=\'fas fa-utensils\'></i></div>'">
                             @else
                                 <div class="placeholder-image">
                                     <i class="fas fa-utensils"></i>

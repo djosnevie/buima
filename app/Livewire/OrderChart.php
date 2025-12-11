@@ -36,10 +36,11 @@ class OrderChart extends Component
                     $startHour = Carbon::now()->subHours($i)->startOfHour();
                     $endHour = Carbon::now()->subHours($i)->endOfHour();
                     $labels[] = $startHour->format('H:00');
-                    $data[] = Commande::whereBetween('created_at', [
-                        $startHour,
-                        $endHour
-                    ])->count();
+                    $data[] = Commande::where('etablissement_id', auth()->user()->etablissement_id)
+                        ->whereBetween('created_at', [
+                            $startHour,
+                            $endHour
+                        ])->count();
                 }
                 break;
 
@@ -49,10 +50,11 @@ class OrderChart extends Component
                     $startDay = Carbon::now()->subDays($i)->startOfDay();
                     $endDay = Carbon::now()->subDays($i)->endOfDay();
                     $labels[] = $startDay->format('D d');
-                    $data[] = Commande::whereBetween('created_at', [
-                        $startDay,
-                        $endDay
-                    ])->count();
+                    $data[] = Commande::where('etablissement_id', auth()->user()->etablissement_id)
+                        ->whereBetween('created_at', [
+                            $startDay,
+                            $endDay
+                        ])->count();
                 }
                 break;
 
@@ -62,10 +64,11 @@ class OrderChart extends Component
                     $startDay = Carbon::now()->subDays($i)->startOfDay();
                     $endDay = Carbon::now()->subDays($i)->endOfDay();
                     $labels[] = $startDay->format('d M');
-                    $data[] = Commande::whereBetween('created_at', [
-                        $startDay,
-                        $endDay
-                    ])->count();
+                    $data[] = Commande::where('etablissement_id', auth()->user()->etablissement_id)
+                        ->whereBetween('created_at', [
+                            $startDay,
+                            $endDay
+                        ])->count();
                 }
                 break;
 
@@ -75,10 +78,11 @@ class OrderChart extends Component
                     $startMonth = Carbon::now()->subMonths($i)->startOfMonth();
                     $endMonth = Carbon::now()->subMonths($i)->endOfMonth();
                     $labels[] = $startMonth->format('M Y');
-                    $data[] = Commande::whereBetween('created_at', [
-                        $startMonth,
-                        $endMonth
-                    ])->count();
+                    $data[] = Commande::where('etablissement_id', auth()->user()->etablissement_id)
+                        ->whereBetween('created_at', [
+                            $startMonth,
+                            $endMonth
+                        ])->count();
                 }
                 break;
         }
