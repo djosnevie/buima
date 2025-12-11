@@ -10,7 +10,7 @@ body {
     left: 0;
     height: 100vh;
     width: 280px;
-    background: linear-gradient(135deg, #ff9f43 0%, #ee5253 100%);
+    background: linear-gradient(135deg, #bf3a29 0%, #d64a39 100%);
     padding: 2rem 0;
     box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
     z-index: 1000;
@@ -90,7 +90,7 @@ body {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #ff9f43, #ee5253);
+    background: linear-gradient(135deg, #bf3a29, #d64a39);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -127,8 +127,8 @@ body {
 }
 
 .icon.orange {
-    background: linear-gradient(135deg, rgba(255, 159, 67, 0.2), rgba(238, 82, 83, 0.2));
-    color: #ff9f43;
+    background: linear-gradient(135deg, rgba(191, 58, 41, 0.2), rgba(214, 74, 57, 0.2));
+    color: #bf3a29;
 }
 
 .icon.blue {
@@ -194,10 +194,38 @@ body {
 }
 
 .breadcrumb-item a:hover {
-    color: #ff9f43;
+    color: #bf3a29;
 }
 
 .breadcrumb-item.active {
     color: #000;
     font-weight: 700;
+}
+
+/* Global Search Box Styles */
+.search-box {
+    position: relative;
+    width: 300px;
+}
+
+.search-box i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    outline: none;
+    transition: all 0.3s;
+}
+
+.search-box input:focus {
+    border-color: #bf3a29;
+    box-shadow: 0 0 0 3px rgba(191, 58, 41, 0.1);
 }

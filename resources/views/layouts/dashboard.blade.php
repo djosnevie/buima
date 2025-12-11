@@ -23,15 +23,10 @@
 
     <style>
         :root {
-            --primary-color:
-                {{ auth()->user()->etablissement->theme_color ?? '#ff6b35' }}
-            ;
-            --secondary-color:
-                {{ auth()->user()->etablissement->secondary_color ?? '#ff9f43' }}
-            ;
-            --button-color:
-                {{ auth()->user()->etablissement->button_color ?? '#ff6b35' }}
-            ;
+            --primary-color: #bf3a29;
+            --secondary-color: #d64a39;
+            /* Lighter declination */
+            --button-color: #bf3a29;
         }
 
         .sidebar {
@@ -74,7 +69,10 @@
 <body>
     <div class="sidebar">
         <div class="sidebar-brand text-center">
-            @if(auth()->user()->etablissement && auth()->user()->etablissement->logo)
+            @if(auth()->check() && auth()->user()->isSuperAdmin())
+                <img src="{{ asset('images/biuma_logo_blanck.png') }}" alt="Biuma" class="img-fluid"
+                    style="height: 60px; object-fit: contain;">
+            @elseif(auth()->user()->etablissement && auth()->user()->etablissement->logo)
                 <img src="{{ asset('images/' . auth()->user()->etablissement->logo) }}"
                     onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->etablissement->nom) }}&background=random';"
                     alt="Logo" class="mb-2" style="width: 50px; height: 50px; object-fit: cover;">

@@ -90,7 +90,13 @@
         <div class="col-12">
             <div class="card border-0 shadow-sm rounded-4">
                 <div class="card-header bg-white border-0 py-3">
-                    <h5 class="fw-bold mb-0">Liste des Restaurants</h5>
+                    <div class="d-flex justify-content-between align-items-center p-3">
+                        <h5 class="fw-bold mb-0">Liste des Restaurants</h5>
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input wire:model.live.debounce.300ms="search" type="text" placeholder="Rechercher...">
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
@@ -207,26 +213,7 @@
                                             </div>
 
 
-                                            <div class="row g-3 mb-4">
-                                                <div class="col-md-4">
-                                                    <label class="form-label text-muted small fw-bold">Couleur
-                                                        Principale</label>
-                                                    <input type="color" class="form-control form-control-color w-100"
-                                                        wire:model="theme_color" title="Couleur Principale">
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <label class="form-label text-muted small fw-bold">Couleur
-                                                        Secondaire</label>
-                                                    <input type="color" class="form-control form-control-color w-100"
-                                                        wire:model="secondary_color" title="Couleur Secondaire">
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <label class="form-label text-muted small fw-bold">Couleur
-                                                        Boutons</label>
-                                                    <input type="color" class="form-control form-control-color w-100"
-                                                        wire:model="button_color" title="Couleur Boutons">
-                                                </div>
-                                            </div>
+
 
                                             <div class="row g-3 mb-4">
                                                 <div class="col-md-6">
@@ -253,8 +240,7 @@
                                             </div>
 
                                             <div class="d-grid gap-2 mt-4">
-                                                <button type="submit" class="btn btn-primary text-white py-2 fw-bold"
-                                                    style="background-color: {{ $button_color ?? '#ff6b35' }}; border-color: {{ $button_color ?? '#ff6b35' }};">Mettre
+                                                <button type="submit" class="btn btn-primary text-white py-2 fw-bold">Mettre
                                                     à jour</button>
                                                 <button type="button" class="btn btn-light text-muted"
                                                     wire:click="resetForm">Annuler</button>

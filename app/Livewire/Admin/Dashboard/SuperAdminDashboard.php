@@ -26,10 +26,21 @@ class SuperAdminDashboard extends Component
     public $newRestaurantsCount;
     public $topRestaurant;
 
+    public $search = '';
+
     public function loadData()
     {
-        $this->etablissements = Etablissement::with('users')->latest()->get();
-        $this->totalRestaurants = $this->etablissements->count();
+        $query = Etablissement::with('users')->latest();
+
+        if ($this->search) {
+            $query->where(function ($q) {
+                $q->where('nom', 'like', '%' . $this->search . '%')
+                    ->orWhere('email', 'like', '%' . $this->search . '%');
+            });
+        }
+
+        $this->etablissements = $query->get();
+        $this->totalRestaurants = Etablissement::count(); // Keep total unaffected by search
         $this->totalUsers = User::count();
 
         // New Metrics: Platform Growth & Performance
@@ -41,6 +52,11 @@ class SuperAdminDashboard extends Component
             ->first();
 
         $this->recentRestaurants = Etablissement::latest()->take(5)->get();
+    }
+
+    public function updatedSearch()
+    {
+        $this->loadData();
     }
 
     public $selectedId;

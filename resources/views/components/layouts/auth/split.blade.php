@@ -20,7 +20,7 @@
 
             <!-- Logo du restaurant centré -->
             <div class="relative z-20 flex h-full items-center justify-center">
-                <a href="{{ route('home') }}" class="flex flex-col items-center gap-4" wire:navigate>
+                <a href="{{ url('/') }}" class="flex flex-col items-center gap-4" wire:navigate>
                     <img src="{{ asset('images/logo.webp') }}" alt="{{ config('app.name', 'Laravel') }}"
                         class="w-64 h-auto object-contain drop-shadow-2xl">
                     <span

@@ -15,7 +15,7 @@ body {
 .left-panel {
     width: 35%;
     background-color: #ff9f43;
-    background-image: url('{{ asset("images/plat.jpg") }}');
+    background-image: url('/images/plat.jpg');
     background-size: cover;
     background-position: center;
     position: relative;
@@ -33,7 +33,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(255, 159, 67, 0.85) 0%, rgba(238, 82, 83, 0.85) 100%);
+    background: linear-gradient(135deg, rgba(191, 58, 41, 0.85) 0%, rgba(214, 74, 57, 0.85) 100%);
     z-index: 1;
 }
 
@@ -67,14 +67,14 @@ body {
     border-radius: 20px;
     cursor: pointer;
     font-weight: 600;
-    color: #ccc;
+    color: #bf3a29;
     transition: all 0.3s;
     transform: rotate(180deg);
 }
 
 .toggle-btn.active {
-    color: #ff9f43;
-    background: rgba(255, 159, 67, 0.1);
+    color: #bf3a29;
+    background: rgba(191, 58, 41, 0.1);
 }
 
 .right-panel {
@@ -103,7 +103,7 @@ body {
 
 .form-control:focus {
     box-shadow: none;
-    border-color: #ff9f43;
+    border-color: #bf3a29;
 }
 
 .form-floating>label {
@@ -114,11 +114,11 @@ body {
 .form-floating>.form-control:focus~label,
 .form-floating>.form-control:not(:placeholder-shown)~label {
     transform: scale(0.85) translateY(-1.5rem) translateX(0);
-    color: #ff9f43;
+    color: #bf3a29;
 }
 
 .btn-primary {
-    background: #ff9f43;
+    background: #bf3a29;
     border: none;
     border-radius: 30px;
     padding: 12px 30px;
@@ -129,7 +129,7 @@ body {
 }
 
 .btn-primary:hover {
-    background: #e58e3c;
+    background: #d64a39;
     transform: translateY(-2px);
     box-shadow: 0 15px 25px rgba(255, 159, 67, 0.4);
 }

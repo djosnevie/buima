@@ -49,27 +49,7 @@
                         </div>
                     </div>
 
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-4">
-                            <label for="theme_color" class="form-label">Couleur Principale</label>
-                            <input wire:model="theme_color" type="color" class="form-control form-control-color w-100"
-                                id="theme_color" title="Choisir une couleur">
-                            @error('theme_color') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>
-                        <div class="col-md-4">
-                            <label for="secondary_color" class="form-label">Couleur Secondaire</label>
-                            <input wire:model="secondary_color" type="color"
-                                class="form-control form-control-color w-100" id="secondary_color"
-                                title="Choisir une couleur">
-                            @error('secondary_color') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>
-                        <div class="col-md-4">
-                            <label for="button_color" class="form-label">Couleur Boutons</label>
-                            <input wire:model="button_color" type="color" class="form-control form-control-color w-100"
-                                id="button_color" title="Choisir une couleur">
-                            @error('button_color') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>
-                    </div>
+
 
                     <!-- Email & Phone Row -->
                     <div class="row g-3 mb-3">
@@ -146,8 +126,7 @@
                     @endif
 
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-primary btn-lg"
-                            style="background-color: {{ $theme_color }}; border-color: {{ $theme_color }}">Créer mon
+                        <button type="submit" class="btn btn-primary btn-lg">Créer mon
                             Restaurant</button>
                     </div>
 

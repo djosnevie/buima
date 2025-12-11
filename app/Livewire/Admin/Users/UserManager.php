@@ -40,25 +40,48 @@ class UserManager extends Component
         $this->loadData();
     }
 
+    public $search = '';
+
     public function loadData()
     {
         if (Auth::user()->isSuperAdmin()) {
-            $this->users = User::with(['etablissement', 'section'])
+            $query = User::with(['etablissement', 'section'])
                 ->where('id', '!=', Auth::id())
-                ->latest()
-                ->get();
+                ->latest();
+
+            if ($this->search) {
+                $query->where(function ($q) {
+                    $q->where('name', 'like', '%' . $this->search . '%')
+                        ->orWhere('email', 'like', '%' . $this->search . '%');
+                });
+            }
+
+            $this->users = $query->get();
 
             $this->sections = Section::with('etablissement')->where('actif', true)->get();
             $this->etablissements = Etablissement::all();
         } else {
-            $this->users = Auth::user()->etablissement->users()
+            $query = Auth::user()->etablissement->users()
                 ->where('id', '!=', Auth::id())
-                ->latest()
-                ->get();
+                ->latest();
+
+            if ($this->search) {
+                $query->where(function ($q) {
+                    $q->where('name', 'like', '%' . $this->search . '%')
+                        ->orWhere('email', 'like', '%' . $this->search . '%');
+                });
+            }
+
+            $this->users = $query->get();
 
             $this->sections = Auth::user()->etablissement->sections()->where('actif', true)->get();
             $this->etablissements = collect();
         }
+    }
+
+    public function updatedSearch()
+    {
+        $this->loadData();
     }
 
     public function create()

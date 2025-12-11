@@ -26,10 +26,10 @@
     <div class="auth-container">
         <div class="left-panel">
             <div class="left-panel-content">
-                <div class="toggle-pill">
+                <!--<div class="toggle-pill">
                     <div class="toggle-btn active">Login</div>
                     <div class="toggle-btn">Sign up</div>
-                </div>
+                </div>-->
             </div>
         </div>
 

@@ -82,8 +82,8 @@
                 if (!ctx) return;
 
                 const getCssVar = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-                const primaryColor = getCssVar('--primary-color') || '#ff9f43';
-                const secondaryColor = getCssVar('--secondary-color') || '#ee5253';
+                const primaryColor = getCssVar('--primary-color') || '#bf3a29';
+                const secondaryColor = getCssVar('--secondary-color') || '#d64a39';
 
                 // Helper to add opacity to hex/rgb
                 const addOpacity = (color, opacity) => {

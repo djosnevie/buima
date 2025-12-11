@@ -1,6 +1,6 @@
 <div class="auth-form-wrapper fade-in">
     <div class="text-center mb-5">
-        <img src="{{ asset('images/logo.webp') }}" alt="Logo" style="height: 80px; width: auto;">
+        <img src="{{ asset('images/biuma_logo_b.PNG') }}" alt="Logo" style="height: 80px; width: auto;">
     </div>
 
     <form wire:submit.prevent="login">

@@ -23,6 +23,13 @@
         <div class="col-12">
             <div class="card border-0 shadow-sm rounded-4">
                 <div class="card-body p-0">
+                    <div class="d-flex justify-content-between align-items-center p-3">
+                        <h5 class="fw-bold mb-0">Liste du Personnel</h5>
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input wire:model.live.debounce.300ms="search" type="text" placeholder="Rechercher...">
+                        </div>
+                    </div>
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0">
                             <thead class="bg-light">
