@@ -43,6 +43,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/tables', \App\Livewire\Tables\TableList::class)->name('tables.index');
     Route::get('/tables/create', \App\Livewire\Tables\TableForm::class)->name('tables.create');
     Route::get('/tables/{table}/edit', \App\Livewire\Tables\TableForm::class)->name('tables.edit');
+
+    // Reports
+    Route::get('/reports', \App\Livewire\Reports\ReportDashboard::class)->name('reports.index');
+    Route::get('/reports/print/{type}', [\App\Http\Controllers\ReportPrintingController::class, 'show'])->name('reports.print');
 });
 
 // Restaurant Setup

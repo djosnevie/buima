@@ -31,10 +31,16 @@ class OrderChart extends Component
 
         switch ($this->period) {
             case 'day':
-                // Last 24 hours (hourly)
-                for ($i = 23; $i >= 0; $i--) {
-                    $startHour = Carbon::now()->subHours($i)->startOfHour();
-                    $endHour = Carbon::now()->subHours($i)->endOfHour();
+                // Today (00:00 to 23:00)
+                $hours = 24;
+                for ($i = 0; $i < $hours; $i++) {
+                    $startHour = Carbon::today()->addHours($i);
+                    $endHour = $startHour->copy()->endOfHour();
+
+                    // Only show up to current hour if preferred, or show full day with 0s
+                    // User asked for "same logic as in report". Report is just "Today".
+                    // Usually "Today" chart implies 00:00 -> 23:59.
+
                     $labels[] = $startHour->format('H:00');
                     $data[] = Commande::where('etablissement_id', auth()->user()->etablissement_id)
                         ->whereBetween('created_at', [

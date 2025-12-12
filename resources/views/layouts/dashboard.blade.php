@@ -73,14 +73,17 @@
                 <img src="{{ asset('images/biuma_logo_blanck.png') }}" alt="Biuma" class="img-fluid"
                     style="height: 60px; object-fit: contain;">
             @elseif(auth()->user()->etablissement && auth()->user()->etablissement->logo)
-                <img src="{{ asset('images/' . auth()->user()->etablissement->logo) }}"
-                    onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->etablissement->nom) }}&background=random';"
-                    alt="Logo" class="mb-2" style="width: 50px; height: 50px; object-fit: cover;">
+                <img src="{{ asset('storage/' . auth()->user()->etablissement->logo) }}"
+                    onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->etablissement->nom) }}&background=random&rounded=true'; this.classList.add('rounded-circle'); this.style.maxWidth='50px'; this.style.height='50px'; this.style.objectFit='cover'; this.style.border='2px solid rgba(255,255,255,0.2)';"
+                    alt="Logo" class="mb-2 img-fluid" style="max-height: 80px; object-fit: contain;">
                 <h5 class="text-white mb-0 fw-bold">{{ auth()->user()->etablissement->nom }}</h5>
             @else
-                <h3 class="text-white mb-0">
-                    <i class="fas fa-utensils me-2"></i> {{ auth()->user()->etablissement->nom ?? "O'Menu" }}
-                </h3>
+                <div class="d-flex flex-column align-items-center">
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->etablissement->nom ?? 'O Menu') }}&background=random&rounded=true"
+                        alt="Logo" class="mb-2 rounded-circle shadow-sm"
+                        style="width: 50px; height: 50px; object-fit: cover; border: 2px solid rgba(255,255,255,0.2);">
+                    <h5 class="text-white mb-0 fw-bold">{{ auth()->user()->etablissement->nom ?? "O'Menu" }}</h5>
+                </div>
             @endif
         </div>
         <nav class="nav flex-column">
@@ -121,7 +124,8 @@
                     </a>
                 </div>
                 <div class="nav-item">
-                    <a class="nav-link" href="#">
+                    <a href="{{ route('reports.index') }}"
+                        class="nav-link {{ request()->routeIs('reports.index') ? 'active' : '' }}">
                         <i class="fas fa-chart-line"></i>
                         <span>Rapports</span>
                     </a>

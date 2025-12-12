@@ -1,122 +1,78 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
     <title>Facture #{{ $commande->numero_commande }}</title>
     <style>
         body {
             font-family: 'Courier New', Courier, monospace;
-            font-size: 12px;
-            margin: 0;
-            padding: 0;
-            background-color: #fff;
-            color: #000;
-            display: flex;
-            justify-content: center;
-        }
-
-        .ticket {
-            width: 300px;
-            /* Standard thermal printer width */
+            font-size: 14px;
+            max-width: 300px;
             margin: 0 auto;
-            padding: 10px;
+            padding: 20px;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            border-bottom: 1px dashed #000;
+            padding-bottom: 10px;
         }
 
-        .header h2 {
-            margin: 0 0 5px 0;
-            font-size: 18px;
-            text-transform: uppercase;
+        .logo {
+            margin-bottom: 5px;
         }
 
-        .header p {
-            margin: 2px 0;
-            font-size: 11px;
+        .logo img {
+            max-width: 100px;
+            height: auto;
         }
 
-        .invoice-content {
-            padding: 0 100px;
+        /* Fallback if no logo image */
+        .logo-text {
+            font-weight: bold;
+            font-size: 20px;
         }
 
         .info {
             margin-bottom: 10px;
-            border-bottom: 1px dashed #000;
-            padding-bottom: 5px;
         }
 
-        .info div {
-            margin-bottom: 3px;
-        }
-
-        table {
+        .items {
             width: 100%;
+            margin-bottom: 20px;
             border-collapse: collapse;
-            margin-bottom: 10px;
         }
 
-        th {
+        .items th {
             text-align: left;
-            border-bottom: 1px dashed #000;
-            padding: 5px 0;
-            font-size: 11px;
+            border-bottom: 1px solid #000;
         }
 
-        td {
+        .items td {
             padding: 5px 0;
-            vertical-align: top;
-        }
-
-        .text-right {
-            text-align: right;
         }
 
         .totals {
-            border-top: 1px dashed #000;
-            padding-top: 5px;
             text-align: right;
-        }
-
-        .totals div {
-            margin-bottom: 3px;
-        }
-
-        .grand-total {
-            font-weight: bold;
-            font-size: 16px;
-            margin-top: 5px;
-            border-top: 1px solid #000;
-            /* Double line effect or solid */
-            padding-top: 5px;
+            border-top: 1px dashed #000;
+            padding-top: 10px;
         }
 
         .footer {
             text-align: center;
             margin-top: 20px;
-            font-size: 11px;
-            border-top: 1px dashed #000;
-            padding-top: 10px;
+            font-size: 12px;
         }
 
         @media print {
-            body {
-                width: 100%;
-                background-color: #fff;
-            }
-
-            .ticket {
-                width: 100%;
-                margin: 0;
-                padding: 0;
-            }
-
             @page {
                 margin: 0;
+            }
+
+            body {
+                padding: 10px;
             }
         }
     </style>
@@ -126,76 +82,71 @@
     @php
         $etablissement = auth()->user()->etablissement ?? $commande->etablissement;
     @endphp
-    <div class="ticket">
-        <div class="header">
+    <div class="header">
+        <div class="logo">
             @if($etablissement && $etablissement->logo)
-                <img src="{{ asset('storage/' . $etablissement->logo) }}" alt="Logo"
-                    style="max-width: 80px; max-height: 80px; margin-bottom: 10px; border-radius: 50%;">
+                <img src="{{ asset('storage/' . $etablissement->logo) }}" alt="Logo">
+            @else
+                <div class="logo-text">{{ $etablissement->nom ?? 'OMENU' }}</div>
             @endif
-
-            <h2 style="{{ $etablissement && $etablissement->logo ? 'margin-top: 5px;' : '' }}">
-                {{ $etablissement->nom ?? "O'Menu" }}
-            </h2>
-
-            <p>{{ $etablissement->adresse ?? 'Adresse non configurée' }}</p>
-            <p>Tél: {{ $etablissement->telephone ?? 'Non spécifié' }}</p>
         </div>
+        <div>{{ $etablissement->type ?? 'Restaurant & Lounge' }}</div>
+        <div>{{ $etablissement->adresse ?? '' }}</div>
+        @if($etablissement->email)
+            <div>{{ $etablissement->email }}</div>
+        @endif
+        <div>Tél: {{ $etablissement->telephone ?? 'Non spécifié' }}</div>
+    </div>
 
-        <div class="invoice-content">
-            <div class="info">
-                <div>Date: {{ $commande->created_at->format('d/m/Y H:i') }}</div>
-                <div>Commande: #{{ substr($commande->numero_commande, -4) }}</div>
-                <div>Serveur: {{ auth()->user()->name }}</div>
-                @if($commande->client_nom)
-                    <div>Client: {{ $commande->client_nom }}</div>
-                @endif
-                @if($commande->client_telephone)
-                    <div>Tél Client: {{ $commande->client_telephone }}</div>
-                @endif
-                @if($commande->table)
-                    <div>Table: {{ $commande->table->numero }}</div>
-                @endif
-            </div>
+    <div class="info">
+        <div>Date: {{ $commande->created_at->format('d/m/Y H:i') }}</div>
+        <div>Commande: #{{ substr($commande->numero_commande, -4) }}</div>
+        <div>Serveur: {{ $commande->user->name }}</div>
+        @if($commande->client_nom)
+            <div>Client: {{ $commande->client_nom }}</div>
+        @endif
+        @if($commande->client_telephone)
+            <div>Tél: {{ $commande->client_telephone }}</div>
+        @endif
+        @if($commande->table)
+            <div>Table: {{ $commande->table->numero }}</div>
+        @endif
+    </div>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width: 15%">Qté</th>
-                        <th style="width: 55%">Article</th>
-                        <th class="text-right" style="width: 30%">Prix</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($commande->items as $item)
-                        <tr>
-                            <td>{{ $item->quantite }}x</td>
-                            <td>{{ $item->produit->nom }}</td>
-                            <td class="text-right">{{ number_format($item->sous_total, 0, ',', ' ') }}
-                                {{ $etablissement->devise ?? 'XAF' }}
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+    <table class="items">
+        <thead>
+            <tr>
+                <th>Qté</th>
+                <th>Article</th>
+                <th style="text-align: right">Prix</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($commande->items as $item)
+                <tr>
+                    <td>{{ $item->quantite }}x</td>
+                    <td>{{ $item->produit->nom }}</td>
+                    <td style="text-align: right">{{ number_format($item->sous_total, 0, ',', ' ') }}
+                        {{ $etablissement->devise ?? 'XAF' }}
+                    </td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
 
-            <div class="totals">
-                <div>Sous-total: {{ number_format($commande->sous_total, 0, ',', ' ') }}
-                    {{ $etablissement->devise ?? 'XAF' }}
-                </div>
-                <div>TVA (10%): {{ number_format($commande->montant_taxes, 0, ',', ' ') }}
-                    {{ $etablissement->devise ?? 'XAF' }}
-                </div>
-                <div class="grand-total">
-                    TOTAL: {{ number_format($commande->total, 0, ',', ' ') }}
-                    {{ $etablissement->devise ?? 'XAF' }}
-                </div>
-            </div>
-
-            <div class="footer">
-                <p>Merci de votre visite !</p>
-                <p>A bientôt</p>
-            </div>
+    <div class="totals">
+        <div>Sous-total: {{ number_format($commande->sous_total, 0, ',', ' ') }} {{ $etablissement->devise ?? 'XAF' }}
         </div>
+        <div>TVA (10%): {{ number_format($commande->montant_taxes, 0, ',', ' ') }} {{ $etablissement->devise ?? 'XAF' }}
+        </div>
+        <div style="font-weight: bold; font-size: 16px; margin-top: 5px">
+            TOTAL: {{ number_format($commande->total, 0, ',', ' ') }} {{ $etablissement->devise ?? 'XAF' }}
+        </div>
+    </div>
+
+    <div class="footer">
+        <div>Merci de votre visite !</div>
+        <div>A bientôt</div>
     </div>
 
     <script>
