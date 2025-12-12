@@ -10,9 +10,11 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::table('commandes', function (Blueprint $table) {
-            $table->string('client_telephone')->nullable()->after('client_nom');
-        });
+        if (!Schema::hasColumn('commandes', 'client_telephone')) {
+            Schema::table('commandes', function (Blueprint $table) {
+                $table->string('client_telephone')->nullable()->after('client_nom');
+            });
+        }
     }
 
     /**

@@ -3,8 +3,8 @@
         <div class="card shadow-sm border-0">
             <div class="card-body p-4">
                 <div class="text-center mb-4">
-                    <h3 class="fw-bold">Configurer votre Restaurant</h3>
-                    <p class="text-muted">Commencez avec O'Menu en quelques secondes.</p>
+                    <h3 class="fw-bold">Créer un restaurant</h3>
+                    <p class="text-muted">Commencez avec Biuma Restaurant Software en quelques secondes.</p>
                 </div>
 
                 @if (session()->has('error'))
@@ -41,7 +41,8 @@
                             <label for="devise" class="form-label">Devise Principale</label>
                             <select wire:model="devise" class="form-select @error('devise') is-invalid @enderror"
                                 id="devise">
-                                <option value="XAF">FCFA (XAF)</option>
+                                <option value="CDF">Franc Congolais (FC)</option>
+                                <option value="XAF">FCFA</option>
                                 <option value="EUR">Euro (€)</option>
                                 <option value="USD">Dollar ($)</option>
                             </select>
@@ -126,7 +127,9 @@
                     @endif
 
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-primary btn-lg">Créer mon
+                        <button type="button" class="btn btn-primary btn-lg"
+                            style="background-color: #bf3a29 !important; border-color: #bf3a29 !important;"
+                            wire:click="createRestaurant">Créer mon
                             Restaurant</button>
                     </div>
 

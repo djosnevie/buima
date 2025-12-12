@@ -5,9 +5,11 @@
                 <h2 class="fw-bold mb-1">Gestion du Personnel</h2>
                 <p class="text-muted">Gérez vos employés et leurs accès aux sections.</p>
             </div>
-            <button class="btn btn-primary text-white" wire:click="create">
-                <i class="fas fa-user-plus me-2"></i>Nouvel Utilisateur
-            </button>
+            @if(auth()->user()->isAdmin() || auth()->user()->isSuperAdmin())
+                <button class="btn btn-primary text-white" wire:click="create">
+                    <i class="fas fa-user-plus me-2"></i>Nouvel Utilisateur
+                </button>
+            @endif
         </div>
     </div>
 
@@ -24,7 +26,9 @@
             <div class="card border-0 shadow-sm rounded-4">
                 <div class="card-body p-0">
                     <div class="d-flex justify-content-between align-items-center p-3">
-                        <h5 class="fw-bold mb-0">Liste du Personnel</h5>
+                        <h5 class="fw-bold mb-0">Liste du Personnel <span
+                                class="badge bg-primary-subtle text-primary rounded-pill ms-2 fs-6">{{ $users->count() }}</span>
+                        </h5>
                         <div class="search-box">
                             <i class="fas fa-search"></i>
                             <input wire:model.live.debounce.300ms="search" type="text" placeholder="Rechercher...">
@@ -61,7 +65,9 @@
                                         @if(auth()->user()->isSuperAdmin())
                                             <td>
                                                 @if($user->etablissement)
-                                                    <span class="fw-bold text-dark">{{ $user->etablissement->nom }}</span>
+                                                    <span class="fw-bold text-dark">
+                                                        {{ $user->etablissement->nom }}
+                                                    </span>
                                                 @else
                                                     <span
                                                         class="badge bg-purple-subtle text-purple-emphasis rounded-pill px-3">Global
@@ -90,15 +96,17 @@
                                             @endif
                                         </td>
                                         <td class="pe-4 text-end">
-                                            <button wire:click="edit({{ $user->id }})"
-                                                class="btn btn-sm btn-link text-primary me-2">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button wire:click="delete({{ $user->id }})"
-                                                class="btn btn-sm btn-link text-danger"
-                                                onclick="confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?') || event.stopImmediatePropagation()">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
+                                            @if(auth()->user()->isAdmin() || auth()->user()->isSuperAdmin())
+                                                <button wire:click="edit({{ $user->id }})"
+                                                    class="btn btn-sm btn-link text-primary me-2">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button wire:click="delete({{ $user->id }})"
+                                                    class="btn btn-sm btn-link text-danger"
+                                                    onclick="confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?') || event.stopImmediatePropagation()">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            @endif
                                         </td>
                                     </tr>
                                 @empty

@@ -47,6 +47,10 @@ class ProductForm extends Component
 
     public function save()
     {
+        if (!auth()->user()->isAdmin() && !auth()->user()->isSuperAdmin()) {
+            abort(403);
+        }
+
         $this->validate();
 
         $data = [

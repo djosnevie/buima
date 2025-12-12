@@ -62,10 +62,14 @@ class RestaurantSettings extends Component
 
     public function updateSettings()
     {
+        if (!auth()->user()->isAdmin() && !auth()->user()->isSuperAdmin()) {
+            abort(403);
+        }
+
         $this->validate();
 
         if ($this->logo) {
-            $logoPath = $this->logo->store('logos', 'public');
+            $logoPath = $this->logo->store('logos', 'public_uploads');
             $this->etablissement->logo = $logoPath;
         }
 

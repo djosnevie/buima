@@ -25,8 +25,9 @@
                                 <img src="{{ $logo->temporaryUrl() }}" class="rounded-circle shadow-sm" width="120"
                                     height="120" style="object-fit: cover; border: 4px solid white;">
                             @elseif($currentLogo)
-                                <img src="{{ asset('storage/' . $currentLogo) }}" class="rounded-circle shadow-sm"
-                                    width="120" height="120" style="object-fit: cover; border: 4px solid white;">
+                                <img src="{{ asset('images/' . $currentLogo) }}" class="rounded-circle shadow-sm"
+                                    width="120" height="120" style="object-fit: cover; border: 4px solid white;"
+                                    onerror="this.onerror=null; this.src='{{ asset('storage/' . $currentLogo) }}'">
                             @else
                                 <div class="bg-light rounded-circle d-flex align-items-center justify-content-center shadow-sm mx-auto"
                                     style="width: 120px; height: 120px; border: 4px solid white;">
@@ -77,11 +78,10 @@
                                     <span class="input-group-text bg-light"><i class="fas fa-coins"></i></span>
                                     <select wire:model="devise"
                                         class="form-select @error('devise') is-invalid @enderror" id="devise">
-                                        <option value="XAF">FCFA (XAF)</option>
+                                        <option value="CDF">Franc Congolais (FC)</option>
+                                        <option value="XAF">FCFA</option>
                                         <option value="EUR">Euro (€)</option>
                                         <option value="USD">Dollar ($)</option>
-                                        <option value="GBP">Livre (£)</option>
-                                        <option value="CAD">Dollar Canadien (CAD)</option>
                                     </select>
                                 </div>
                                 @error('devise') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
@@ -105,9 +105,15 @@
                         </div>
 
                         <div class="mt-4 pt-4 border-top text-end">
-                            <button type="submit" class="btn btn-primary px-5 py-2 fw-bold shadow">
-                                <i class="fas fa-save me-2"></i> Enregistrer
-                            </button>
+                            @if(auth()->user()->isAdmin() || auth()->user()->isSuperAdmin())
+                                <button type="submit" class="btn btn-primary px-5 py-2 fw-bold shadow">
+                                    <i class="fas fa-save me-2"></i> Enregistrer
+                                </button>
+                            @else
+                                <div class="alert alert-info text-start d-inline-block mb-0">
+                                    <i class="fas fa-lock me-2"></i> Mode lecture seule (Employé)
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>

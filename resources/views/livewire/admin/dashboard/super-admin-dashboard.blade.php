@@ -116,17 +116,21 @@
                                         <td class="ps-4 py-3">
                                             <div class="d-flex align-items-center">
                                                 @if($etablissement->logo)
-                                                    <img src="{{ asset('storage/' . $etablissement->logo) }}"
+                                                    <img src="{{ asset('images/' . $etablissement->logo) }}"
                                                         class="rounded-circle me-3"
-                                                        style="width: 40px; height: 40px; object-fit: cover;">
+                                                        style="width: 40px; height: 40px; object-fit: cover;"
+                                                        onerror="this.onerror=null; this.src='{{ asset('storage/' . $etablissement->logo) }}'">
                                                 @else
-                                                    <div class="avatar-initial rounded-circle bg-light text-primary fw-bold d-flex align-items-center justify-content-center me-3"
-                                                        style="width: 40px; height: 40px;">
+                                                    <div class="avatar-initial rounded-circle bg-white text-black fw-bold d-flex align-items-center justify-content-center me-3"
+                                                        style="width: 40px; height: 40px; font-family: 'Outfit', sans-serif; box-shadow: 0 0 10px rgba(0,0,0,0.2);">
                                                         {{ strtoupper(substr($etablissement->nom, 0, 1)) }}
                                                     </div>
                                                 @endif
                                                 <div>
-                                                    <div class="fw-bold">{{ $etablissement->nom }}</div>
+                                                    <div class="fw-bold text-dark" style="cursor: pointer;"
+                                                        wire:click="$dispatch('open-restaurant-employees', { etablissementId: {{ $etablissement->id }} })">
+                                                        {{ $etablissement->nom }}
+                                                    </div>
                                                     <div class="small text-muted">
                                                         {{ $etablissement->email ?? 'Pas d\'email' }}
                                                     </div>
@@ -205,7 +209,8 @@
                                                 <div class="col-md-6">
                                                     <label class="form-label text-muted small fw-bold">Devise</label>
                                                     <select class="form-select" wire:model="devise">
-                                                        <option value="XAF">FCFA (XAF)</option>
+                                                        <option value="CDF">Franc Congolais (FC)</option>
+                                                        <option value="XAF">FCFA</option>
                                                         <option value="EUR">Euro (€)</option>
                                                         <option value="USD">Dollar ($)</option>
                                                     </select>

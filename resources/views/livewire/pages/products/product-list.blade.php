@@ -82,9 +82,11 @@
             <button wire:click="toggleCategoryManager" class="btn-secondary">
                 <i class="fas fa-tags"></i> Catégories
             </button>
-            <a href="{{ route('products.create') }}" class="btn-add">
-                <i class="fas fa-plus"></i> Nouveau Produit
-            </a>
+            @if(auth()->user()->isAdmin() || auth()->user()->isSuperAdmin())
+                <a href="{{ route('products.create') }}" class="btn-add">
+                    <i class="fas fa-plus"></i> Nouveau Produit
+                </a>
+            @endif
         </div>
     </div>
 
@@ -109,7 +111,7 @@
                     <p class="description">{{ Str::limit($produit->description, 50) }}</p>
                     <div class="price-row">
                         <span class="price">{{ number_format($produit->prix_vente, 0, ',', ' ') }}
-                            {{ auth()->user()->etablissement->devise ?? 'XAF' }}</span>
+                            {{ auth()->user()->etablissement->devise_display ?? 'FCFA' }}</span>
                         <span class="status {{ $produit->disponible ? 'active' : 'inactive' }}">
                             {{ $produit->disponible ? 'Disponible' : 'Indisponible' }}
                         </span>
@@ -117,13 +119,15 @@
                 </div>
 
                 <div class="product-actions">
-                    <a href="{{ route('products.edit', $produit->id) }}" class="btn-edit">
-                        <i class="fas fa-edit"></i>
-                    </a>
-                    <button wire:click="delete({{ $produit->id }})"
-                        wire:confirm="Êtes-vous sûr de vouloir supprimer ce produit ?" class="btn-delete">
-                        <i class="fas fa-trash"></i>
-                    </button>
+                    @if(auth()->user()->isAdmin() || auth()->user()->isSuperAdmin())
+                        <a href="{{ route('products.edit', $produit->id) }}" class="btn-edit">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <button wire:click="delete({{ $produit->id }})"
+                            wire:confirm="Êtes-vous sûr de vouloir supprimer ce produit ?" class="btn-delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    @endif
                 </div>
             </div>
         @empty

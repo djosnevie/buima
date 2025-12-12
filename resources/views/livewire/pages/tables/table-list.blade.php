@@ -77,9 +77,11 @@
                     class="filter-btn {{ $filterStatus === 'occupee' ? 'active' : '' }}">Occupées</button>
             </div>
         </div>
-        <a href="{{ route('tables.create') }}" class="btn-add">
-            <i class="fas fa-plus"></i> Nouvelle Table
-        </a>
+        @if(auth()->user()->isAdmin() || auth()->user()->isSuperAdmin())
+            <a href="{{ route('tables.create') }}" class="btn-add">
+                <i class="fas fa-plus"></i> Nouvelle Table
+            </a>
+        @endif
     </div>
 
     <div class="tables-grid">
@@ -88,13 +90,15 @@
                 <div class="table-header">
                     <span class="table-number">T-{{ $table->numero }}</span>
                     <div class="table-actions">
-                        <a href="{{ route('tables.edit', $table->id) }}" class="btn-icon edit">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <button wire:click="delete({{ $table->id }})" wire:confirm="Supprimer cette table ?"
-                            class="btn-icon delete">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                        @if(auth()->user()->isAdmin() || auth()->user()->isSuperAdmin())
+                            <a href="{{ route('tables.edit', $table->id) }}" class="btn-icon edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button wire:click="delete({{ $table->id }})" wire:confirm="Supprimer cette table ?"
+                                class="btn-icon delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        @endif
                     </div>
                 </div>
 

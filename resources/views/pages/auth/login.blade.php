@@ -25,10 +25,14 @@
                     Se souvenir de moi
                 </label>
             </div>
-            <a href="#" class="text-decoration-none small">Mot de passe oublié ?</a>
         </div>
 
-        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">
+        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold"
+            style="background-color: #bf3a29 !important; border-color: #bf3a29 !important; outline: none !important;"
+            onmouseover="this.style.setProperty('background-color', '#a02f20', 'important'); this.style.setProperty('border-color', '#a02f20', 'important');"
+            onmouseout="this.style.setProperty('background-color', '#bf3a29', 'important'); this.style.setProperty('border-color', '#bf3a29', 'important');"
+            onmousedown="this.style.setProperty('background-color', '#bf3a29', 'important'); this.style.setProperty('border-color', '#bf3a29', 'important'); this.style.setProperty('outline', 'none', 'important'); this.style.setProperty('box-shadow', 'none', 'important');"
+            onfocus="this.style.setProperty('background-color', '#bf3a29', 'important'); this.style.setProperty('border-color', '#bf3a29', 'important'); this.style.setProperty('outline', 'none', 'important'); this.style.setProperty('box-shadow', 'none', 'important');">
             <span wire:loading.remove>Se connecter</span>
             <span wire:loading><i class="fas fa-spinner fa-spin"></i> Connexion...</span>
         </button>

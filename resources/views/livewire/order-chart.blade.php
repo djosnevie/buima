@@ -69,133 +69,102 @@
         </div>
     </div>
 
-    <div class="chart-wrapper">
-        <canvas id="orderChart"></canvas>
-    </div>
+    @if(!auth()->user()->isSuperAdmin())
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden" wire:ignore x-data="{
+                chart: null,
+                init() {
+                    const ctx = document.getElementById('orderChart').getContext('2d');
 
-    <script>
-        document.addEventListener('livewire:initialized', () => {
-            let chart = null;
+                    // Function to init chart
+                    const initChart = (data, labels) => {
+                        if (this.chart) this.chart.destroy();
 
-            const initChart = () => {
-                const ctx = document.getElementById('orderChart');
-                if (!ctx) return;
-
-                const getCssVar = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-                const primaryColor = getCssVar('--primary-color') || '#bf3a29';
-                const secondaryColor = getCssVar('--secondary-color') || '#d64a39';
-
-                // Helper to add opacity to hex/rgb
-                const addOpacity = (color, opacity) => {
-                    // Simple heuristic or use canvas gradient if needed. 
-                    // For now, assuming standard Chart.js behavior or using the var directly if it's hex.
-                    // If var(--primary-color) is provided, we use it directly.
-                    return color;
-                };
-
-                const chartData = @json($chartData);
-                const chartLabels = @json($chartLabels);
-
-                if (chart) {
-                    chart.destroy();
-                }
-
-                chart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: chartLabels,
-                        datasets: [{
-                            label: 'Commandes',
-                            data: chartData,
-                            borderColor: primaryColor,
-                            backgroundColor: 'rgba(0,0,0,0)', // Simplified or need logic for gradient
-                            borderWidth: 3,
-                            fill: true,
-                            tension: 0.4,
-                            pointRadius: 4,
-                            pointHoverRadius: 6,
-                            pointBackgroundColor: primaryColor,
-                            pointBorderColor: '#fff',
-                            pointBorderWidth: 2,
-                            pointHoverBackgroundColor: secondaryColor,
-                            pointHoverBorderColor: '#fff',
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
+                        this.chart = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                    label: 'Commandes',
+                                    data: data,
+                                    borderColor: '#bf3a29', // Brand Primary Color
+                                    backgroundColor: 'rgba(191, 58, 41, 0.1)',
+                                    borderWidth: 2,
+                                    tension: 0.4,
+                                    fill: true,
+                                    pointBackgroundColor: '#fff',
+                                    pointBorderColor: '#bf3a29',
+                                    pointBorderWidth: 2,
+                                    pointRadius: 4,
+                                    pointHoverRadius: 6
+                                }]
                             },
-                            tooltip: {
-                                backgroundColor: 'rgba(31, 41, 55, 0.95)',
-                                titleColor: '#fff',
-                                bodyColor: '#fff',
-                                borderColor: primaryColor,
-                                borderWidth: 1,
-                                padding: 12,
-                                displayColors: false,
-                                callbacks: {
-                                    label: function (context) {
-                                        return context.parsed.y + ' commande(s)';
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    stepSize: 1,
-                                    color: '#6b7280',
-                                    font: {
-                                        size: 12,
-                                        weight: '500'
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: { display: false },
+                                    tooltip: {
+                                        backgroundColor: 'rgba(0,0,0,0.8)',
+                                        padding: 10,
+                                        cornerRadius: 8,
+                                        displayColors: false,
+                                        titleFont: { size: 13 },
+                                        bodyFont: { size: 14, weight: 'bold' }
                                     }
                                 },
-                                grid: {
-                                    color: 'rgba(0, 0, 0, 0.05)',
-                                    drawBorder: false
-                                }
-                            },
-                            x: {
-                                ticks: {
-                                    color: '#6b7280',
-                                    font: {
-                                        size: 11,
-                                        weight: '500'
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        grid: {
+                                            color: '#f0f0f0',
+                                            drawBorder: false
+                                        },
+                                        ticks: {
+                                            stepSize: 1,
+                                            font: { size: 11, family: 'Inter' },
+                                            color: '#6c757d'
+                                        }
                                     },
-                                    maxRotation: 45,
-                                    minRotation: 0
-                                },
-                                grid: {
-                                    display: false,
-                                    drawBorder: false
+                                    x: {
+                                        grid: { display: false },
+                                        ticks: {
+                                            font: { size: 11, family: 'Inter' },
+                                            color: '#6c757d',
+                                            maxRotation: 0
+                                        }
+                                    }
                                 }
                             }
-                        },
-                        interaction: {
-                            intersect: false,
-                            mode: 'index'
-                        }
-                    }
-                });
-            };
+                        });
+                    };
 
-            initChart();
+                    // Initialize with current data from Livewire
+                    initChart($wire.chartData, $wire.chartLabels);
 
-            Livewire.on('chartUpdated', () => {
-                setTimeout(() => initChart(), 100);
-            });
-
-            window.addEventListener('resize', () => {
-                if (chart) {
-                    chart.resize();
+                    // Watch for updates
+                    $wire.on('chartUpdated', () => {
+                       initChart($wire.chartData, $wire.chartLabels);
+                    });
                 }
-            });
-        });
-    </script>
+            }">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="fw-bold mb-0" style="color: var(--primary-color);">
+                        <i class="fas fa-chart-area me-2"></i>
+                        Analyse des Commandes
+                    </h5>
+                </div>
+
+                <div class="chart-container" style="position: relative; height:300px; width:100%">
+                    <canvas id="orderChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Load Chart.js locally or CDN if preferred, but usually layout handles it. Including here just in case. -->
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        </div>
+    @endif
     <!-- Order Chart Styles -->
     <link rel="stylesheet" href="{{ asset('css/livewire/order-chart.css') }}">
 </div>
+```

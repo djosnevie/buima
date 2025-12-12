@@ -112,6 +112,10 @@ class UserManager extends Component
 
     public function save()
     {
+        if (!auth()->user()->isAdmin() && !auth()->user()->isSuperAdmin()) {
+            abort(403);
+        }
+
         $validationRules = $this->rules;
         if ($this->isEditing) {
             $validationRules['email'] = 'required|email|max:255|unique:users,email,' . $this->selectedUserId;
@@ -163,6 +167,10 @@ class UserManager extends Component
 
     public function delete($id)
     {
+        if (!auth()->user()->isAdmin() && !auth()->user()->isSuperAdmin()) {
+            abort(403);
+        }
+
         $user = User::find($id);
         $hasAccess = Auth::user()->isSuperAdmin() ||
             ($user && $user->etablissement_id === Auth::user()->etablissement_id);

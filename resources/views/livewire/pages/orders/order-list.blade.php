@@ -146,7 +146,7 @@
 
                 <div class="order-footer">
                     <div class="total">{{ number_format($commande->total, 0, ',', ' ') }}
-                        {{ auth()->user()->etablissement->devise ?? 'XAF' }}
+                        {{ auth()->user()->etablissement->devise_display ?? 'FCFA' }}
                     </div>
                     <div class="actions">
                         @if($commande->statut === 'en_attente')
@@ -366,7 +366,7 @@
                                             <span class="item-qty">{{ $item->quantite }}</span>
                                             <span class="item-name">{{ $item->produit->nom }}</span>
                                         </div>
-                                        <span class="item-price">{{ number_format($item->prix_unitaire * $item->quantite, 0, ',', ' ') }} {{ auth()->user()->etablissement->devise ?? 'XAF' }}</span>
+                                        <span class="item-price">{{ number_format($item->prix_unitaire * $item->quantite, 0, ',', ' ') }} {{ auth()->user()->etablissement->devise_display ?? 'FCFA' }}</span>
                                     </div>
                                 @endforeach
                             </div>
@@ -385,7 +385,7 @@
                     <div class="panel-footer">
                         <div class="total-row">
                             <span>Total</span>
-                            <span>{{ number_format($selectedOrder->total, 0, ',', ' ') }} {{ auth()->user()->etablissement->devise ?? 'XAF' }}</span>
+                            <span>{{ number_format($selectedOrder->total, 0, ',', ' ') }} {{ auth()->user()->etablissement->devise_display ?? 'FCFA' }}</span>
                         </div>
 
                         <div class="panel-section">

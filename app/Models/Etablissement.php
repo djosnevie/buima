@@ -59,4 +59,16 @@ class Etablissement extends Model
     {
         return $this->hasMany(Commande::class);
     }
+
+    public function getDeviseDisplayAttribute()
+    {
+        $map = [
+            'XAF' => 'FCFA',
+            'CDF' => 'FC',
+            'EUR' => '€',
+            'USD' => '$',
+        ];
+
+        return $map[$this->devise] ?? $this->devise;
+    }
 }

@@ -21,6 +21,10 @@ class TableList extends Component
 
     public function delete($id)
     {
+        if (!auth()->user()->isAdmin() && !auth()->user()->isSuperAdmin()) {
+            abort(403);
+        }
+
         $table = Table::find($id);
         if ($table) {
             try {

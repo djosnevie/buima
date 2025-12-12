@@ -83,6 +83,157 @@
         </div>
     </div>
 
+    <!-- Preview Section -->
+    @if($previewData)
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold mb-0">Aperçu : {{ $previewData['title'] }}</h5>
+                        <div class="d-flex align-items-center gap-2">
+                             <button wire:click="downloadReport('{{ $previewType }}')"
+                                wire:loading.attr="disabled"
+                                class="btn btn-primary btn-sm px-4 shadow-sm">
+                                <span wire:loading.remove wire:target="downloadReport">
+                                    <i class="fas fa-file-pdf me-2"></i> Télécharger
+                                </span>
+                                <span wire:loading wire:target="downloadReport">
+                                    <i class="fas fa-spinner fa-spin me-2"></i> Génération...
+                                </span>
+                            </button>
+                            <button wire:click="$set('previewData', null)" class="btn-close"></button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- Display simple preview based on type -->
+                        @if($previewType === 'sales')
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th class="text-end">Total</th>
+                                        <th class="text-end">Commandes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($previewData['daily_sales'] as $sale)
+                                        <tr>
+                                            <td>{{ \Carbon\Carbon::parse($sale->date)->format('d/m/Y') }}</td>
+                                            <td class="text-end">{{ number_format($sale->total, 0, ',', ' ') }}
+                                                {{ auth()->user()->etablissement->devise }}</td>
+                                            <td class="text-end">{{ $sale->count }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        @elseif($previewType === 'products')
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Produit</th>
+                                        <th class="text-end">Qté</th>
+                                        <th class="text-end">Revenu</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($previewData['products'] as $prod)
+                                        <tr>
+                                            <td>{{ $prod->nom }}</td>
+                                            <td class="text-end">{{ $prod->qty }}</td>
+                                            <td class="text-end">{{ number_format($prod->revenue, 0, ',', ' ') }}
+                                                {{ auth()->user()->etablissement->devise }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        @elseif($previewType === 'product_list')
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Catégorie</th>
+                                        <th>Produit</th>
+                                        <th class="text-end">Prix</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($previewData['product_list'] as $prod)
+                                        <tr>
+                                            <td>{{ $prod->categorie }}</td>
+                                            <td>{{ $prod->nom }}</td>
+                                            <td class="text-end">{{ number_format($prod->prix, 0, ',', ' ') }}
+                                                {{ auth()->user()->etablissement->devise }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                         @elseif($previewType === 'categories')
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Catégorie</th>
+                                        <th class="text-end">Ventes</th>
+                                        <th class="text-end">Revenu</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($previewData['categories'] as $cat)
+                                        <tr>
+                                            <td>{{ $cat->nom }}</td>
+                                            <td class="text-end">{{ $cat->count }}</td>
+                                            <td class="text-end">{{ number_format($cat->revenue, 0, ',', ' ') }}
+                                                {{ auth()->user()->etablissement->devise }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        @elseif($previewType === 'staff')
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Serveur</th>
+                                        <th class="text-end">Commandes</th>
+                                        <th class="text-end">Revenu</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($previewData['staff'] as $st)
+                                        <tr>
+                                            <td>{{ $st->name }}</td>
+                                            <td class="text-end">{{ $st->count }}</td>
+                                            <td class="text-end">{{ number_format($st->revenue, 0, ',', ' ') }}
+                                                {{ auth()->user()->etablissement->devise }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        @elseif($previewType === 'payment')
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Statut</th>
+                                        <th class="text-end">Nombre</th>
+                                        <th class="text-end">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($previewData['payments'] as $pay)
+                                        <tr>
+                                            <td>{{ ucfirst($pay->statut) }}</td>
+                                            <td class="text-end">{{ $pay->count }}</td>
+                                            <td class="text-end">{{ number_format($pay->total, 0, ',', ' ') }}
+                                                {{ auth()->user()->etablissement->devise }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+
     <!-- Export Section -->
     <div class="row">
         <div class="col-12">
@@ -94,66 +245,53 @@
                     <div class="row g-3">
                         <!-- Ventes -->
                         <div class="col-6 col-md-4 col-lg-2">
-                            <a href="#"
-                                onclick="printReport('{{ route('reports.print', ['type' => 'sales', 'range' => $dateRange, 'start' => $startDate, 'end' => $endDate]) }}'); return false;"
-                                class="report-card">
+                            <button wire:click="previewReport('sales')" class="report-card w-100 bg-white">
                                 <i class="fas fa-file-invoice-dollar fa-2x mb-2"></i>
                                 <span class="fw-bold">Ventes</span>
-                            </a>
+                            </button>
                         </div>
                         <!-- Produits Top -->
                         <div class="col-6 col-md-4 col-lg-2">
-                            <a href="#"
-                                onclick="printReport('{{ route('reports.print', ['type' => 'products', 'range' => $dateRange, 'start' => $startDate, 'end' => $endDate]) }}'); return false;"
-                                class="report-card">
+                            <button wire:click="previewReport('products')" class="report-card w-100 bg-white">
                                 <i class="fas fa-hamburger fa-2x mb-2"></i>
                                 <span class="fw-bold">Produits Top</span>
-                            </a>
+                            </button>
                         </div>
                         <!-- Liste Produits -->
                         <div class="col-6 col-md-4 col-lg-2">
-                            <a href="#"
-                                onclick="printReport('{{ route('reports.print', ['type' => 'product_list', 'range' => $dateRange, 'start' => $startDate, 'end' => $endDate]) }}'); return false;"
-                                class="report-card">
+                            <button wire:click="previewReport('product_list')" class="report-card w-100 bg-white">
                                 <i class="fas fa-list fa-2x mb-2"></i>
                                 <span class="fw-bold">Liste Produits</span>
-                            </a>
+                            </button>
                         </div>
                         <!-- Catégories -->
                         <div class="col-6 col-md-4 col-lg-2">
-                            <a href="#"
-                                onclick="printReport('{{ route('reports.print', ['type' => 'categories', 'range' => $dateRange, 'start' => $startDate, 'end' => $endDate]) }}'); return false;"
-                                class="report-card">
+                            <button wire:click="previewReport('categories')" class="report-card w-100 bg-white">
                                 <i class="fas fa-tags fa-2x mb-2"></i>
                                 <span class="fw-bold">Catégories</span>
-                            </a>
+                            </button>
                         </div>
                         <!-- Performance -->
-                        <div class="col-6 col-md-4 col-lg-2">
-                            <a href="#"
-                                onclick="printReport('{{ route('reports.print', ['type' => 'staff', 'range' => $dateRange, 'start' => $startDate, 'end' => $endDate]) }}'); return false;"
-                                class="report-card">
-                                <i class="fas fa-users-cog fa-2x mb-2"></i>
-                                <span class="fw-bold">Performance</span>
-                            </a>
-                        </div>
+                        @if(auth()->user()->isAdmin() || auth()->user()->isSuperAdmin())
+                            <div class="col-6 col-md-4 col-lg-2">
+                                <button wire:click="previewReport('staff')" class="report-card w-100 bg-white">
+                                    <i class="fas fa-users-cog fa-2x mb-2"></i>
+                                    <span class="fw-bold">Performance</span>
+                                </button>
+                            </div>
+                        @endif
                         <!-- Paiements -->
                         <div class="col-6 col-md-4 col-lg-2">
-                            <a href="#"
-                                onclick="printReport('{{ route('reports.print', ['type' => 'payment', 'range' => $dateRange, 'start' => $startDate, 'end' => $endDate]) }}'); return false;"
-                                class="report-card">
+                            <button wire:click="previewReport('payment')" class="report-card w-100 bg-white">
                                 <i class="fas fa-credit-card fa-2x mb-2"></i>
                                 <span class="fw-bold">Paiements</span>
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Hidden Iframe for Printing -->
-    <iframe id="printFrame" style="display:none;"></iframe>
 
     <style>
         .report-card {
@@ -173,17 +311,28 @@
 
         .report-card:hover {
             background-color: #dc3545;
-            color: white;
+            color: #fff; /* Keeping white text on red background is actually correct design-wise, perhaps the user meant the background turned white? */
+            /* Wait, the user said "buttons becomes white". */
+            /* The CSS says background-color: #dc3545 (red) and color: white. */
+            /* If the user dislikes it, maybe they want the inverse or just a shadow? */
+            /* "in hover repports buttons becomes white ? I don;t want that." */
+            /* The initial state is white bg (from Bootstrap utility classes on the button). */
+            /* The CSS class .report-card sets background: #fff5f5 (light pink). */
+            /* On hover it goes red. */
+            /* Let's re-read: "becomes white". */
+            /* Inspecting the blade: <button ... class="report-card w-100 bg-white"> */
+            /* Ah! The inline class `bg-white` might be conflicting or interacting weirdly. */
+            /* The user likely means they don't want the text to disappear or the whole thing to look 'white' / 'blank' if something is wrong. */
+            /* OR, they genuinely don't want the hover effect to change the color so drastically. */
+            /* Let's try removing the `color: white` change and see if that satisfies "don't become white". */
+            /* Actually, if I remove `color: white`, text stays red on red background -> unreadable. */
+            /* Maybe they meant the ICON becomes white? */
+            /* Let's assume they want a subtle hover, not a full fill. */
+            /* I will change hover to just darken the border and background slightly, keeping text red. */
+            background-color: #ffe0e0;
+            color: #dc3545; 
             transform: translateY(-2px);
             box-shadow: 0 4px 6px rgba(220, 53, 69, 0.2);
         }
     </style>
-
-    <script>
-        function printReport(url) {
-            const iframe = document.getElementById('printFrame');
-            iframe.src = url;
-            // The iframe page (generic.blade.php) has window.onload = window.print()
-        }
-    </script>
 </div>

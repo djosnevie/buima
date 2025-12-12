@@ -21,6 +21,9 @@ class ReportDashboard extends Component
     public $totalOrders = 0;
     public $averageOrderValue = 0;
 
+    public $previewData = null;
+    public $previewType = null;
+
     public function mount()
     {
         $this->setDateRange('today');
@@ -47,6 +50,7 @@ class ReportDashboard extends Component
                 $this->endDate = Carbon::now()->endOfYear()->format('Y-m-d');
                 break;
         }
+
         $this->calculateMetrics();
     }
 
@@ -54,8 +58,15 @@ class ReportDashboard extends Component
     {
         if ($propertyName === 'startDate' || $propertyName === 'endDate') {
             $this->dateRange = 'custom';
+            $this->previewData = null; // Close preview on date change
             $this->calculateMetrics();
         }
+    }
+
+    public function updatedDateRange($value)
+    {
+        $this->previewData = null; // Close preview on date change
+        $this->setDateRange($value);
     }
 
     public function calculateMetrics()
@@ -66,16 +77,27 @@ class ReportDashboard extends Component
         $query = Commande::where('etablissement_id', Auth::user()->etablissement_id)
             ->whereBetween('created_at', [$start, $end]);
 
+        if (!Auth::user()->isAdmin() && !Auth::user()->isSuperAdmin()) {
+            $query->where('user_id', Auth::id());
+        }
+
         $this->totalRevenue = $query->sum('total');
         $this->totalOrders = $query->count();
         $this->averageOrderValue = $this->totalOrders > 0 ? $this->totalRevenue / $this->totalOrders : 0;
     }
 
-    public function downloadReport($type)
+    private function generateReportData($type)
     {
         $start = Carbon::parse($this->startDate)->startOfDay();
         $end = Carbon::parse($this->endDate)->endOfDay();
         $etablissement = Auth::user()->etablissement;
+        $user = Auth::user();
+        $isGlobal = $user->isAdmin() || $user->isSuperAdmin();
+
+        // Prevent non-admins from accessing staff reports
+        if ($type === 'staff' && !$isGlobal) {
+            abort(403, 'Unauthorized action.');
+        }
 
         $data = [
             'type' => $type,
@@ -87,6 +109,10 @@ class ReportDashboard extends Component
 
         $query = Commande::where('etablissement_id', $etablissement->id)
             ->whereBetween('created_at', [$start, $end]);
+
+        if (!$isGlobal) {
+            $query->where('user_id', $user->id);
+        }
 
         switch ($type) {
             case 'sales':
@@ -101,12 +127,18 @@ class ReportDashboard extends Component
             case 'products':
                 $data['title'] = 'Top Produits';
                 // This requires a join with items
-                $data['products'] = DB::table('commande_items')
+                // Need to re-apply the user filter on the join query
+                $productQuery = DB::table('commande_items')
                     ->join('commandes', 'commande_items.commande_id', '=', 'commandes.id')
                     ->join('produits', 'commande_items.produit_id', '=', 'produits.id')
                     ->where('commandes.etablissement_id', $etablissement->id)
-                    ->whereBetween('commandes.created_at', [$start, $end])
-                    ->select('produits.nom', DB::raw('SUM(commande_items.quantite) as qty'), DB::raw('SUM(commande_items.sous_total) as revenue'))
+                    ->whereBetween('commandes.created_at', [$start, $end]);
+
+                if (!$isGlobal) {
+                    $productQuery->where('commandes.user_id', $user->id);
+                }
+
+                $data['products'] = $productQuery->select('produits.nom', DB::raw('SUM(commande_items.quantite) as qty'), DB::raw('SUM(commande_items.sous_total) as revenue'))
                     ->groupBy('produits.nom')
                     ->orderByDesc('qty')
                     ->limit(20)
@@ -115,13 +147,18 @@ class ReportDashboard extends Component
 
             case 'categories':
                 $data['title'] = 'Ventes par Catégorie';
-                $data['categories'] = DB::table('commande_items')
+                $catQuery = DB::table('commande_items')
                     ->join('commandes', 'commande_items.commande_id', '=', 'commandes.id')
                     ->join('produits', 'commande_items.produit_id', '=', 'produits.id')
                     ->join('categories', 'produits.categorie_id', '=', 'categories.id')
                     ->where('commandes.etablissement_id', $etablissement->id)
-                    ->whereBetween('commandes.created_at', [$start, $end])
-                    ->select('categories.nom', DB::raw('SUM(commande_items.sous_total) as revenue'), DB::raw('COUNT(commande_items.id) as count'))
+                    ->whereBetween('commandes.created_at', [$start, $end]);
+
+                if (!$isGlobal) {
+                    $catQuery->where('commandes.user_id', $user->id);
+                }
+
+                $data['categories'] = $catQuery->select('categories.nom', DB::raw('SUM(commande_items.sous_total) as revenue'), DB::raw('COUNT(commande_items.id) as count'))
                     ->groupBy('categories.nom')
                     ->orderByDesc('revenue')
                     ->get();
@@ -129,15 +166,7 @@ class ReportDashboard extends Component
 
             case 'staff':
                 $data['title'] = 'Performance Serveurs';
-                // Assumes we track user_id on command (which we do if Auth::user created it, usually tracked?)
-                // Actually need to check if Commande has user_id relation or similar.
-                // Assuming 'serveur' is tracked somehow. In previous files I saw 'Serveur: Auth::user()->name' in invoice.
-                // But is it stored in DB? Migration `2025_12...` added client telephone.
-                // Let's assume we can group by creator (user_id if exists).
-                // Standard Laravel models usually have created_by or similar if set up, or just use existing log.
-                // Wait, `auth()->user()->orders()`?
-                // I will use a generic workaround if user_id isn't explicit on Commande: created_at? No.
-                // Let's check Commande model in next step if this fails. For now assuming typical relationship.
+                // Only accessible by admin (checked above)
                 $data['staff'] = DB::table('commandes')
                     ->join('users', 'commandes.user_id', '=', 'users.id')
                     ->where('commandes.etablissement_id', $etablissement->id)
@@ -150,14 +179,41 @@ class ReportDashboard extends Component
 
             case 'payment':
                 $data['title'] = 'Méthodes de Paiement';
-                // Assuming 'mode_paiement' or similar exists, or just status.
-                // If not, we might report on Status (Payé vs En attente).
                 $data['payments'] = $query->select('statut', DB::raw('COUNT(*) as count'), DB::raw('SUM(total) as total'))
                     ->groupBy('statut')
                     ->get();
                 break;
+
+            case 'product_list':
+                $data['title'] = 'Liste des Produits';
+                $data['start'] = null;
+                $data['end'] = null;
+                $data['product_list'] = DB::table('produits')
+                    ->leftJoin('categories', 'produits.categorie_id', '=', 'categories.id')
+                    ->where('produits.etablissement_id', $etablissement->id)
+                    ->select('produits.nom', 'produits.prix_vente as prix', 'categories.nom as categorie', 'produits.image')
+                    ->orderBy('categories.nom')
+                    ->orderBy('produits.nom')
+                    ->get();
+                break;
         }
 
+        if (!$isGlobal) {
+            $data['title'] .= ' - ' . $user->name;
+        }
+
+        return $data;
+    }
+
+    public function previewReport($type)
+    {
+        $this->previewType = $type;
+        $this->previewData = $this->generateReportData($type);
+    }
+
+    public function downloadReport($type)
+    {
+        $data = $this->generateReportData($type);
         $pdf = Pdf::loadView('reports.pdf.generic', $data);
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->output();

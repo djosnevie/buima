@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/biuma_logo_b.png') }}">
     <title>@yield('title', config('app.name', 'Laravel'))</title>
 
     <!-- Bootstrap 5 CDN -->
@@ -68,25 +69,35 @@
 
 <body>
     <div class="sidebar">
+        <!-- Sidebar Profile / Brand -->
         <div class="sidebar-brand text-center">
+
             @if(auth()->check() && auth()->user()->isSuperAdmin())
                 <img src="{{ asset('images/biuma_logo_blanck.png') }}" alt="Biuma" class="img-fluid"
                     style="height: 60px; object-fit: contain;">
             @elseif(auth()->user()->etablissement && auth()->user()->etablissement->logo)
-                <img src="{{ asset('storage/' . auth()->user()->etablissement->logo) }}"
-                    onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->etablissement->nom) }}&background=random&rounded=true'; this.classList.add('rounded-circle'); this.style.maxWidth='50px'; this.style.height='50px'; this.style.objectFit='cover'; this.style.border='2px solid rgba(255,255,255,0.2)';"
-                    alt="Logo" class="mb-2 img-fluid" style="max-height: 80px; object-fit: contain;">
-                <h5 class="text-white mb-0 fw-bold">{{ auth()->user()->etablissement->nom }}</h5>
+                <div class="position-relative d-inline-block">
+                    <img src="{{ asset('storage/' . auth()->user()->etablissement->logo) }}"
+                        onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->etablissement->nom) }}&background=ffffff&color=000000&rounded=true'; this.classList.add('rounded-circle'); this.style.maxWidth='50px'; this.style.height='50px'; this.style.objectFit='cover';"
+                        alt="Logo" class="mb-2 img-fluid" style="max-height: 80px; object-fit: contain;">
+                </div>
+                <h5 class="text-white mb-0 fw-bold mt-2" style="text-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    {{ auth()->user()->etablissement->nom }}
+                </h5>
             @else
                 <div class="d-flex flex-column align-items-center">
-                    <img src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->etablissement->nom ?? 'O Menu') }}&background=random&rounded=true"
-                        alt="Logo" class="mb-2 rounded-circle shadow-sm"
-                        style="width: 50px; height: 50px; object-fit: cover; border: 2px solid rgba(255,255,255,0.2);">
-                    <h5 class="text-white mb-0 fw-bold">{{ auth()->user()->etablissement->nom ?? "O'Menu" }}</h5>
+                    <div class="user-avatar rounded-circle d-flex align-items-center justify-content-center fw-bold mb-2 position-relative"
+                        style="width: 60px; height: 60px; border: 3px solid rgba(255,255,255,0.9); font-family: 'Outfit', sans-serif; font-size: 1.4rem; background-color: #ffffff !important; background-image: none !important; color: #000000 !important; box-shadow: 0 0 25px rgba(255,255,255,0.4);">
+                        {{ strtoupper(substr(auth()->user()->etablissement->nom ?? "O'Menu", 0, 1)) }}{{ strtoupper(substr(auth()->user()->etablissement->nom ?? "O'Menu", 1, 1) ?? '') }}
+                    </div>
+                    <h5 class="text-white mb-0 fw-bold" style="text-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        {{ auth()->user()->etablissement->nom ?? "O'Menu" }}
+                    </h5>
                 </div>
             @endif
         </div>
-        <nav class="nav flex-column">
+
+        <nav class="nav flex-column mt-4">
             @if(!auth()->user()->isSuperAdmin())
                 <div class="nav-item">
                     <a href="{{ route('dashboard') }}"
@@ -131,6 +142,7 @@
                     </a>
                 </div>
             @endif
+
             @if(auth()->user()->isSuperAdmin())
                 <div class="nav-item">
                     <a class="nav-link {{ request()->routeIs('super_admin.dashboard') ? 'active' : '' }}"
@@ -139,8 +151,16 @@
                         <span>Restaurants</span>
                     </a>
                 </div>
+                <div class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('settings.users') ? 'active' : '' }}"
+                        href="{{ route('settings.users') }}">
+                        <i class="fas fa-users"></i>
+                        <span>Personnel</span>
+                    </a>
+                </div>
             @endif
-            @if(auth()->user()->isAdmin())
+
+            @if(auth()->user()->isAdmin() && !auth()->user()->isSuperAdmin())
                 <div class="nav-item">
                     <a class="nav-link {{ request()->routeIs('settings.*') && !request()->routeIs('settings.sections') && !request()->routeIs('settings.users') ? 'active' : '' }}"
                         href="{{ route('settings.restaurant') }}">
@@ -148,10 +168,6 @@
                         <span>Paramètres</span>
                     </a>
                 </div>
-            @endif
-
-            @if(auth()->user()->isAdmin())
-
                 <div class="nav-item">
                     <a class="nav-link {{ request()->routeIs('settings.sections') ? 'active' : '' }}"
                         href="{{ route('settings.sections') }}">
@@ -159,7 +175,6 @@
                         <span>Sections</span>
                     </a>
                 </div>
-
                 <div class="nav-item">
                     <a class="nav-link {{ request()->routeIs('settings.users') ? 'active' : '' }}"
                         href="{{ route('settings.users') }}">
@@ -191,7 +206,7 @@
                 <div class="dropdown">
                     <div class="user-dropdown d-flex align-items-center gap-2 cursor-pointer" data-bs-toggle="dropdown"
                         aria-expanded="false" style="cursor: pointer;">
-                        <div class="user-avatar bg-light rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold"
+                        <div class="user-avatar bg-primary rounded-circle d-flex align-items-center justify-content-center text-white fw-bold"
                             style="width: 40px; height: 40px;">
                             {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                         </div>
@@ -206,8 +221,10 @@
                                 onclick="Livewire.dispatch('open-profile-modal'); return false;"><i
                                     class="fas fa-user me-2 text-muted"></i>Profil</a>
                         </li>
-                        <li><a class="dropdown-item py-2" href="{{ route('settings.restaurant') }}"><i
-                                    class="fas fa-cog me-2 text-muted"></i>Paramètres</a></li>
+                        @if(auth()->user()->isAdmin() && !auth()->user()->isSuperAdmin())
+                            <li><a class="dropdown-item py-2" href="{{ route('settings.restaurant') }}"><i
+                                        class="fas fa-cog me-2 text-muted"></i>Paramètres</a></li>
+                        @endif
                         <li>
                             <hr class="dropdown-divider my-1">
                         </li>
@@ -249,6 +266,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     @livewireScripts
     <livewire:profile.edit-profile />
+    <livewire:restaurant-employees />
 </body>
 
 </html>

@@ -28,6 +28,10 @@ class ProductList extends Component
 
     public function delete($id)
     {
+        if (!auth()->user()->isAdmin() && !auth()->user()->isSuperAdmin()) {
+            abort(403);
+        }
+
         $produit = Produit::find($id);
         if ($produit) {
             try {

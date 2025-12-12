@@ -20,12 +20,37 @@ class SectionManager extends Component
     public $selectedSectionId;
     public $isEditing = false;
 
+    public $usersInSection = [];
+    public $isUsersModalOpen = false;
+    public $viewingSectionName = '';
+
     protected $rules = [
         'nom' => 'required|string|max:255',
         'description' => 'nullable|string|max:500',
         'actif' => 'boolean',
         'etablissement_id' => 'nullable|exists:etablissements,id',
     ];
+
+    public function showUsers($id)
+    {
+        $section = Section::with('users')->find($id);
+
+        $hasAccess = Auth::user()->isSuperAdmin() ||
+            ($section && $section->etablissement_id === Auth::user()->etablissement_id);
+
+        if ($section && $hasAccess) {
+            $this->usersInSection = $section->users;
+            $this->viewingSectionName = $section->nom;
+            $this->isUsersModalOpen = true;
+        }
+    }
+
+    public function closeUsersModal()
+    {
+        $this->isUsersModalOpen = false;
+        $this->usersInSection = [];
+        $this->viewingSectionName = '';
+    }
 
     public function mount()
     {
@@ -68,6 +93,10 @@ class SectionManager extends Component
 
     public function save()
     {
+        if (!auth()->user()->isAdmin() && !auth()->user()->isSuperAdmin()) {
+            abort(403);
+        }
+
         $this->validate();
 
         // Determine Etablissement ID
@@ -117,6 +146,10 @@ class SectionManager extends Component
 
     public function delete($id)
     {
+        if (!auth()->user()->isAdmin() && !auth()->user()->isSuperAdmin()) {
+            abort(403);
+        }
+
         $section = Section::find($id);
         $hasAccess = Auth::user()->isSuperAdmin() ||
             ($section && $section->etablissement_id === Auth::user()->etablissement_id);

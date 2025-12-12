@@ -34,6 +34,10 @@ class CategoryManager extends Component
 
     public function save()
     {
+        if (!auth()->user()->isAdmin() && !auth()->user()->isSuperAdmin()) {
+            abort(403);
+        }
+
         $this->validate();
 
         $data = [
@@ -70,6 +74,10 @@ class CategoryManager extends Component
 
     public function delete($id)
     {
+        if (!auth()->user()->isAdmin() && !auth()->user()->isSuperAdmin()) {
+            abort(403);
+        }
+
         try {
             Categorie::find($id)->delete();
             session()->flash('message', 'Catégorie supprimée.');

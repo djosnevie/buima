@@ -10,16 +10,28 @@ class TopProducts extends Component
 {
     public function render()
     {
+        $user = auth()->user();
+
+        // Return empty if SuperAdmin
+        if ($user->isSuperAdmin()) {
+            return view('livewire.top-products', ['topProducts' => collect()]);
+        }
+
         // Get top 5 products by quantity sold
-        $topProducts = CommandeItem::select('commande_items.produit_id', DB::raw('SUM(commande_items.quantite) as total_quantity'), DB::raw('SUM(commande_items.sous_total) as total_revenue'))
+        $query = CommandeItem::select('commande_items.produit_id', DB::raw('SUM(commande_items.quantite) as total_quantity'), DB::raw('SUM(commande_items.sous_total) as total_revenue'))
             ->join('commandes', 'commande_items.commande_id', '=', 'commandes.id')
-            ->where('commandes.etablissement_id', auth()->user()->etablissement_id)
-            ->with([
-                'produit' => function ($query) {
-                    // Also ensure product belongs to establishment (redundant but safe)
-                    $query->where('etablissement_id', auth()->user()->etablissement_id);
-                }
-            ])
+            ->where('commandes.etablissement_id', $user->etablissement_id);
+
+        // Scope to employee if not Admin
+        if (!$user->isAdmin()) {
+            $query->where('commandes.user_id', $user->id);
+        }
+
+        $topProducts = $query->with([
+            'produit' => function ($q) use ($user) {
+                $q->where('etablissement_id', $user->etablissement_id);
+            }
+        ])
             ->groupBy('commande_items.produit_id')
             ->orderBy('total_quantity', 'desc')
             ->limit(5)

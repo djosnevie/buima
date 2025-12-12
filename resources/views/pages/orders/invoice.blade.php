@@ -85,7 +85,8 @@
     <div class="header">
         <div class="logo">
             @if($etablissement && $etablissement->logo)
-                <img src="{{ asset('storage/' . $etablissement->logo) }}" alt="Logo">
+                <img src="{{ asset('images/' . $etablissement->logo) }}" alt="Logo"
+                    onerror="this.onerror=null; this.src='{{ asset('storage/' . $etablissement->logo) }}'">
             @else
                 <div class="logo-text">{{ $etablissement->nom ?? 'OMENU' }}</div>
             @endif
@@ -127,7 +128,7 @@
                     <td>{{ $item->quantite }}x</td>
                     <td>{{ $item->produit->nom }}</td>
                     <td style="text-align: right">{{ number_format($item->sous_total, 0, ',', ' ') }}
-                        {{ $etablissement->devise ?? 'XAF' }}
+                        {{ $etablissement->devise_display ?? 'FCFA' }}
                     </td>
                 </tr>
             @endforeach
@@ -135,12 +136,14 @@
     </table>
 
     <div class="totals">
-        <div>Sous-total: {{ number_format($commande->sous_total, 0, ',', ' ') }} {{ $etablissement->devise ?? 'XAF' }}
+        <div>Sous-total: {{ number_format($commande->sous_total, 0, ',', ' ') }}
+            {{ $etablissement->devise_display ?? 'FCFA' }}
         </div>
-        <div>TVA (10%): {{ number_format($commande->montant_taxes, 0, ',', ' ') }} {{ $etablissement->devise ?? 'XAF' }}
+        <div>TVA (10%): {{ number_format($commande->montant_taxes, 0, ',', ' ') }}
+            {{ $etablissement->devise_display ?? 'FCFA' }}
         </div>
         <div style="font-weight: bold; font-size: 16px; margin-top: 5px">
-            TOTAL: {{ number_format($commande->total, 0, ',', ' ') }} {{ $etablissement->devise ?? 'XAF' }}
+            TOTAL: {{ number_format($commande->total, 0, ',', ' ') }} {{ $etablissement->devise_display ?? 'FCFA' }}
         </div>
     </div>
 

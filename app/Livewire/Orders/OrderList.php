@@ -197,9 +197,16 @@ class OrderList extends Component
 
     public function render()
     {
+        $user = auth()->user();
+        $isGlobal = $user->isAdmin() || $user->isSuperAdmin();
+
         $query = Commande::with(['table', 'items.produit'])
-            ->where('etablissement_id', auth()->user()->etablissement_id)
+            ->where('etablissement_id', $user->etablissement_id)
             ->latest();
+
+        if (!$isGlobal) {
+            $query->where('user_id', $user->id);
+        }
 
         if ($this->filterStatus !== 'all') {
             $query->where('statut', $this->filterStatus);
