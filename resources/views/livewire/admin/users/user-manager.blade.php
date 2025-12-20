@@ -43,7 +43,8 @@
                                         <th class="py-3 text-muted small fw-bold">ÉTABLISSEMENT</th>
                                     @endif
                                     <th class="py-3 text-muted small fw-bold">RÔLE</th>
-                                    <th class="py-3 text-muted small fw-bold">SECTION ASSIGNÉE</th>
+                                    <th class="py-3 text-muted small fw-bold">SECTION (ZONE)</th>
+                                    <th class="py-3 text-muted small fw-bold">CAISSE ASSIGNÉE</th>
                                     <th class="pe-4 py-3 text-end text-muted small fw-bold">ACTIONS</th>
                                 </tr>
                             </thead>
@@ -89,10 +90,19 @@
                                             @if($user->section)
                                                 <span
                                                     class="badge bg-secondary-subtle text-secondary rounded-pill px-3">{{ $user->section->nom }}</span>
-                                            @elseif($user->role === 'admin')
+                                            @elseif($user->role === 'admin' || $user->role === 'manager')
                                                 <span class="text-muted small">Accès Global</span>
                                             @else
                                                 <span class="text-muted small">Aucune (Accès limité)</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($user->caisse)
+                                                <span class="badge bg-success-subtle text-success rounded-pill px-3">
+                                                    <i class="fas fa-cash-register me-1"></i> {{ $user->caisse->nom }}
+                                                </span>
+                                            @else
+                                                <span class="text-muted small">-</span>
                                             @endif
                                         </td>
                                         <td class="pe-4 text-end">
@@ -178,6 +188,21 @@
                                         @endforeach
                                     </select>
                                 </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label text-muted small fw-bold">Caisse Assignée</label>
+                                <select class="form-select" wire:model="caisse_id">
+                                    <option value="">Aucune</option>
+                                    @foreach($caisses as $caisse)
+                                        <option value="{{ $caisse->id }}">{{ $caisse->nom }}
+                                            @if(auth()->user()->isSuperAdmin())
+                                                ({{ $caisse->etablissement->nom ?? 'N/A' }})
+                                            @endif
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('caisse_id') <span class="text-danger small">{{ $message }}</span> @enderror
                             </div>
 
                             @if(auth()->user()->isSuperAdmin())

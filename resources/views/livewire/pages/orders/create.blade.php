@@ -147,14 +147,8 @@
                 @forelse($produits as $produit)
                     <div class="product-card" wire:click="addToCart({{ $produit->id }})">
                         <div class="product-image">
-                            @if($produit->image)
-                                <img src="{{ asset('images/' . $produit->image) }}" alt="{{ $produit->nom }}"
-                                     onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'placeholder-image\'><i class=\'fas fa-utensils\'></i></div>'">
-                            @else
-                                <div class="placeholder-image">
-                                    <i class="fas fa-utensils"></i>
-                                </div>
-                            @endif
+                            <img src="{{ $produit->image_url }}" alt="{{ $produit->nom }}"
+                                 onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode($produit->nom) }}&background=f8f9fa&color=bf3a29';">
                         </div>
                         <div class="product-info">
                             <h6 class="product-title">{{ $produit->nom }}</h6>
@@ -242,7 +236,7 @@
                             <span class="fw-bold">{{ number_format($this->subtotal, 0, ',', ' ') }} {{ auth()->user()->etablissement->devise_display ?? 'FCFA' }}</span>
                         </div>
                         <div class="d-flex justify-content-between mb-2">
-                            <span class="text-muted">TVA (10%)</span>
+                            <span class="text-muted">TVA ({{ (float)(auth()->user()->etablissement->tva_taux ?? 0) }}%)</span>
                             <span>{{ number_format($this->taxes, 0, ',', ' ') }} {{ auth()->user()->etablissement->devise_display ?? 'FCFA' }}</span>
                         </div>
                         <div class="d-flex justify-content-between mb-3 pt-2 border-top">

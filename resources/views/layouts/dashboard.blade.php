@@ -71,27 +71,37 @@
     <div class="sidebar">
         <!-- Sidebar Profile / Brand -->
         <div class="sidebar-brand text-center">
+            @php
+                $currentEtablissement = auth()->user()->etablissement;
+                if (auth()->user()->isManager() && session('manager_view_site_id')) {
+                    $contextSite = \App\Models\Etablissement::find(session('manager_view_site_id'));
+                    if ($contextSite) {
+                        $currentEtablissement = $contextSite;
+                    }
+                }
+            @endphp
 
             @if(auth()->check() && auth()->user()->isSuperAdmin())
                 <img src="{{ asset('images/biuma_logo_blanck.png') }}" alt="Biuma" class="img-fluid"
                     style="height: 60px; object-fit: contain;">
-            @elseif(auth()->user()->etablissement && auth()->user()->etablissement->logo)
+            @elseif($currentEtablissement && $currentEtablissement->logo)
                 <div class="position-relative d-inline-block">
-                    <img src="{{ asset('storage/' . auth()->user()->etablissement->logo) }}"
-                        onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->etablissement->nom) }}&background=ffffff&color=000000&rounded=true'; this.classList.add('rounded-circle'); this.style.maxWidth='50px'; this.style.height='50px'; this.style.objectFit='cover';"
-                        alt="Logo" class="mb-2 img-fluid" style="max-height: 80px; object-fit: contain;">
+                    <!-- Fix: Ensure asset path points to 'images/' disk root, not 'storage/' -->
+                    <img src="{{ asset('images/' . $currentEtablissement->logo) }}"
+                        onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode($currentEtablissement->nom) }}&background=ffffff&color=000000&rounded=true'; this.classList.add('rounded-circle');"
+                        alt="Logo" class="mb-2 img-fluid rounded-circle" style="width: 80px; height: 80px; object-fit: cover; border: 3px solid rgba(255,255,255,0.2);">
                 </div>
                 <h5 class="text-white mb-0 fw-bold mt-2" style="text-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                    {{ auth()->user()->etablissement->nom }}
+                    {{ $currentEtablissement->nom }}
                 </h5>
             @else
                 <div class="d-flex flex-column align-items-center">
                     <div class="user-avatar rounded-circle d-flex align-items-center justify-content-center fw-bold mb-2 position-relative"
                         style="width: 60px; height: 60px; border: 3px solid rgba(255,255,255,0.9); font-family: 'Outfit', sans-serif; font-size: 1.4rem; background-color: #ffffff !important; background-image: none !important; color: #000000 !important; box-shadow: 0 0 25px rgba(255,255,255,0.4);">
-                        {{ strtoupper(substr(auth()->user()->etablissement->nom ?? "O'Menu", 0, 1)) }}{{ strtoupper(substr(auth()->user()->etablissement->nom ?? "O'Menu", 1, 1) ?? '') }}
+                        {{ strtoupper(substr($currentEtablissement->nom ?? "O'Menu", 0, 1)) }}{{ strtoupper(substr($currentEtablissement->nom ?? "O'Menu", 1, 1) ?? '') }}
                     </div>
                     <h5 class="text-white mb-0 fw-bold" style="text-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                        {{ auth()->user()->etablissement->nom ?? "O'Menu" }}
+                        {{ $currentEtablissement->nom ?? "O'Menu" }}
                     </h5>
                 </div>
             @endif
@@ -106,41 +116,87 @@
                         <span>Tableau de bord</span>
                     </a>
                 </div>
-                <div class="nav-item">
-                    <a href="{{ route('orders.create') }}"
-                        class="nav-link {{ request()->routeIs('orders.create') ? 'active' : '' }}">
-                        <i class="fas fa-plus-circle"></i>
-                        <span>Nouvelle Commande</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="{{ route('orders.index') }}"
-                        class="nav-link {{ request()->routeIs('orders.index') ? 'active' : '' }}">
-                        <i class="fas fa-list-alt"></i>
-                        <span>Commandes</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="{{ route('products.index') }}"
-                        class="nav-link {{ request()->routeIs('products.*') ? 'active' : '' }}">
-                        <i class="fas fa-box"></i>
-                        <span>Produits</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="{{ route('tables.index') }}"
-                        class="nav-link {{ request()->routeIs('tables.*') ? 'active' : '' }}">
-                        <i class="fas fa-table"></i>
-                        <span>Tables</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="{{ route('reports.index') }}"
-                        class="nav-link {{ request()->routeIs('reports.index') ? 'active' : '' }}">
-                        <i class="fas fa-chart-line"></i>
-                        <span>Rapports</span>
-                    </a>
-                </div>
+                @if(auth()->user()->etablissement->hasModule('orders'))
+                    <div class="nav-item">
+                        <a href="{{ route('orders.create') }}"
+                            class="nav-link {{ request()->routeIs('orders.create') ? 'active' : '' }}">
+                            <i class="fas fa-plus-circle"></i>
+                            <span>Nouvelle Commande</span>
+                        </a>
+                    </div>
+                @endif
+                @if(auth()->user()->etablissement->hasModule('orders'))
+                    <div class="nav-item">
+                        <a href="{{ route('orders.index') }}"
+                            class="nav-link {{ request()->routeIs('orders.index') ? 'active' : '' }}">
+                            <i class="fas fa-list-alt"></i>
+                            <span>Commandes</span>
+                        </a>
+                    </div>
+                @endif
+                @if(auth()->user()->etablissement->hasModule('products'))
+                    <div class="nav-item">
+                        <a href="{{ route('products.index') }}"
+                            class="nav-link {{ request()->routeIs('products.*') ? 'active' : '' }}">
+                            <i class="fas fa-box"></i>
+                            <span>Produits</span>
+                        </a>
+                    </div>
+                @endif
+                @if(auth()->user()->etablissement->hasModule('tables'))
+                    <div class="nav-item">
+                        <a href="{{ route('tables.index') }}"
+                            class="nav-link {{ request()->routeIs('tables.*') ? 'active' : '' }}">
+                            <i class="fas fa-table"></i>
+                            <span>Tables</span>
+                        </a>
+                    </div>
+                @endif
+                @if(auth()->user()->etablissement->hasModule('inventory') && auth()->user()->isAdmin())
+                    <div class="nav-item">
+                        <a href="{{ route('suppliers.index') }}"
+                            class="nav-link {{ request()->routeIs('suppliers.*') ? 'active' : '' }}">
+                            <i class="fas fa-truck"></i>
+                            <span>Fournisseurs</span>
+                        </a>
+                    </div>
+                @endif
+                @if(auth()->user()->etablissement->hasModule('inventory'))
+                    <div class="nav-item">
+                        <a href="{{ route('stock.index') }}"
+                            class="nav-link {{ request()->routeIs('stock.*') ? 'active' : '' }}">
+                            <i class="fas fa-cubes"></i>
+                            <span>Stocks</span>
+                        </a>
+                    </div>
+                @endif
+                @if(auth()->user()->etablissement->hasModule('caisses'))
+                    <div class="nav-item">
+                        <a href="{{ route('caisses.index') }}"
+                            class="nav-link {{ request()->routeIs('caisses.*') ? 'active' : '' }}">
+                            <i class="fas fa-cash-register"></i>
+                            <span>Caisses</span>
+                        </a>
+                    </div>
+                @endif
+                @if(auth()->user()->etablissement->hasModule('finance'))
+                    <div class="nav-item">
+                        <a href="{{ route('finance.index') }}"
+                            class="nav-link {{ request()->routeIs('finance.*') ? 'active' : '' }}">
+                            <i class="fas fa-wallet"></i>
+                            <span>Finance</span>
+                        </a>
+                    </div>
+                @endif
+                @if(auth()->user()->etablissement->hasModule('reports'))
+                    <div class="nav-item">
+                        <a href="{{ route('reports.index') }}"
+                            class="nav-link {{ request()->routeIs('reports.index') ? 'active' : '' }}">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Rapports</span>
+                        </a>
+                    </div>
+                @endif
             @endif
 
             @if(auth()->user()->isSuperAdmin())
@@ -151,11 +207,14 @@
                         <span>Restaurants</span>
                     </a>
                 </div>
+            @endif
+
+            @if(auth()->user()->isManager() && !auth()->user()->isSuperAdmin() && auth()->user()->etablissement->hasModule('pos'))
                 <div class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('settings.users') ? 'active' : '' }}"
-                        href="{{ route('settings.users') }}">
-                        <i class="fas fa-users"></i>
-                        <span>Personnel</span>
+                    <a class="nav-link {{ request()->routeIs('manager.pos.index') ? 'active' : '' }}"
+                        href="{{ route('manager.pos.index') }}">
+                        <i class="fas fa-network-wired"></i>
+                        <span>Points de Vente</span>
                     </a>
                 </div>
             @endif
@@ -166,6 +225,13 @@
                         href="{{ route('settings.restaurant') }}">
                         <i class="fas fa-cog"></i>
                         <span>Paramètres</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('settings.backups') ? 'active' : '' }}"
+                        href="{{ route('settings.backups') }}">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Sauvegardes</span>
                     </a>
                 </div>
                 <div class="nav-item">
@@ -191,11 +257,39 @@
         <div class="top-header">
             <div>
                 <h2 class="h5 fw-bold mb-0 text-dark">@yield('title', 'Tableau de bord')</h2>
+                @php $activeSession = auth()->user()->activeSession(); @endphp
                 @if(auth()->user()->etablissement)
-                    <p class="text-muted mb-0 small"><i class="fas fa-store me-1"></i>
-                        {{ auth()->user()->etablissement->nom }}</p>
+                    @php 
+                        $parent = auth()->user()->parentEstablishment();
+                    @endphp
+                    <div class="d-flex align-items-center gap-2 mt-1">
+                        <p class="text-muted mb-0 small">
+                            <i class="fas fa-store me-1"></i>
+                            @if($parent && $parent->id != auth()->user()->etablissement_id)
+                                <span class="fw-bold text-dark">{{ $parent->nom }}</span>
+                                <i class="fas fa-chevron-right mx-1 tiny-text opacity-50"></i>
+                            @endif
+                            {{ auth()->user()->etablissement->nom }}
+                        </p>
+                        @if($activeSession)
+                            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"
+                                style="font-size: 0.7rem;">
+                                <i class="fas fa-cash-register me-1"></i> {{ $activeSession->caisse->nom }}
+                            </span>
+                        @elseif(auth()->user()->caisse)
+                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1"
+                                style="font-size: 0.7rem;">
+                                <i class="fas fa-cash-register me-1"></i> {{ auth()->user()->caisse->nom }}
+                            </span>
+                        @endif
+                    </div>
                 @endif
             </div>
+
+            <div class="d-flex align-items-center gap-3">
+                @if(auth()->user()->isManager() && request()->routeIs('dashboard'))
+                    <livewire:admin.dashboard.site-switcher />
+                @endif
 
             <div class="user-profile d-flex align-items-center gap-3">
                 <button class="btn btn-light d-lg-none" type="button" data-bs-toggle="offcanvas"
@@ -239,6 +333,7 @@
                 </div>
             </div>
         </div>
+    </div>
 
         <div class="content-area">
             @hasSection('breadcrumb')

@@ -63,7 +63,16 @@ class SectionManager extends Component
             $this->sections = Section::with('etablissement')->latest()->get();
             $this->etablissements = Etablissement::all();
         } else {
-            $this->sections = Auth::user()->etablissement->sections()->latest()->get();
+            // Manager Context
+            if (Auth::user()->isManager() && session('manager_view_site_id')) {
+                $targetId = session('manager_view_site_id');
+                $this->sections = Section::where('etablissement_id', $targetId)->latest()->get();
+            } else {
+                // Default to auth user's establishment (or maybe aggregated? Sections are usually specific. Let's stick to auth user default)
+                // Actually sections are usually per restaurant. If vue global, we might see all?
+                // For now, let's target the primary establishment if no context, or stick to existing logic.
+                $this->sections = Auth::user()->etablissement->sections()->latest()->get();
+            }
             $this->etablissements = collect();
         }
     }

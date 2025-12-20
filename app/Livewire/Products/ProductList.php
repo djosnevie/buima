@@ -53,9 +53,20 @@ class ProductList extends Component
 
     public function render()
     {
-        $query = Produit::with('categorie')
-            ->where('etablissement_id', auth()->user()->etablissement_id)
-            ->latest();
+        $query = Produit::with('categorie');
+
+        if (auth()->user()->isManager()) {
+            $contextSiteId = session('manager_view_site_id');
+            if ($contextSiteId) {
+                $query->where('etablissement_id', $contextSiteId);
+            } else {
+                $query->whereIn('etablissement_id', auth()->user()->getAccessibleEtablissementIds());
+            }
+        } else {
+            $query->where('etablissement_id', auth()->user()->etablissement_id);
+        }
+
+        $query->latest();
 
         if ($this->search) {
             $query->where('nom', 'like', '%' . $this->search . '%');

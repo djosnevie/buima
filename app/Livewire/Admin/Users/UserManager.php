@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Users;
 
 use App\Models\User;
+use App\Models\Caisse;
 use App\Models\Section;
 use App\Models\Etablissement;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +15,7 @@ class UserManager extends Component
     public $users;
     public $sections; // For dropdown
     public $etablissements; // For Super Admin dropdown
+    public $caisses; // For dropdown
 
     // Form properties
     public $name;
@@ -21,6 +23,7 @@ class UserManager extends Component
     public $password;
     public $role = 'user';
     public $section_id = '';
+    public $caisse_id = ''; // Added
     public $etablissement_id = ''; // For Super Admin
 
     public $selectedUserId;
@@ -30,8 +33,9 @@ class UserManager extends Component
     protected $rules = [
         'name' => 'required|string|max:255',
         'email' => 'required|email|max:255|unique:users,email',
-        'role' => 'required|in:admin,user',
+        'role' => 'required|in:manager,admin,user',
         'section_id' => 'nullable|exists:sections,id',
+        'caisse_id' => 'nullable|exists:caisses,id', // Added
         'etablissement_id' => 'nullable|exists:etablissements,id',
     ];
 
@@ -45,7 +49,7 @@ class UserManager extends Component
     public function loadData()
     {
         if (Auth::user()->isSuperAdmin()) {
-            $query = User::with(['etablissement', 'section'])
+            $query = User::with(['etablissement', 'section', 'caisse']) // Modified
                 ->where('id', '!=', Auth::id())
                 ->latest();
 
@@ -60,9 +64,11 @@ class UserManager extends Component
 
             $this->sections = Section::with('etablissement')->where('actif', true)->get();
             $this->etablissements = Etablissement::all();
+            $this->caisses = Caisse::all(); // Added
         } else {
             $query = Auth::user()->etablissement->users()
                 ->where('id', '!=', Auth::id())
+                ->with(['section', 'caisse']) // Modified
                 ->latest();
 
             if ($this->search) {
@@ -75,6 +81,7 @@ class UserManager extends Component
             $this->users = $query->get();
 
             $this->sections = Auth::user()->etablissement->sections()->where('actif', true)->get();
+            $this->caisses = Auth::user()->etablissement->caisses()->where('active', true)->get(); // Added
             $this->etablissements = collect();
         }
     }
@@ -104,6 +111,7 @@ class UserManager extends Component
             $this->email = $user->email;
             $this->role = $user->role;
             $this->section_id = $user->section_id;
+            $this->caisse_id = $user->caisse_id;
             $this->etablissement_id = $user->etablissement_id;
             $this->isEditing = true;
             $this->isOpen = true;
@@ -130,6 +138,13 @@ class UserManager extends Component
             ? ($this->etablissement_id ?: null)
             : Auth::user()->etablissement_id;
 
+        // Restriction: Manager/Admin cannot create Super Admins
+        // And Manager shouldn't create other Managers normally via this UI (they have POS Manager)
+        $finalRole = $this->role;
+        if (!Auth::user()->isSuperAdmin() && $finalRole === 'manager') {
+            $finalRole = 'admin'; // Override if a non-superadmin tries to create a manager
+        }
+
         if ($this->isEditing) {
             $user = User::find($this->selectedUserId);
             $hasAccess = Auth::user()->isSuperAdmin() ||
@@ -139,8 +154,9 @@ class UserManager extends Component
                 $data = [
                     'name' => $this->name,
                     'email' => $this->email,
-                    'role' => $this->role,
+                    'role' => $finalRole,
                     'section_id' => $this->section_id ?: null,
+                    'caisse_id' => $this->caisse_id ?: null,
                     'etablissement_id' => $targetEtablissementId,
                 ];
                 if ($this->password) {
@@ -154,11 +170,12 @@ class UserManager extends Component
                 'name' => $this->name,
                 'email' => $this->email,
                 'password' => Hash::make($this->password),
-                'role' => $this->role,
+                'role' => $finalRole,
                 'section_id' => $this->section_id ?: null,
+                'caisse_id' => $this->caisse_id ?: null,
                 'etablissement_id' => $targetEtablissementId,
             ]);
-            session()->flash('message', 'Utilisateur créé avec succès.');
+            session()->flash('message', 'Utilisateur créé avec succès pour l\'établissement actif.');
         }
 
         $this->resetForm();
@@ -189,6 +206,7 @@ class UserManager extends Component
         $this->password = '';
         $this->role = 'user';
         $this->section_id = '';
+        $this->caisse_id = '';
         $this->etablissement_id = '';
         $this->selectedUserId = null;
         $this->isEditing = false;
@@ -198,6 +216,8 @@ class UserManager extends Component
 
     public function render()
     {
-        return view('livewire.admin.users.user-manager')->layout('layouts.dashboard');
+        /** @var \Illuminate\View\View $view */
+        $view = view('livewire.admin.users.user-manager');
+        return $view->layout('layouts.dashboard');
     }
 }

@@ -94,15 +94,9 @@
         @forelse($produits as $produit)
             <div class="product-card">
                 <div class="product-image">
-                    @if($produit->image)
-                        <img src="{{ asset('images/' . $produit->image) }}"
-                            onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'placeholder-image\'><i class=\'fas fa-utensils\'></i></div>';"
-                            alt="{{ $produit->nom }}">
-                    @else
-                        <div class="placeholder-image">
-                            <i class="fas fa-utensils"></i>
-                        </div>
-                    @endif
+                    <img src="{{ $produit->image_url }}"
+                        onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode($produit->nom) }}&background=f8f9fa&color=bf3a29';"
+                        alt="{{ $produit->nom }}">
                     <div class="category-badge">{{ $produit->categorie->nom ?? 'Sans catégorie' }}</div>
                 </div>
 

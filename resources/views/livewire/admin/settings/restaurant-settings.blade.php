@@ -102,6 +102,84 @@
                                 <label for="adresse" class="form-label fw-medium">Adresse Postale</label>
                                 <textarea wire:model="adresse" class="form-control" id="adresse" rows="3"></textarea>
                             </div>
+
+                            <hr class="my-4">
+
+                            <h5 class="fw-bold mb-3"><i class="fas fa-file-invoice-dollar me-2"></i>Informations Légales
+                                & Fiscales</h5>
+                            <div class="col-md-6">
+                                <label for="rccm" class="form-label fw-medium">RCCM</label>
+                                <input wire:model="rccm" type="text" class="form-control" id="rccm"
+                                    placeholder="N° Registre Commerce">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="nui" class="form-label fw-medium">NUI</label>
+                                <input wire:model="nui" type="text" class="form-control" id="nui"
+                                    placeholder="N° Identifiant Unique">
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="card bg-light border-0">
+                                    <div class="card-body">
+                                        <div class="form-check form-switch mb-2">
+                                            <input wire:model.live="tva_applicable" class="form-check-input"
+                                                type="checkbox" id="tva_app_settings">
+                                            <label class="form-check-label fw-bold" for="tva_app_settings">TVA
+                                                Applicable</label>
+                                        </div>
+                                        @if($tva_applicable)
+                                            <div class="row align-items-center g-3">
+                                                <div class="col-auto">
+                                                    <label for="tva_taux" class="form-label mb-0">Taux TVA (%)</label>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="input-group">
+                                                        <input wire:model="tva_taux" type="number" step="0.01"
+                                                            class="form-control" id="tva_taux">
+                                                        <span class="input-group-text">%</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+                            <h5 class="fw-bold mb-3"><i class="fas fa-globe me-2"></i>Site Web & Réseaux Sociaux</h5>
+
+                            <div class="col-md-12">
+                                <label for="site_web" class="form-label fw-medium">Site Web</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-link"></i></span>
+                                    <input wire:model="site_web" type="url" class="form-control" id="site_web"
+                                        placeholder="https://...">
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="facebook" class="form-label fw-medium">Facebook</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fab fa-facebook text-primary"></i></span>
+                                    <input wire:model="facebook" type="url" class="form-control" id="facebook"
+                                        placeholder="Page Facebook">
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="instagram" class="form-label fw-medium">Instagram</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fab fa-instagram text-danger"></i></span>
+                                    <input wire:model="instagram" type="url" class="form-control" id="instagram"
+                                        placeholder="Lien Instagram">
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label for="description" class="form-label fw-medium">Description / Slogan</label>
+                                <textarea wire:model="description" class="form-control" id="description" rows="2"
+                                    placeholder="Description courte pour votre menu..."></textarea>
+                            </div>
                         </div>
 
                         <div class="mt-4 pt-4 border-top text-end">

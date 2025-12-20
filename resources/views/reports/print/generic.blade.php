@@ -168,6 +168,77 @@
                 @endforeach
             </tbody>
         </table>
+    @elseif($type === 'caisse_sessions')
+        <table>
+            <thead>
+                <tr>
+                    <th>Caisse</th>
+                    <th>Caissier</th>
+                    <th>Ouverture</th>
+                    <th class="text-right">Fermeture Réel</th>
+                    <th class="text-right">Écart</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($sessions as $sess)
+                    <tr>
+                        <td>{{ $sess->caisse_nom }}</td>
+                        <td>{{ $sess->caissier }}</td>
+                        <td>{{ \Carbon\Carbon::parse($sess->date_ouverture)->format('d/m H:i') }}</td>
+                        <td class="text-right">{{ number_format($sess->montant_fermeture_reel, 0, ',', ' ') }}</td>
+                        <td class="text-right">{{ number_format($sess->montant_fermeture_reel - $sess->montant_fermeture_theorique, 0, ',', ' ') }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @elseif($type === 'stock_valuation')
+        <div class="summary-box">
+            <p>Valeur Totale du Stock: <strong>{{ number_format($total_valuation, 0, ',', ' ') }} {{ $etablissement->devise }}</strong></p>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Produit</th>
+                    <th class="text-right">Stock</th>
+                    <th class="text-right">Prix Achat</th>
+                    <th class="text-right">Valorisation</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($valuation as $val)
+                    <tr>
+                        <td>{{ $val->nom }}</td>
+                        <td class="text-right">{{ $val->quantite }}</td>
+                        <td class="text-right">{{ number_format($val->prix_achat, 0, ',', ' ') }}</td>
+                        <td class="text-right">{{ number_format($val->total_value, 0, ',', ' ') }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @elseif($type === 'expenses')
+        <div class="summary-box">
+            <p>Total des Dépenses: <strong>{{ number_format($total_expenses, 0, ',', ' ') }} {{ $etablissement->devise }}</strong></p>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Catégorie</th>
+                    <th>Description</th>
+                    <th class="text-right">Montant</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($expenses as $exp)
+                    <tr>
+                        <td>{{ \Carbon\Carbon::parse($exp->date_depense)->format('d/m/Y') }}</td>
+                        <td>{{ $exp->categorie_nom }}</td>
+                        <td>{{ $exp->description }}</td>
+                        <td class="text-right">-{{ number_format($exp->montant, 0, ',', ' ') }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
     @endif
 
     <div class="footer">

@@ -44,4 +44,9 @@ class Table extends Model
     {
         $this->update(['statut' => 'libre']);
     }
+
+    public function getQrUrlAttribute()
+    {
+        return route('public.menu', ['slug' => $this->etablissement->slug, 'table' => $this->numero]);
+    }
 }

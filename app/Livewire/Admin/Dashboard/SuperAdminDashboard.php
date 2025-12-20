@@ -69,6 +69,10 @@ class SuperAdminDashboard extends Component
     public $theme_color = '#ff6b35'; // Default primary
     public $secondary_color = '#ff9f43'; // Default secondary
     public $button_color = '#ff6b35'; // Default button
+    public $rccm, $nui, $site_web, $facebook, $instagram, $description;
+    public $tva_applicable = false;
+    public $tva_taux = 0;
+    public $selectedModules = [];
     public $isOpen = false;
 
     protected $rules = [
@@ -81,6 +85,14 @@ class SuperAdminDashboard extends Component
         'theme_color' => 'nullable|string|max:7',
         'secondary_color' => 'nullable|string|max:7',
         'button_color' => 'nullable|string|max:7',
+        'rccm' => 'nullable|string|max:100',
+        'nui' => 'nullable|string|max:100',
+        'site_web' => 'nullable|url|max:255',
+        'facebook' => 'nullable|url|max:255',
+        'instagram' => 'nullable|url|max:255',
+        'description' => 'nullable|string|max:1000',
+        'tva_applicable' => 'nullable|boolean',
+        'tva_taux' => 'nullable|numeric|min:0|max:100',
     ];
 
     public function edit($id)
@@ -97,6 +109,15 @@ class SuperAdminDashboard extends Component
             $this->theme_color = $etablissement->theme_color ?? '#ff6b35';
             $this->secondary_color = $etablissement->secondary_color ?? '#ff9f43';
             $this->button_color = $etablissement->button_color ?? '#ff6b35';
+            $this->rccm = $etablissement->rccm;
+            $this->nui = $etablissement->nui;
+            $this->site_web = $etablissement->site_web;
+            $this->facebook = $etablissement->facebook;
+            $this->instagram = $etablissement->instagram;
+            $this->description = $etablissement->description;
+            $this->tva_applicable = $etablissement->tva_applicable;
+            $this->tva_taux = $etablissement->tva_taux;
+            $this->selectedModules = $etablissement->modules ?? ['orders', 'products', 'tables'];
             $this->isOpen = true;
         }
     }
@@ -118,6 +139,15 @@ class SuperAdminDashboard extends Component
                     'theme_color' => $this->theme_color,
                     'secondary_color' => $this->secondary_color,
                     'button_color' => $this->button_color,
+                    'rccm' => $this->rccm,
+                    'nui' => $this->nui,
+                    'site_web' => $this->site_web,
+                    'facebook' => $this->facebook,
+                    'instagram' => $this->instagram,
+                    'description' => $this->description,
+                    'tva_applicable' => $this->tva_applicable,
+                    'tva_taux' => $this->tva_taux,
+                    'modules' => $this->selectedModules,
                 ]);
                 session()->flash('message', 'Restaurant mis à jour avec succès.');
                 $this->resetForm();
@@ -154,6 +184,8 @@ class SuperAdminDashboard extends Component
 
     public function render()
     {
-        return view('livewire.admin.dashboard.super-admin-dashboard')->layout('layouts.dashboard');
+        /** @var \Illuminate\View\View $view */
+        $view = view('livewire.admin.dashboard.super-admin-dashboard');
+        return $view->layout('layouts.dashboard');
     }
 }

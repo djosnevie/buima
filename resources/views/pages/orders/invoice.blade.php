@@ -112,6 +112,9 @@
         @if($commande->table)
             <div>Table: {{ $commande->table->numero }}</div>
         @endif
+        @if($commande->caisse)
+            <div>Caisse: {{ $commande->caisse->nom }}</div>
+        @endif
     </div>
 
     <table class="items">
@@ -139,7 +142,8 @@
         <div>Sous-total: {{ number_format($commande->sous_total, 0, ',', ' ') }}
             {{ $etablissement->devise_display ?? 'FCFA' }}
         </div>
-        <div>TVA (10%): {{ number_format($commande->montant_taxes, 0, ',', ' ') }}
+        <div>TVA ({{ (float) ($etablissement->tva_taux ?? 10) }}%):
+            {{ number_format($commande->montant_taxes, 0, ',', ' ') }}
             {{ $etablissement->devise_display ?? 'FCFA' }}
         </div>
         <div style="font-weight: bold; font-size: 16px; margin-top: 5px">

@@ -50,8 +50,13 @@ class CreateOrder extends Component
     {
         $produit = Produit::find($produitId);
 
-        if (!$produit)
-            return;
+        // Check if stock module is enabled
+        if (auth()->user()->etablissement->hasModule('inventory')) {
+            if (!$produit->hasSufficientStock(1)) {
+                session()->flash('error', "Stock insuffisant pour {$produit->nom}.");
+                return;
+            }
+        }
 
         if (isset($this->cart[$produitId])) {
             $this->cart[$produitId]['quantite']++;
@@ -68,6 +73,14 @@ class CreateOrder extends Component
     public function incrementQuantity($produitId)
     {
         if (isset($this->cart[$produitId])) {
+            $produit = Produit::find($produitId);
+            // Check module and stock
+            if (auth()->user()->etablissement->hasModule('inventory')) {
+                if ($produit && !$produit->hasSufficientStock($this->cart[$produitId]['quantite'] + 1)) {
+                    session()->flash('error', "Stock insuffisant pour {$produit->nom}.");
+                    return;
+                }
+            }
             $this->cart[$produitId]['quantite']++;
         }
     }
@@ -97,7 +110,11 @@ class CreateOrder extends Component
 
     public function getTaxesProperty()
     {
-        return $this->subtotal * 0.10;
+        $taux = 0;
+        if (auth()->user()->etablissement->tva_applicable) {
+            $taux = auth()->user()->etablissement->tva_taux / 100;
+        }
+        return $this->subtotal * $taux;
     }
 
     public function getTotalProperty()
@@ -134,6 +151,7 @@ class CreateOrder extends Component
                 'client_telephone' => $this->clientPhone,
                 'client_adresse' => $this->clientAddress,
                 'user_id' => auth()->id(),
+                'caisse_id' => auth()->user()->caisse_id,
                 'statut' => 'en_attente',
                 'sous_total' => $this->subtotal,
                 'montant_taxes' => $this->taxes,
@@ -142,6 +160,43 @@ class CreateOrder extends Component
                 'heure_prise' => now(),
                 'notes' => $this->notes,
             ]);
+
+            // Final stock check and deduction
+            foreach ($this->cart as $item) {
+                $produit = Produit::find($item['produit_id']);
+
+                if ($produit && $produit->gestion_stock) {
+                    // Start of Stock Module Check
+                    if (auth()->user()->etablissement->hasModule('inventory')) {
+                        if (!$produit->hasSufficientStock($item['quantite'])) {
+                            throw new \Exception("Le produit {$produit->nom} n'a plus assez de stock.");
+                        }
+
+                        // Deduct stock
+                        $stock = $produit->stock;
+                        if ($stock) {
+                            $qty = (int) $item['quantite'];
+                            $old = (int) $stock->quantite;
+                            $new = $old - $qty;
+                            $stock->update(['quantite' => $new]);
+
+                            \App\Models\MouvementStock::create([
+                                'etablissement_id' => auth()->user()->etablissement_id,
+                                'user_id' => auth()->id(),
+                                'stockable_type' => Produit::class,
+                                'stockable_id' => $produit->id,
+                                'type' => 'sortie',
+                                'quantite' => $qty,
+                                'quantite_avant' => $old,
+                                'quantite_apres' => $new,
+                                'commentaire' => 'Commande #' . $commande->numero_commande,
+                                'date_mouvement' => now(),
+                            ]);
+                        }
+                    }
+                    // If module is disabled, we do NOT deduc stock or check validity
+                }
+            }
 
             // Create order items
             foreach ($this->cart as $item) {
@@ -182,7 +237,6 @@ class CreateOrder extends Component
             ->get();
 
         $produitsQuery = Produit::where('etablissement_id', auth()->user()->etablissement_id)
-            ->select('id', 'nom', 'prix_vente', 'image', 'categorie_id')
             ->available();
 
         if ($this->selectedCategory) {

@@ -11,6 +11,7 @@ class Commande extends Model
     protected $fillable = [
         'etablissement_id',
         'table_id',
+        'caisse_id',
         'numero_commande',
         'type_commande',
         'client_nom',
@@ -47,6 +48,11 @@ class Commande extends Model
         return $this->belongsTo(Table::class);
     }
 
+    public function caisse(): BelongsTo
+    {
+        return $this->belongsTo(Caisse::class);
+    }
+
     public function etablissement(): BelongsTo
     {
         return $this->belongsTo(Etablissement::class);
@@ -65,8 +71,14 @@ class Commande extends Model
     public function calculateTotal(): void
     {
         $this->sous_total = $this->items->sum('sous_total');
-        $this->montant_taxes = $this->sous_total * 0.1; // 10% TVA
-        $this->total = $this->sous_total + $this->montant_taxes + $this->montant_livraison - $this->montant_reduction;
+
+        $tvaTaux = 0;
+        if ($this->etablissement && $this->etablissement->tva_applicable) {
+            $tvaTaux = (float) $this->etablissement->tva_taux / 100;
+        }
+
+        $this->montant_taxes = (string) round($this->sous_total * $tvaTaux, 2);
+        $this->total = (string) round($this->sous_total + (float) $this->montant_taxes + $this->montant_livraison - $this->montant_reduction, 2);
         $this->save();
     }
 
@@ -75,8 +87,10 @@ class Commande extends Model
         $this->calculateTotal();
     }
 
-    public static function generateOrderNumber(): string
+    public static function generateOrderNumber(string $prefix = 'CMD'): string
     {
-        return 'CMD-' . now()->format('Ymd') . '-' . str_pad(static::whereDate('created_at', today())->count() + 1, 4, '0', STR_PAD_LEFT);
+        $todayStr = now()->format('Ymd');
+        $count = static::whereDate('created_at', today())->count() + 1;
+        return $prefix . '-' . $todayStr . '-' . str_pad($count, 4, '0', STR_PAD_LEFT);
     }
 }

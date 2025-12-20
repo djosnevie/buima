@@ -18,21 +18,34 @@ class TopProducts extends Component
         }
 
         // Get top 5 products by quantity sold
-        $query = CommandeItem::select('commande_items.produit_id', DB::raw('SUM(commande_items.quantite) as total_quantity'), DB::raw('SUM(commande_items.sous_total) as total_revenue'))
+        // Create base query
+        $query = CommandeItem::select(
+            'commande_items.produit_id',
+            'produits.etablissement_id as produit_etablissement_id', // Select this for eager load scope if needed, though 'with' closure handles it
+            DB::raw('SUM(commande_items.quantite) as total_quantity'),
+            DB::raw('SUM(commande_items.sous_total) as total_revenue')
+        )
             ->join('commandes', 'commande_items.commande_id', '=', 'commandes.id')
-            ->where('commandes.etablissement_id', $user->etablissement_id);
+            ->join('produits', 'commande_items.produit_id', '=', 'produits.id'); // Join products to get establishment if needed for filtering or data
 
-        // Scope to employee if not Admin
-        if (!$user->isAdmin()) {
-            $query->where('commandes.user_id', $user->id);
+        if ($user->isManager()) {
+            $contextSiteId = session('manager_view_site_id');
+            if ($contextSiteId) {
+                $query->where('commandes.etablissement_id', $contextSiteId);
+            } else {
+                $etablissementIds = $user->getAccessibleEtablissementIds();
+                $query->whereIn('commandes.etablissement_id', $etablissementIds);
+            }
+        } else {
+            $query->where('commandes.etablissement_id', $user->etablissement_id);
+            // Scope to employee if not Admin
+            if (!$user->isAdmin()) {
+                $query->where('commandes.user_id', $user->id);
+            }
         }
 
-        $topProducts = $query->with([
-            'produit' => function ($q) use ($user) {
-                $q->where('etablissement_id', $user->etablissement_id);
-            }
-        ])
-            ->groupBy('commande_items.produit_id')
+        $topProducts = $query->with('produit')
+            ->groupBy('commande_items.produit_id', 'produits.etablissement_id') // Group by produit and establishment to be safe per SQL mode
             ->orderBy('total_quantity', 'desc')
             ->limit(5)
             ->get();

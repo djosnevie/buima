@@ -16,11 +16,21 @@ class RestaurantEmployees extends Component
 
     public function open($etablissementId = null)
     {
-        $targetEtablissementId = $etablissementId ?? Auth::user()->etablissement_id;
+        $targetEtablissementId = $etablissementId;
+
+        if (!$targetEtablissementId) {
+            if (Auth::user()->isManager() && session('manager_view_site_id')) {
+                $targetEtablissementId = session('manager_view_site_id');
+            } else {
+                $targetEtablissementId = Auth::user()->etablissement_id;
+            }
+        }
+
         $this->isOpen = true;
 
         if ($targetEtablissementId) {
             $this->employees = User::where('etablissement_id', $targetEtablissementId)
+                ->whereNotIn('role', ['manager', 'super_admin'])
                 ->orderBy('name')
                 ->get();
 

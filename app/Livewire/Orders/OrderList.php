@@ -36,7 +36,7 @@ class OrderList extends Component
     {
         if (strlen($this->productSearch) >= 2) {
             $this->searchResults = \App\Models\Produit::with('categorie')
-                ->where('etablissement_id', auth()->user()->etablissement_id)
+                ->whereIn('etablissement_id', auth()->user()->getAccessibleEtablissementIds())
                 ->where('nom', 'like', '%' . $this->productSearch . '%')
                 ->take(5)
                 ->get();
@@ -153,7 +153,7 @@ class OrderList extends Component
 
     public function deleteOrder($id)
     {
-        $commande = Commande::where('etablissement_id', auth()->user()->etablissement_id)->find($id);
+        $commande = Commande::whereIn('etablissement_id', auth()->user()->getAccessibleEtablissementIds())->find($id);
         if ($commande) {
             $commande->items()->delete();
             $commande->delete();
@@ -164,7 +164,7 @@ class OrderList extends Component
 
     public function updateStatus($commandeId, $newStatus)
     {
-        $commande = Commande::where('etablissement_id', auth()->user()->etablissement_id)->find($commandeId);
+        $commande = Commande::whereIn('etablissement_id', auth()->user()->getAccessibleEtablissementIds())->find($commandeId);
 
         if (!$commande)
             return;
@@ -198,15 +198,33 @@ class OrderList extends Component
     public function render()
     {
         $user = auth()->user();
-        $isGlobal = $user->isAdmin() || $user->isSuperAdmin();
+        $accessibleIds = $user->getAccessibleEtablissementIds();
 
-        $query = Commande::with(['table', 'items.produit'])
-            ->where('etablissement_id', $user->etablissement_id)
-            ->latest();
+        $query = Commande::with(['table', 'items.produit']);
 
-        if (!$isGlobal) {
-            $query->where('user_id', $user->id);
+        if ($user->isManager()) {
+            $contextSiteId = session('manager_view_site_id');
+            if ($contextSiteId) {
+                // Specific Site View
+                $query->where('etablissement_id', $contextSiteId);
+            } else {
+                // Global View - Accessible Sites
+                $query->whereIn('etablissement_id', $user->getAccessibleEtablissementIds());
+            }
+        } else {
+            // Employee / Admin View
+            $query->where('etablissement_id', $user->etablissement_id);
+            if (!$user->isAdmin()) { // If not an admin, further filter by user_id or caisse_id
+                $query->where(function ($q) use ($user) {
+                    $q->where('user_id', $user->id);
+                    if ($user->caisse_id) {
+                        $q->orWhere('caisse_id', $user->caisse_id);
+                    }
+                });
+            }
         }
+
+        $query->latest();
 
         if ($this->filterStatus !== 'all') {
             $query->where('statut', $this->filterStatus);
@@ -222,7 +240,7 @@ class OrderList extends Component
         return view('livewire.pages.orders.order-list', [
             'commandes' => $query->paginate(8),
             'selectedOrder' => $this->selectedOrderId ? Commande::with(['items.produit', 'table'])->find($this->selectedOrderId) : null,
-            'tables' => \App\Models\Table::where('etablissement_id', auth()->user()->etablissement_id)->get(),
+            'tables' => \App\Models\Table::whereIn('etablissement_id', $accessibleIds)->get(),
         ])->layout('layouts.dashboard');
     }
 }

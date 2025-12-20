@@ -92,6 +92,68 @@
                         <textarea wire:model="adresse" class="form-control" id="adresse" rows="2"></textarea>
                     </div>
 
+                    <h5 class="mb-3 border-bottom pb-2 mt-4">Informations Supplémentaires & Fiscalité</h5>
+
+                    <!-- RCCM & NUI -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="rccm" class="form-label">RCCM</label>
+                            <input wire:model="rccm" type="text" class="form-control" id="rccm"
+                                placeholder="N° Registre Commerce">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="nui" class="form-label">NUI</label>
+                            <input wire:model="nui" type="text" class="form-control" id="nui"
+                                placeholder="N° Identifiant Unique">
+                        </div>
+                    </div>
+
+                    <!-- TVA -->
+                    <div class="card bg-light border-0 mb-3">
+                        <div class="card-body p-3">
+                            <div class="form-check form-switch mb-2">
+                                <input wire:model.live="tva_applicable" class="form-check-input" type="checkbox"
+                                    id="tva_applicable">
+                                <label class="form-check-label fw-bold" for="tva_applicable">TVA Applicable</label>
+                            </div>
+                            @if($tva_applicable)
+                                <div class="mb-0">
+                                    <label for="tva_taux" class="form-label small">Taux TVA (%)</label>
+                                    <div class="input-group input-group-sm">
+                                        <input wire:model="tva_taux" type="number" step="0.01" class="form-control"
+                                            id="tva_taux">
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Social & Web -->
+                    <div class="mb-3">
+                        <label for="site_web" class="form-label">Site Web</label>
+                        <input wire:model="site_web" type="url" class="form-control" id="site_web"
+                            placeholder="https://...">
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="facebook" class="form-label"><i class="fab fa-facebook text-primary me-1"></i>
+                                Facebook</label>
+                            <input wire:model="facebook" type="url" class="form-control" id="facebook">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="instagram" class="form-label"><i class="fab fa-instagram text-danger me-1"></i>
+                                Instagram</label>
+                            <input wire:model="instagram" type="url" class="form-control" id="instagram">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description / Slogan</label>
+                        <textarea wire:model="description" class="form-control" id="description" rows="2"></textarea>
+                    </div>
+
                     @if(!auth()->check() || auth()->user()->isSuperAdmin())
                         <h5 class="mb-3 border-bottom pb-2 mt-4">Compte Administrateur (Gérant)</h5>
 

@@ -26,6 +26,7 @@ class User extends Authenticatable
         'role',
         'etablissement_id',
         'section_id',
+        'caisse_id',
     ];
 
     /**
@@ -75,20 +76,36 @@ class User extends Authenticatable
         return $this->belongsTo(Section::class);
     }
 
+    public function caisse(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Caisse::class);
+    }
+
     // Role Helpers
     public function isSuperAdmin(): bool
     {
         return $this->role === 'super_admin';
     }
 
+    public function isManager(): bool
+    {
+        return $this->role === 'manager' || $this->isSuperAdmin();
+    }
+
     public function isAdmin(): bool
     {
-        return $this->role === 'admin' || $this->isSuperAdmin();
+        // Admin is the branch manager. Manager is the owner.
+        return $this->role === 'admin' || $this->isManager();
     }
 
     public function isUser(): bool
     {
         return $this->role === 'user';
+    }
+
+    public function ownedEstablishments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Etablissement::class, 'manager_id');
     }
 
     public function hasAccessToSection($sectionId): bool
@@ -97,5 +114,53 @@ class User extends Authenticatable
             return true;
         }
         return $this->section_id == $sectionId;
+    }
+
+    /**
+     * Get the current active caisse session for the user
+     */
+    public function activeSession(): ?SessionCaisse
+    {
+        return SessionCaisse::where('user_id', $this->id)
+            ->where('statut', 'ouverte')
+            ->whereHas('caisse', function ($q) {
+                $q->where('etablissement_id', $this->etablissement_id);
+            })
+            ->first();
+    }
+
+    /**
+     * Get IDs of all establishments the user has access to
+     */
+    public function getAccessibleEtablissementIds(): array
+    {
+        if ($this->isSuperAdmin()) {
+            return Etablissement::pluck('id')->toArray();
+        }
+
+        if ($this->isManager()) {
+            return $this->ownedEstablishments()->pluck('id')->toArray();
+        }
+
+        return [$this->etablissement_id];
+    }
+
+    /**
+     * Get the primary (mother) establishment for this user's management
+     */
+    public function parentEstablishment(): ?Etablissement
+    {
+        if ($this->isSuperAdmin())
+            return null;
+
+        // If the user has a manager_id (owner), their parent is the oldest establishment of that manager
+        $managerId = $this->role === 'manager' ? $this->id : $this->etablissement?->manager_id;
+
+        if (!$managerId)
+            return $this->etablissement;
+
+        return Etablissement::where('manager_id', $managerId)
+            ->oldest()
+            ->first();
     }
 }

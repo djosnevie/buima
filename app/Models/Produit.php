@@ -30,9 +30,54 @@ class Produit extends Model
         'gestion_stock' => 'boolean',
     ];
 
+    public function etablissement(): BelongsTo
+    {
+        return $this->belongsTo(Etablissement::class);
+    }
+
     public function categorie(): BelongsTo
     {
         return $this->belongsTo(Categorie::class);
+    }
+
+    public function stock(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(StockProduit::class);
+    }
+
+    public function mouvements(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(MouvementStock::class, 'stockable');
+    }
+
+    public function getStockActuelAttribute()
+    {
+        return $this->stock->quantite ?? 0;
+    }
+
+    public function getSeuilAlerteAttribute()
+    {
+        return $this->stock->seuil_alerte ?? 0;
+    }
+
+    public function hasSufficientStock($requestedQuantity = 1)
+    {
+        if (!$this->gestion_stock) {
+            return true;
+        }
+
+        // Restriction: no command below the threshold
+        return ($this->stock_actuel - $requestedQuantity) >= $this->seuil_alerte;
+    }
+
+    public function getImageUrlAttribute()
+    {
+        if (!$this->image) {
+            return "https://ui-avatars.com/api/?name=" . urlencode($this->nom) . "&background=f8f9fa&color=bf3a29";
+        }
+
+        // Use the public_uploads disk specifically
+        return \Illuminate\Support\Facades\Storage::disk('public_uploads')->url($this->image);
     }
 
     public function scopeAvailable($query)

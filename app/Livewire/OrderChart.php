@@ -39,15 +39,28 @@ class OrderChart extends Component
         $isGlobal = $user->isAdmin();
         $etablissementId = $user->etablissement_id;
 
+        // Determine scope
+        if ($user->isManager()) {
+            $contextSiteId = session('manager_view_site_id');
+            if ($contextSiteId) {
+                $queryBase = Commande::where('etablissement_id', $contextSiteId);
+            } else {
+                $etablissementIds = $user->getAccessibleEtablissementIds();
+                $queryBase = Commande::whereIn('etablissement_id', $etablissementIds);
+            }
+        } else {
+            $etablissementId = $user->etablissement_id;
+            $queryBase = Commande::where('etablissement_id', $etablissementId);
+            if (!$isGlobal) {
+                $queryBase->where('user_id', $user->id);
+            }
+        }
+
         switch ($this->period) {
             case 'day':
                 // Use whereDate and groupBy HOUR for strict alignment with DashboardStats
-                $query = Commande::where('etablissement_id', $etablissementId)
-                    ->whereDate('created_at', Carbon::today());
-
-                if (!$isGlobal) {
-                    $query->where('user_id', $user->id);
-                }
+                $query = clone $queryBase;
+                $query->whereDate('created_at', Carbon::today());
 
                 // Execute query grouped by hour
                 $results = $query->selectRaw('HOUR(created_at) as hour, COUNT(*) as count')
@@ -63,21 +76,11 @@ class OrderChart extends Component
                 break;
 
             case 'week':
-                // Last 7 days including today? Or aligned to week?
-                // DashboardStats doesn't have a weekly view, but consistency is key.
-                // Keeping existing loop logic but ensuring endOfDay covers correct range, 
-                // OR use DATE(created_at). Grouping by DATE is safer.
-
-                // Let's use 7 days back range
                 $startDate = Carbon::now()->subDays(6)->startOfDay();
                 $endDate = Carbon::now()->endOfDay();
 
-                $query = Commande::where('etablissement_id', $etablissementId)
-                    ->whereBetween('created_at', [$startDate, $endDate]);
-
-                if (!$isGlobal) {
-                    $query->where('user_id', $user->id);
-                }
+                $query = clone $queryBase;
+                $query->whereBetween('created_at', [$startDate, $endDate]);
 
                 $results = $query->selectRaw('DATE(created_at) as date, COUNT(*) as count')
                     ->groupBy('date')
@@ -96,12 +99,8 @@ class OrderChart extends Component
                 $startDate = Carbon::now()->subDays(29)->startOfDay();
                 $endDate = Carbon::now()->endOfDay();
 
-                $query = Commande::where('etablissement_id', $etablissementId)
-                    ->whereBetween('created_at', [$startDate, $endDate]);
-
-                if (!$isGlobal) {
-                    $query->where('user_id', $user->id);
-                }
+                $query = clone $queryBase;
+                $query->whereBetween('created_at', [$startDate, $endDate]);
 
                 $results = $query->selectRaw('DATE(created_at) as date, COUNT(*) as count')
                     ->groupBy('date')
@@ -120,12 +119,8 @@ class OrderChart extends Component
                 $startDate = Carbon::now()->subMonths(11)->startOfMonth();
                 $endDate = Carbon::now()->endOfMonth();
 
-                $query = Commande::where('etablissement_id', $etablissementId)
-                    ->whereBetween('created_at', [$startDate, $endDate]);
-
-                if (!$isGlobal) {
-                    $query->where('user_id', $user->id);
-                }
+                $query = clone $queryBase;
+                $query->whereBetween('created_at', [$startDate, $endDate]);
 
                 // Group by Year-Month
                 $results = $query->selectRaw('DATE_FORMAT(created_at, "%Y-%m") as month, COUNT(*) as count')

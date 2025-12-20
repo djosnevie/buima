@@ -45,12 +45,8 @@
                         @if($newImage)
                             <img src="{{ $newImage->temporaryUrl() }}">
                         @elseif($image)
-                            <img src="{{ asset('images/' . $image) }}"
-                                onerror="this.onerror=null; this.nextElementSibling.style.display='flex'; this.style.display='none';">
-                            <div class="placeholder" style="display: none;">
-                                <i class="fas fa-camera"></i>
-                                <span>Image indisponible</span>
-                            </div>
+                            <img src="{{ \Illuminate\Support\Facades\Storage::disk('public_uploads')->url($image) }}"
+                                onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode($nom) }}&background=f8f9fa&color=bf3a29';">
                         @else
                             <div class="placeholder">
                                 <i class="fas fa-camera"></i>

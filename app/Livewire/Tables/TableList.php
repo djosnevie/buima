@@ -54,7 +54,18 @@ class TableList extends Component
 
     public function render()
     {
-        $query = Table::where('etablissement_id', auth()->user()->etablissement_id);
+        $query = Table::query();
+
+        if (auth()->user()->isManager()) {
+            $contextSiteId = session('manager_view_site_id');
+            if ($contextSiteId) {
+                $query->where('etablissement_id', $contextSiteId);
+            } else {
+                $query->whereIn('etablissement_id', auth()->user()->getAccessibleEtablissementIds());
+            }
+        } else {
+            $query->where('etablissement_id', auth()->user()->etablissement_id);
+        }
 
         if ($this->search) {
             $query->where('numero', 'like', '%' . $this->search . '%');

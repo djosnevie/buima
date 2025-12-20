@@ -12,6 +12,7 @@ class Etablissement extends Model
 
     protected $fillable = [
         'nom',
+        'slug',
         'type',
         'adresse',
         'telephone',
@@ -23,12 +24,30 @@ class Etablissement extends Model
         'button_color',
         'configuration',
         'actif',
+        'manager_id',
+        'rccm',
+        'nui',
+        'site_web',
+        'facebook',
+        'instagram',
+        'description',
+        'tva_applicable',
+        'tva_taux',
+        'modules',
     ];
 
     protected $casts = [
         'configuration' => 'array',
+        'modules' => 'array',
         'actif' => 'boolean',
+        'tva_applicable' => 'boolean',
+        'tva_taux' => 'decimal:2',
     ];
+
+    public function manager(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'manager_id');
+    }
 
     public function users(): HasMany
     {
@@ -60,6 +79,36 @@ class Etablissement extends Model
         return $this->hasMany(Commande::class);
     }
 
+    public function fournisseurs(): HasMany
+    {
+        return $this->hasMany(Fournisseur::class);
+    }
+
+    public function caisses(): HasMany
+    {
+        return $this->hasMany(Caisse::class);
+    }
+
+    public function ingredients(): HasMany
+    {
+        return $this->hasMany(Ingredient::class);
+    }
+
+    public function depenses(): HasMany
+    {
+        return $this->hasMany(Depense::class);
+    }
+
+    public function approvisionnements(): HasMany
+    {
+        return $this->hasMany(Approvisionnement::class);
+    }
+
+    public function inventaires(): HasMany
+    {
+        return $this->hasMany(Inventaire::class);
+    }
+
     public function getDeviseDisplayAttribute()
     {
         $map = [
@@ -70,5 +119,17 @@ class Etablissement extends Model
         ];
 
         return $map[$this->devise] ?? $this->devise;
+    }
+
+    public function hasModule(string $module): bool
+    {
+        // If modules is null (not yet configured), use defaults
+        if (is_null($this->modules)) {
+            $defaultModules = ['pos', 'qr_menu', 'orders', 'products', 'tables'];
+            return in_array($module, $defaultModules);
+        }
+
+        // Otherwise respect the configured array (even if empty)
+        return in_array($module, $this->modules);
     }
 }

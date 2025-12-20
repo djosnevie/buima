@@ -24,6 +24,9 @@ class RestaurantSettings extends Component
     public $logo;
     public $currentLogo;
     public $type;
+    public $rccm, $nui, $site_web, $facebook, $instagram, $description;
+    public $tva_applicable = false;
+    public $tva_taux = 0;
 
     protected $rules = [
         'nom' => 'required|string|max:255',
@@ -36,6 +39,14 @@ class RestaurantSettings extends Component
         'button_color' => 'nullable|string|max:7',
         'logo' => 'nullable|image|max:1024',
         'type' => 'required|in:avec_tables,sans_tables,mixte',
+        'rccm' => 'nullable|string|max:100',
+        'nui' => 'nullable|string|max:100',
+        'site_web' => 'nullable|url|max:255',
+        'facebook' => 'nullable|url|max:255',
+        'instagram' => 'nullable|url|max:255',
+        'description' => 'nullable|string|max:1000',
+        'tva_applicable' => 'nullable|boolean',
+        'tva_taux' => 'nullable|numeric|min:0|max:100',
     ];
 
     public function mount()
@@ -58,6 +69,14 @@ class RestaurantSettings extends Component
         $this->button_color = $this->etablissement->button_color ?? '#ff6b35';
         $this->currentLogo = $this->etablissement->logo;
         $this->type = $this->etablissement->type;
+        $this->rccm = $this->etablissement->rccm;
+        $this->nui = $this->etablissement->nui;
+        $this->site_web = $this->etablissement->site_web;
+        $this->facebook = $this->etablissement->facebook;
+        $this->instagram = $this->etablissement->instagram;
+        $this->description = $this->etablissement->description;
+        $this->tva_applicable = $this->etablissement->tva_applicable;
+        $this->tva_taux = $this->etablissement->tva_taux;
     }
 
     public function updateSettings()
@@ -83,6 +102,14 @@ class RestaurantSettings extends Component
             'secondary_color' => $this->secondary_color,
             'button_color' => $this->button_color,
             'type' => $this->type,
+            'rccm' => $this->rccm,
+            'nui' => $this->nui,
+            'site_web' => $this->site_web,
+            'facebook' => $this->facebook,
+            'instagram' => $this->instagram,
+            'description' => $this->description,
+            'tva_applicable' => $this->tva_applicable,
+            'tva_taux' => $this->tva_taux,
         ]);
 
         session()->flash('message', 'Paramètres mis à jour avec succès.');
@@ -95,6 +122,8 @@ class RestaurantSettings extends Component
 
     public function render()
     {
-        return view('livewire.admin.settings.restaurant-settings')->layout('layouts.dashboard');
+        /** @var \Illuminate\View\View $view */
+        $view = view('livewire.admin.settings.restaurant-settings');
+        return $view->layout('layouts.dashboard');
     }
 }

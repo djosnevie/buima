@@ -24,7 +24,7 @@
     <!-- Summary Cards -->
     <div class="row g-4 mb-4">
         <!-- Revenue -->
-        <div class="col-xl-4 col-md-6">
+        <div class="col-xl-3 col-md-6">
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
                 <div class="card-body p-4 position-relative">
                     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -32,19 +32,31 @@
                             style="width: 48px; height: 48px;">
                             <i class="fas fa-coins fa-lg"></i>
                         </div>
-                        <div class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2">
-                            Revenus
+                    </div>
+                    <h2 class="fw-bold mb-1">{{ number_format($totalRevenue, 0, ',', ' ') }} <small class="text-muted fs-6">{{ auth()->user()->etablissement->devise }}</small></h2>
+                    <p class="text-muted small mb-0">Total Recettes</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Margin -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
+                <div class="card-body p-4 position-relative">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="icon-circle bg-info bg-opacity-10 text-info rounded-circle d-flex align-items-center justify-content-center"
+                            style="width: 48px; height: 48px;">
+                            <i class="fas fa-dollar-sign fa-lg"></i>
                         </div>
                     </div>
-                    <h2 class="fw-bold mb-1">{{ number_format($totalRevenue, 0, ',', ' ') }} <small
-                            class="text-muted fs-6">{{ auth()->user()->etablissement->devise }}</small></h2>
-                    <p class="text-muted small mb-0">Total sur la période</p>
+                    <h2 class="fw-bold mb-1 text-info">{{ number_format($totalMargin, 0, ',', ' ') }} <small class="text-muted fs-6">{{ auth()->user()->etablissement->devise }}</small></h2>
+                    <p class="text-muted small mb-0">Marge Estimeé</p>
                 </div>
             </div>
         </div>
 
         <!-- Orders -->
-        <div class="col-xl-4 col-md-6">
+        <div class="col-xl-3 col-md-6">
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
                 <div class="card-body p-4 position-relative">
                     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -52,18 +64,15 @@
                             style="width: 48px; height: 48px;">
                             <i class="fas fa-shopping-bag fa-lg"></i>
                         </div>
-                        <div class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2">
-                            Commandes
-                        </div>
                     </div>
                     <h2 class="fw-bold mb-1">{{ $totalOrders }}</h2>
-                    <p class="text-muted small mb-0">Commandes passées</p>
+                    <p class="text-muted small mb-0">Commandes</p>
                 </div>
             </div>
         </div>
 
         <!-- Avg Order -->
-        <div class="col-xl-4 col-md-6">
+        <div class="col-xl-3 col-md-6">
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
                 <div class="card-body p-4 position-relative">
                     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -71,13 +80,9 @@
                             style="width: 48px; height: 48px;">
                             <i class="fas fa-chart-line fa-lg"></i>
                         </div>
-                        <div class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3 py-2">
-                            Panier Moyen
-                        </div>
                     </div>
-                    <h2 class="fw-bold mb-1">{{ number_format($averageOrderValue, 0, ',', ' ') }} <small
-                            class="text-muted fs-6">{{ auth()->user()->etablissement->devise }}</small></h2>
-                    <p class="text-muted small mb-0">Moyenne par commande</p>
+                    <h2 class="fw-bold mb-1">{{ number_format($averageOrderValue, 0, ',', ' ') }} <small class="text-muted fs-6">{{ auth()->user()->etablissement->devise }}</small></h2>
+                    <p class="text-muted small mb-0">Panier Moyen</p>
                 </div>
             </div>
         </div>
@@ -226,6 +231,121 @@
                                     @endforeach
                                 </tbody>
                             </table>
+                        @elseif($previewType === 'caisse_sessions')
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Caisse</th>
+                                        <th>Caissier</th>
+                                        <th>Ouverture</th>
+                                        <th class="text-end">Fermeture Réel</th>
+                                        <th class="text-end">Écart</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($previewData['sessions'] as $sess)
+                                        <tr>
+                                            <td>{{ $sess->caisse_nom }}</td>
+                                            <td>{{ $sess->caissier }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($sess->date_ouverture)->format('d/m H:i') }}</td>
+                                            <td class="text-end">{{ number_format($sess->montant_fermeture_reel, 0, ',', ' ') }}</td>
+                                            <td class="text-end">
+                                                <span class="badge {{ ($sess->montant_fermeture_reel - $sess->montant_fermeture_theorique) >= 0 ? 'bg-success' : 'bg-danger' }}">
+                                                    {{ number_format($sess->montant_fermeture_reel - $sess->montant_fermeture_theorique, 0, ',', ' ') }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        @elseif($previewType === 'stock_valuation')
+                            <div class="alert alert-info py-2 mb-3">
+                                Total Valorisation: <strong>{{ number_format($previewData['total_valuation'], 0, ',', ' ') }} {{ auth()->user()->etablissement->devise }}</strong>
+                            </div>
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Produit</th>
+                                        <th class="text-end">Stock</th>
+                                        <th class="text-end">Prix Achat</th>
+                                        <th class="text-end">Valorisation</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($previewData['valuation'] as $val)
+                                        <tr>
+                                            <td>{{ $val->nom }}</td>
+                                            <td class="text-end">{{ $val->quantite }}</td>
+                                            <td class="text-end">{{ number_format($val->prix_achat, 0, ',', ' ') }}</td>
+                                            <td class="text-end fw-bold">{{ number_format($val->total_value, 0, ',', ' ') }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        @elseif($previewType === 'expenses')
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Catégorie</th>
+                                        <th>Description</th>
+                                        <th class="text-end">Montant</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($previewData['expenses'] as $exp)
+                                        <tr>
+                                            <td>{{ \Carbon\Carbon::parse($exp->date_depense)->format('d/m/Y') }}</td>
+                                            <td>{{ $exp->categorie_nom }}</td>
+                                            <td>{{ $exp->description }}</td>
+                                            <td class="text-end text-danger">-{{ number_format($exp->montant, 0, ',', ' ') }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        @elseif($previewType === 'hourly_sales')
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Heure</th>
+                                        <th class="text-end">Commandes</th>
+                                        <th class="text-end">Revenu</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($previewData['hourly'] as $hour)
+                                        <tr>
+                                            <td>{{ sprintf('%02d:00', $hour->hour) }} - {{ sprintf('%02d:00', $hour->hour + 1) }}</td>
+                                            <td class="text-end">{{ $hour->count }}</td>
+                                            <td class="text-end">{{ number_format($hour->revenue, 0, ',', ' ') }}
+                                                {{ auth()->user()->etablissement->devise }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        @elseif($previewType === 'sites_performance')
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Site</th>
+                                        <th class="text-end">Commandes</th>
+                                        <th class="text-end">Revenu</th>
+                                        <th class="text-end">Panier Moyen</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($previewData['sites'] as $site)
+                                        <tr>
+                                            <td>{{ $site->nom }}</td>
+                                            <td class="text-end">{{ $site->commandes_count }}</td>
+                                            <td class="text-end">{{ number_format($site->commandes_sum_total ?? 0, 0, ',', ' ') }}
+                                                {{ auth()->user()->etablissement->devise }}</td>
+                                            <td class="text-end">{{ number_format($site->average_ticket, 0, ',', ' ') }}
+                                                {{ auth()->user()->etablissement->devise }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         @endif
                     </div>
                 </div>
@@ -238,8 +358,11 @@
     <div class="row">
         <div class="col-12">
             <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-header bg-white border-0 py-3">
+                <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
                     <h5 class="fw-bold mb-0">Exporter les Rapports (PDF)</h5>
+                    <button wire:click="exportAccounting" class="btn btn-outline-dark btn-sm rounded-pill px-3">
+                        <i class="fas fa-file-csv me-1"></i> Export Excel (Compta)
+                    </button>
                 </div>
                 <div class="card-body">
                     <div class="row g-3">
@@ -287,6 +410,40 @@
                                 <span class="fw-bold">Paiements</span>
                             </button>
                         </div>
+                        <!-- Caisse Sessions -->
+                        <div class="col-6 col-md-4 col-lg-2">
+                            <button wire:click="previewReport('caisse_sessions')" class="report-card w-100 bg-white">
+                                <i class="fas fa-cash-register fa-2x mb-2"></i>
+                                <span class="fw-bold">Sessions Caisse</span>
+                            </button>
+                        </div>
+                        <!-- Stock Valuation -->
+                        <div class="col-6 col-md-4 col-lg-2">
+                            <button wire:click="previewReport('stock_valuation')" class="report-card w-100 bg-white">
+                                <i class="fas fa-boxes fa-2x mb-2"></i>
+                                <span class="fw-bold">Valeur Stock</span>
+                            </button>
+                        </div>
+                        <!-- Expenses -->
+
+                        
+                        <!-- Hourly Sales -->
+                        <div class="col-6 col-md-4 col-lg-2">
+                             <button wire:click="previewReport('hourly_sales')" class="report-card w-100 bg-white">
+                                <i class="fas fa-clock fa-2x mb-2"></i>
+                                <span class="fw-bold">Heures</span>
+                            </button>
+                        </div>
+
+                         <!-- Multi-Site Performance (Manager Only) -->
+                         @if(auth()->user()->isManager())
+                            <div class="col-6 col-md-4 col-lg-2">
+                                <button wire:click="previewReport('sites_performance')" class="report-card w-100 bg-white">
+                                    <i class="fas fa-network-wired fa-2x mb-2"></i>
+                                    <span class="fw-bold">Performances Sites</span>
+                                </button>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -323,16 +480,14 @@
             /* Inspecting the blade: <button ... class="report-card w-100 bg-white"> */
             /* Ah! The inline class `bg-white` might be conflicting or interacting weirdly. */
             /* The user likely means they don't want the text to disappear or the whole thing to look 'white' / 'blank' if something is wrong. */
-            /* OR, they genuinely don't want the hover effect to change the color so drastically. */
-            /* Let's try removing the `color: white` change and see if that satisfies "don't become white". */
-            /* Actually, if I remove `color: white`, text stays red on red background -> unreadable. */
-            /* Maybe they meant the ICON becomes white? */
-            /* Let's assume they want a subtle hover, not a full fill. */
-            /* I will change hover to just darken the border and background slightly, keeping text red. */
-            background-color: #ffe0e0;
-            color: #dc3545; 
+            background-color: #dc3545 !important;
+            color: #ffffff !important;
             transform: translateY(-2px);
             box-shadow: 0 4px 6px rgba(220, 53, 69, 0.2);
+        }
+        
+        .report-card:hover i, .report-card:hover span {
+            color: #ffffff !important;
         }
     </style>
 </div>

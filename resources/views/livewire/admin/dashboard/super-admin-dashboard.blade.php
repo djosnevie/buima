@@ -143,11 +143,12 @@
                                         </td>
                                         <td>
                                             @php
-                                                $admin = $etablissement->users->where('role', 'admin')->first();
+                                                $owner = $etablissement->users->where('role', 'manager')->first()
+                                                    ?? $etablissement->users->where('role', 'admin')->first();
                                             @endphp
-                                            @if($admin)
-                                                {{ $admin->name }} <br>
-                                                <small class="text-muted">{{ $admin->email }}</small>
+                                            @if($owner)
+                                                <span class="fw-bold">{{ $owner->name }}</span> <br>
+                                                <small class="text-muted">{{ $owner->email }}</small>
                                             @else
                                                 <span class="text-danger small">Non assigné</span>
                                             @endif
@@ -182,7 +183,7 @@
                     @if($isOpen)
                         <div class="modal fade show" tabindex="-1" style="display: block; background: rgba(0,0,0,0.5);"
                             aria-modal="true" role="dialog">
-                            <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-dialog modal-dialog-centered modal-xl">
                                 <div class="modal-content border-0 shadow-lg">
                                     <div class="modal-header border-0 pb-0">
                                         <h5 class="modal-title fw-bold">Modifier le Restaurant</h5>
@@ -242,6 +243,93 @@
                                                 <textarea class="form-control" wire:model="adresse" rows="2"></textarea>
                                                 @error('adresse') <span class="text-danger small">{{ $message }}</span>
                                                 @enderror
+                                            </div>
+
+                                            <hr class="my-4">
+
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <h6 class="fw-bold mb-3">Informations Légales & Fiscales</h6>
+                                                    <div class="row g-3 mb-3">
+                                                        <div class="col-md-6">
+                                                            <label class="form-label text-muted small fw-bold">RCCM</label>
+                                                            <input type="text" class="form-control" wire:model="rccm">
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="form-label text-muted small fw-bold">NUI</label>
+                                                            <input type="text" class="form-control" wire:model="nui">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-check form-switch mb-2">
+                                                        <input class="form-check-input" type="checkbox"
+                                                            wire:model.live="tva_applicable" id="tva_edit">
+                                                        <label class="form-check-label fw-bold small" for="tva_edit">TVA
+                                                            Applicable</label>
+                                                    </div>
+                                                    @if($tva_applicable)
+                                                        <div class="input-group input-group-sm mb-3">
+                                                            <span class="input-group-text">Taux</span>
+                                                            <input type="number" step="0.01" class="form-control"
+                                                                wire:model="tva_taux">
+                                                            <span class="input-group-text">%</span>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <h6 class="fw-bold mb-3">Réseaux & Web</h6>
+                                                    <div class="mb-3">
+                                                        <label class="form-label text-muted small fw-bold">Site Web</label>
+                                                        <input type="url" class="form-control" wire:model="site_web">
+                                                    </div>
+                                                    <div class="row g-3 mb-3">
+                                                        <div class="col-md-6">
+                                                            <label
+                                                                class="form-label text-muted small fw-bold">Facebook</label>
+                                                            <input type="url" class="form-control" wire:model="facebook">
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label
+                                                                class="form-label text-muted small fw-bold">Instagram</label>
+                                                            <input type="url" class="form-control" wire:model="instagram">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-4">
+                                                <label class="form-label text-muted small fw-bold">Description /
+                                                    Slogan</label>
+                                                <textarea class="form-control" wire:model="description" rows="2"></textarea>
+                                            </div>
+
+                                            <hr class="my-4">
+                                            <h6 class="fw-bold mb-3">Modules Activés</h6>
+                                            <div class="row g-4">
+                                                @php
+                                                    $allModules = [
+                                                        'pos' => 'Points de Vente',
+                                                        'qr_menu' => 'Menu QR (Commande)',
+                                                        'inventory' => 'Stocks & Fournisseurs',
+                                                        'finance' => 'Finance (P&L, Marges)',
+                                                        'caisses' => 'Gestion des Caisses',
+                                                        'reports' => 'Rapports & Stats',
+                                                        'tables' => 'Gestion des Tables',
+                                                        'orders' => 'Gestion Commandes',
+                                                        'products' => 'Gestion Produits'
+                                                    ];
+                                                @endphp
+                                                @foreach($allModules as $key => $label)
+                                                    <div class="col-md-4">
+                                                        <div class="form-check form-switch border rounded p-2 ps-5">
+                                                            <input class="form-check-input ms-0 me-3 mt-1" type="checkbox"
+                                                                wire:model="selectedModules" value="{{ $key }}"
+                                                                id="mod_{{ $key }}">
+                                                            <label class="form-check-label fw-bold small" for="mod_{{ $key }}">
+                                                                {{ $label }}
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
                                             </div>
 
                                             <div class="d-grid gap-2 mt-4">
