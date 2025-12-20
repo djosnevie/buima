@@ -18,6 +18,12 @@ return new class extends Migration {
             $table->boolean('actif')->default(true);
             $table->timestamps();
         });
+
+        if (Schema::hasTable('users') && Schema::hasColumn('users', 'section_id')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->foreign('section_id')->references('id')->on('sections')->onDelete('set null');
+            });
+        }
     }
 
     /**

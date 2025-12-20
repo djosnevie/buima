@@ -17,6 +17,12 @@ return new class extends Migration {
             $table->text('description')->nullable();
             $table->timestamps();
         });
+
+        if (Schema::hasTable('depenses') && Schema::hasColumn('depenses', 'categorie_depense_id')) {
+            Schema::table('depenses', function (Blueprint $table) {
+                $table->foreign('categorie_depense_id')->references('id')->on('categorie_depenses')->onDelete('set null');
+            });
+        }
     }
 
     /**

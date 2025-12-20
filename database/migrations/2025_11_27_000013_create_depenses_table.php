@@ -4,13 +4,13 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     public function up(): void
     {
         Schema::create('depenses', function (Blueprint $table) {
             $table->id();
             $table->foreignId('etablissement_id')->constrained()->onDelete('cascade');
+            $table->foreignId('categorie_depense_id')->nullable(); // Constrained in categorie_depenses migration
             $table->foreignId('transaction_id')->nullable()->constrained()->onDelete('set null');
             $table->enum('categorie', [
                 'achat_stock',
@@ -30,7 +30,7 @@ return new class extends Migration
             $table->string('justificatif')->nullable(); // fichier
             $table->foreignId('user_id')->constrained();
             $table->timestamps();
-            
+
             $table->index(['etablissement_id', 'categorie', 'date_depense']);
         });
     }

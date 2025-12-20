@@ -4,14 +4,13 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     public function up(): void
     {
         Schema::create('produits', function (Blueprint $table) {
             $table->id();
             $table->foreignId('etablissement_id')->constrained()->onDelete('cascade');
-            $table->foreignId('categorie_id')->constrained()->onDelete('restrict');
+            $table->foreignId('categorie_id')->nullable()->constrained()->onDelete('restrict');
             $table->string('nom');
             $table->string('code_barre')->nullable()->unique();
             $table->text('description')->nullable();
@@ -23,7 +22,7 @@ return new class extends Migration
             $table->boolean('disponible')->default(true);
             $table->boolean('gestion_stock')->default(true); // true = gérer stock
             $table->timestamps();
-            
+
             $table->index(['etablissement_id', 'disponible']);
         });
     }

@@ -13,12 +13,12 @@ return new class extends Migration {
             $table->foreignId('user_id')->constrained(); // Caissier
             $table->dateTime('date_ouverture');
             $table->dateTime('date_fermeture')->nullable();
-            $table->decimal('fond_caisse_depart', 10, 2)->default(0);
-            $table->decimal('fond_caisse_theorique', 10, 2)->default(0);
-            $table->decimal('fond_caisse_reel', 10, 2)->nullable();
+            $table->decimal('montant_ouverture', 10, 2)->default(0);
+            $table->decimal('montant_fermeture_theorique', 10, 2)->default(0);
+            $table->decimal('montant_fermeture_reel', 10, 2)->nullable();
             $table->decimal('ecart', 10, 2)->default(0);
             $table->enum('statut', ['ouverte', 'fermee'])->default('ouverte');
-            $table->text('commentaire')->nullable();
+            $table->text('notes')->nullable();
             $table->timestamps();
 
             $table->index(['caisse_id', 'statut', 'date_ouverture']);

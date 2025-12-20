@@ -23,6 +23,7 @@ return new class extends Migration {
                 'mobile_money'
             ]);
             $table->text('description')->nullable();
+            $table->string('statut')->default('complete'); // pending, complete, failed
             $table->foreignId('user_id')->constrained();
             $table->dateTime('date_transaction');
             $table->timestamps();
