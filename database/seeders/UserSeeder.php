@@ -22,7 +22,7 @@ class UserSeeder extends Seeder
         $users = [
             [
                 'name' => 'Super Admin',
-                'email' => 'superadmin@omenu.com',
+                'email' => 'superadmin@buima.com',
                 'role' => 'super_admin',
                 'password' => Hash::make('password'),
                 'etablissement_id' => null,
@@ -45,12 +45,12 @@ class UserSeeder extends Seeder
 
         foreach ($users as $user) {
             DB::table('users')->updateOrInsert(
-                ['email' => $user['email']],
+            ['email' => $user['email']],
                 array_merge($user, [
-                    'email_verified_at' => now(),
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ])
+                'email_verified_at' => now(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ])
             );
         }
     }
