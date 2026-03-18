@@ -260,13 +260,42 @@
 
                         <button class="btn btn-primary w-100 py-2 fw-bold" wire:click="createOrder"
                             @if(empty($cart)) disabled @endif>
-                            <i class="fas fa-check-circle me-2"></i>Valider la commande
+                            <i class="fas fa-{{ $existingOrderId ? 'save' : 'check-circle' }} me-2"></i>
+                            {{ $existingOrderId ? 'Enregistrer les modifications' : 'Valider la commande' }}
                         </button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <!-- Manager Validation Modal -->
+    @if($showManagerPinModal)
+        <div class="modal fade show" tabindex="-1" style="display: block; background: rgba(0,0,0,0.5); z-index: 1050;">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title"><i class="fas fa-lock me-2"></i>Validation Requise</h5>
+                        <button type="button" class="btn-close btn-close-white" wire:click="cancelManagerApproval"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <p class="mb-4">Cette action (suppression d'un produit) nécessite l'approbation d'un manager. Veuillez saisir un mot de passe autorisé.</p>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Mot de passe Manager</label>
+                            <input type="password" class="form-control form-control-lg @error('managerPassword') is-invalid @enderror" wire:model="managerPassword" placeholder="Saisissez le mot de passe...">
+                            @error('managerPassword')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light">
+                        <button type="button" class="btn btn-secondary" wire:click="cancelManagerApproval">Annuler</button>
+                        <button type="button" class="btn btn-danger px-4" wire:click="validateManagerApproval">Autoriser l'action</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <!-- Create Order Styles -->
     <link rel="stylesheet" href="{{ asset('css/livewire/pages/orders/create.css') }}">
 

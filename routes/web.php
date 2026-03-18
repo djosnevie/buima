@@ -31,6 +31,9 @@ Route::middleware(['auth'])->group(function () {
     // Orders
     Route::middleware(['module:orders'])->group(function () {
         Route::view('/orders/create', 'orders.create')->name('orders.create');
+        Route::get('/orders/{commande}/edit', function (\App\Models\Commande $commande) {
+            return view('orders.create', ['orderId' => $commande->id]);
+        })->name('orders.edit');
         Route::get('/orders', \App\Livewire\Orders\OrderList::class)->name('orders.index');
         Route::get('/orders/{commande}/invoice', function (\App\Models\Commande $commande) {
             return view('pages.orders.invoice', ['commande' => $commande]);

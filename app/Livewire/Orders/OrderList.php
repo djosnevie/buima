@@ -21,6 +21,9 @@ class OrderList extends Component
 
     public $selectedOrderId = null;
     public $isEditing = false;
+    public $showManagerPinModal = false;
+    public $managerPassword = '';
+    public $pendingCancellationOrderId = null;
     public $editForm = [
         'client_nom' => '',
         'client_telephone' => '',
@@ -155,6 +158,10 @@ class OrderList extends Component
     {
         $commande = Commande::whereIn('etablissement_id', auth()->user()->getAccessibleEtablissementIds())->find($id);
         if ($commande) {
+            if ($commande->statut === 'annulee') {
+                session()->flash('error', 'Une commande annulée ne peut pas être supprimée.');
+                return;
+            }
             $commande->items()->delete();
             $commande->delete();
             $this->closeSideView();
@@ -169,7 +176,12 @@ class OrderList extends Component
         if (!$commande)
             return;
 
-        // Lock check: if already 'payee', only allow 'annulee' (and only by admins)
+        if ($commande->statut === 'annulee') {
+            session()->flash('error', 'Une commande annulée ne peut plus être modifiée.');
+            return;
+        }
+
+        // Lock check: if already 'payee', only allow 'annulee' (and only by admins or validated manager)
         if ($commande->statut === 'payee' && $newStatus !== 'annulee') {
             session()->flash('error', 'Commande payée verrouillée. Annulation requise pour modifier.');
             return;
@@ -177,22 +189,105 @@ class OrderList extends Component
 
         // Role check for cancellation
         if ($newStatus === 'annulee') {
-            if (!auth()->user()->isAdmin() && !auth()->user()->isSuperAdmin()) {
-                session()->flash('error', 'Action réservée aux gérants.');
+            if (!auth()->user()->isManager() && !auth()->user()->isAdmin() && !auth()->user()->isSuperAdmin()) {
+                $this->pendingCancellationOrderId = $commandeId;
+                $this->showManagerPinModal = true;
                 return;
             }
         }
 
+        $this->executeStatusUpdate($commande, $newStatus);
+    }
+
+    private function executeStatusUpdate($commande, $newStatus)
+    {
         $commande->update(['statut' => $newStatus]);
 
-        if ($newStatus === 'payee') {
-            $this->dispatch('print-invoice', url: route('orders.invoice', $commande->id));
-            if ($commande->table) {
-                $commande->table->markAsFree();
+        if (in_array($newStatus, ['payee', 'annulee']) && $commande->table) {
+            $commande->table->markAsFree();
+        }
+
+        if ($newStatus === 'annulee') {
+            // Revert stock if inventory module is active
+            if (auth()->user()->etablissement->hasModule('inventory')) {
+                foreach ($commande->items as $item) {
+                    $produit = \App\Models\Produit::find($item->produit_id);
+                    if ($produit && $produit->gestion_stock && $produit->stock) {
+                        $stock = $produit->stock;
+                        $qty = (int) $item->quantite;
+                        $old = (int) $stock->quantite;
+                        $new = $old + $qty;
+                        $stock->update(['quantite' => $new]);
+
+                        \App\Models\MouvementStock::create([
+                            'etablissement_id' => auth()->user()->etablissement_id,
+                            'user_id' => auth()->id(),
+                            'stockable_type' => \App\Models\Produit::class,
+                            'stockable_id' => $produit->id,
+                            'type' => 'entree',
+                            'quantite' => $qty,
+                            'quantite_avant' => $old,
+                            'quantite_apres' => $new,
+                            'commentaire' => 'Annulation Commande #' . $commande->numero_commande,
+                            'date_mouvement' => now(),
+                        ]);
+                    }
+                }
             }
         }
 
+        if ($newStatus === 'payee') {
+            $this->dispatch('print-invoice', url: route('orders.invoice', $commande->id));
+        }
+
         session()->flash('success', 'Statut mis à jour.');
+    }
+
+    public function validateManagerApproval()
+    {
+        $this->resetErrorBag('managerPassword');
+
+        if (empty($this->managerPassword)) {
+            $this->addError('managerPassword', 'Veuillez saisir un mot de passe.');
+            return;
+        }
+
+        $managers = \App\Models\User::where('etablissement_id', auth()->user()->etablissement_id)
+            ->whereIn('role', ['manager', 'admin'])
+            ->get();
+            
+        $isValid = false;
+        foreach ($managers as $mgr) {
+            if (\Illuminate\Support\Facades\Hash::check($this->managerPassword, $mgr->password)) {
+                $isValid = true;
+                break;
+            }
+        }
+
+        if (!$isValid && auth()->user()->etablissement->manager_id) {
+             $owner = \App\Models\User::find(auth()->user()->etablissement->manager_id);
+             if ($owner && \Illuminate\Support\Facades\Hash::check($this->managerPassword, $owner->password)) {
+                 $isValid = true;
+             }
+        }
+
+        if ($isValid && $this->pendingCancellationOrderId) {
+            $commande = Commande::find($this->pendingCancellationOrderId);
+            if ($commande) {
+                $this->executeStatusUpdate($commande, 'annulee');
+            }
+            $this->cancelManagerApproval();
+        } else {
+            $this->addError('managerPassword', 'Mot de passe incorrect ou non autorisé.');
+        }
+    }
+
+    public function cancelManagerApproval()
+    {
+        $this->showManagerPinModal = false;
+        $this->managerPassword = '';
+        $this->pendingCancellationOrderId = null;
+        $this->resetErrorBag('managerPassword');
     }
 
     public function render()

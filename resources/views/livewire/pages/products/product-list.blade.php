@@ -83,6 +83,17 @@
                 <i class="fas fa-tags"></i> Catégories
             </button>
             @if(auth()->user()->isAdmin() || auth()->user()->isSuperAdmin())
+                <input type="file" id="importProduct" wire:model.live="importFile" style="display:none;" accept=".xlsx,.xls,.csv">
+                <label for="importProduct" class="btn-secondary" style="background-color: #2b5797; color: white; border: none; cursor: pointer; margin-bottom: 0;">
+                    <i class="fas fa-file-import"></i> Importer
+                </label>
+                <div wire:loading wire:target="importFile" class="spinner-border spinner-border-sm text-primary ms-2" role="status">
+                    <span class="visually-hidden">Chargement...</span>
+                </div>
+                
+                <button wire:click="exportExcel" class="btn-secondary" style="background-color: #217346; color: white; border-color: #217346;">
+                    <i class="fas fa-file-excel"></i> Exporter
+                </button>
                 <a href="{{ route('products.create') }}" class="btn-add">
                     <i class="fas fa-plus"></i> Nouveau Produit
                 </a>

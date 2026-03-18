@@ -45,6 +45,18 @@ class TableList extends Component
     {
         $table = Table::find($id);
         if ($table) {
+            // Check if we are trying to free an occupied table
+            if ($table->statut === 'occupee') {
+                $hasPendingOrders = \App\Models\Commande::where('table_id', $table->id)
+                    ->whereIn('statut', ['en_attente', 'servie'])
+                    ->exists();
+                
+                if ($hasPendingOrders) {
+                    session()->flash('error', 'Impossible de libérer cette table : une commande est en cours (en attente ou servie).');
+                    return;
+                }
+            }
+
             // Toggle between libre and occupee
             $table->statut = $table->statut === 'libre' ? 'occupee' : 'libre';
             $table->save();

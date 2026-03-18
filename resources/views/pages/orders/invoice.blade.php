@@ -117,6 +117,16 @@
         @endif
     </div>
 
+    <div style="text-align: center; margin: 15px 0; padding: 5px; border: 1px solid #000; font-weight: bold; font-size: 16px;">
+        @if($commande->statut === 'payee')
+            STATUT : PAYÉE
+        @elseif($commande->statut === 'servie')
+            STATUT : NON PAYÉE
+        @else
+            STATUT : {{ strtoupper(str_replace('_', ' ', $commande->statut)) }}
+        @endif
+    </div>
+
     <table class="items">
         <thead>
             <tr>

@@ -30,7 +30,7 @@ class CommandeItem extends Model
 
     public function produit(): BelongsTo
     {
-        return $this->belongsTo(Produit::class);
+        return $this->belongsTo(Produit::class)->withTrashed();
     }
 
     protected static function booted()

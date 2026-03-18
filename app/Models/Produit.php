@@ -3,10 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Produit extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'etablissement_id',
         'categorie_id',
@@ -37,7 +40,7 @@ class Produit extends Model
 
     public function categorie(): BelongsTo
     {
-        return $this->belongsTo(Categorie::class);
+        return $this->belongsTo(Categorie::class)->withTrashed();
     }
 
     public function stock(): \Illuminate\Database\Eloquent\Relations\HasOne

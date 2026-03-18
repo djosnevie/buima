@@ -88,7 +88,24 @@
 
         <!-- List Section -->
         <div class="category-list">
-            <h4>Liste des catégories</h4>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h4 style="margin: 0;">Liste des catégories</h4>
+                @if(auth()->user()->isAdmin() || auth()->user()->isSuperAdmin())
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="file" id="importCategory" wire:model.live="importFile" style="display:none;" accept=".xlsx,.xls,.csv">
+                        <label for="importCategory" class="btn-secondary" style="background-color: #2b5797; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.9rem; cursor: pointer; margin-bottom: 0;">
+                            <i class="fas fa-file-import"></i> Importer
+                        </label>
+                        <div wire:loading wire:target="importFile" class="spinner-border spinner-border-sm text-primary" role="status">
+                            <span class="visually-hidden">...</span>
+                        </div>
+
+                        <button wire:click="exportExcel" class="btn-secondary" style="background-color: #217346; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.9rem;">
+                            <i class="fas fa-file-excel"></i> Exporter
+                        </button>
+                    </div>
+                @endif
+            </div>
             <div class="list-container">
                 @foreach($categories as $category)
                     <div class="category-item">

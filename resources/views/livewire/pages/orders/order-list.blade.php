@@ -160,11 +160,13 @@
                                 <i class="fas fa-euro-sign"></i>
                             </button>
                         @endif
-                        <button
-                            onclick="printInvoice('{{ route('orders.invoice', $commande->id) }}'); event.stopPropagation();"
-                            class="btn-action btn-print">
-                            <i class="fas fa-print"></i>
-                        </button>
+                        @if(in_array($commande->statut, ['servie', 'payee']))
+                            <button
+                                onclick="printInvoice('{{ route('orders.invoice', $commande->id) }}'); event.stopPropagation();"
+                                class="btn-action btn-print" title="Imprimer la facture">
+                                <i class="fas fa-print"></i>
+                            </button>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -193,10 +195,10 @@
                         @endif
                     </div>
                     <div class="header-actions-panel">
-                        @if(!$isEditing && $selectedOrder->statut !== 'payee')
-                            <button wire:click="enableEdit" class="btn-icon" title="Modifier">
+                        @if(!$isEditing && !in_array($selectedOrder->statut, ['payee', 'annulee']))
+                            <a href="{{ route('orders.edit', $selectedOrder->id) }}" class="btn-icon" title="Ouvrir dans le POS pour modifier">
                                 <i class="fas fa-edit"></i>
-                            </button>
+                            </a>
                         @endif
                         <button wire:click="closeSideView" class="btn-close-panel">
                             <i class="fas fa-times"></i>
@@ -419,6 +421,11 @@
                                             } else {
                                                 $isDisabled = true;
                                             }
+                                        } elseif ($selectedOrder->statut === 'annulee') {
+                                            // Lock logic: if annulee, disable all other buttons
+                                            if ($key !== 'annulee') {
+                                                $isDisabled = true;
+                                            }
                                         }
                                     @endphp
                                     
@@ -435,9 +442,11 @@
                         </div>
 
                         <div class="action-buttons">
-                            <button onclick="printInvoice('{{ route('orders.invoice', $selectedOrder->id) }}')" class="btn-panel btn-print">
-                                <i class="fas fa-print"></i> Imprimer Facture
-                            </button>
+                            @if(in_array($selectedOrder->statut, ['servie', 'payee']))
+                                <button onclick="printInvoice('{{ route('orders.invoice', $selectedOrder->id) }}')" class="btn-panel btn-print">
+                                    <i class="fas fa-print"></i> Imprimer Facture
+                                </button>
+                            @endif
                             @if($selectedOrder->statut !== 'payee' || auth()->user()->isAdmin() || auth()->user()->isSuperAdmin())
                                 <button wire:click="deleteOrder({{ $selectedOrder->id }})" wire:confirm="Êtes-vous sûr de vouloir supprimer cette commande ?" class="btn-panel btn-delete-order">
                                     <i class="fas fa-trash"></i> Supprimer
@@ -457,6 +466,34 @@
             frame.src = url;
         }
     </script>
+    <!-- Manager Validation Modal -->
+    @if($showManagerPinModal)
+        <div class="modal fade show" tabindex="-1" style="display: block; background: rgba(0,0,0,0.5); z-index: 1050;">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title"><i class="fas fa-lock me-2"></i>Validation Requise</h5>
+                        <button type="button" class="btn-close btn-close-white" wire:click="cancelManagerApproval"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <p class="mb-4">L'annulation d'une commande nécessite l'approbation d'un manager. Veuillez saisir un mot de passe autorisé.</p>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Mot de passe Manager</label>
+                            <input type="password" class="form-control form-control-lg @error('managerPassword') is-invalid @enderror" wire:model="managerPassword" placeholder="Saisissez le mot de passe...">
+                            @error('managerPassword')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light">
+                        <button type="button" class="btn btn-secondary" wire:click="cancelManagerApproval">Annuler</button>
+                        <button type="button" class="btn btn-danger px-4" wire:click="validateManagerApproval">Autoriser l'annulation</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <!-- Order List Styles -->
     <link rel="stylesheet" href="{{ asset('css/livewire/pages/orders/order-list.css') }}">
 </div>
