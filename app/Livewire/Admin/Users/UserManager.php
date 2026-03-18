@@ -21,7 +21,7 @@ class UserManager extends Component
     public $name;
     public $email;
     public $password;
-    public $role = 'user';
+    public $role = 'caissier';
     public $section_id = '';
     public $caisse_id = ''; // Added
     public $etablissement_id = ''; // For Super Admin
@@ -33,9 +33,9 @@ class UserManager extends Component
     protected $rules = [
         'name' => 'required|string|max:255',
         'email' => 'required|email|max:255|unique:users,email',
-        'role' => 'required|in:manager,admin,user',
+        'role' => 'required|in:manager,admin,caissier,user',
         'section_id' => 'nullable|exists:sections,id',
-        'caisse_id' => 'nullable|exists:caisses,id', // Added
+        'caisse_id' => 'nullable|exists:caisses,id',
         'etablissement_id' => 'nullable|exists:etablissements,id',
     ];
 
@@ -105,6 +105,12 @@ class UserManager extends Component
         $hasAccess = Auth::user()->isSuperAdmin() ||
             ($user && $user->etablissement_id === Auth::user()->etablissement_id);
 
+        // A manager cannot edit admin or super_admin accounts
+        if (Auth::user()->isManager() && !Auth::user()->isSuperAdmin() && $user && in_array($user->role, ['admin', 'manager', 'super_admin'])) {
+            session()->flash('error', 'Vous n\'avez pas la permission de modifier ce compte.');
+            return;
+        }
+
         if ($user && $hasAccess) {
             $this->selectedUserId = $id;
             $this->name = $user->name;
@@ -138,11 +144,10 @@ class UserManager extends Component
             ? ($this->etablissement_id ?: null)
             : Auth::user()->etablissement_id;
 
-        // Restriction: Manager/Admin cannot create Super Admins
-        // And Manager shouldn't create other Managers normally via this UI (they have POS Manager)
+        // Restriction: Manager/Admin cannot create Super Admins or Managers
         $finalRole = $this->role;
-        if (!Auth::user()->isSuperAdmin() && $finalRole === 'manager') {
-            $finalRole = 'admin'; // Override if a non-superadmin tries to create a manager
+        if (!Auth::user()->isSuperAdmin() && in_array($finalRole, ['manager', 'super_admin'])) {
+            $finalRole = 'admin';
         }
 
         if ($this->isEditing) {
@@ -192,6 +197,12 @@ class UserManager extends Component
         $hasAccess = Auth::user()->isSuperAdmin() ||
             ($user && $user->etablissement_id === Auth::user()->etablissement_id);
 
+        // Manager cannot delete admins
+        if (Auth::user()->isManager() && !Auth::user()->isSuperAdmin() && $user && in_array($user->role, ['admin', 'manager', 'super_admin'])) {
+            session()->flash('error', 'Vous n\'avez pas la permission de supprimer un administrateur.');
+            return;
+        }
+
         if ($user && $hasAccess) {
             $user->delete();
             session()->flash('message', 'Utilisateur supprimé.');
@@ -204,7 +215,7 @@ class UserManager extends Component
         $this->name = '';
         $this->email = '';
         $this->password = '';
-        $this->role = 'user';
+        $this->role = 'caissier'; // Default to caissier (replaces 'user')
         $this->section_id = '';
         $this->caisse_id = '';
         $this->etablissement_id = '';

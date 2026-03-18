@@ -30,6 +30,13 @@ class CreateOrder extends Component
 
     public function mount($table = null, $orderId = null)
     {
+        // Sales are exclusively for caissiers
+        if (auth()->user()->isAdmin()) {
+            session()->flash('error', 'Les ventes sont réservées aux caissiers. Un manager ou administrateur ne peut pas créer de commandes.');
+            $this->redirect(route('orders.index'));
+            return;
+        }
+
         $this->selectedCategory = null; // Default to 'Tous'
 
         // Pre-fill table if coming from table list
@@ -302,6 +309,9 @@ class CreateOrder extends Component
                 ]);
 
             } else {
+                // Get active session for caissiers
+                $activeSession = auth()->user()->activeSession();
+
                 // Create order
                 $commande = Commande::create([
                     'etablissement_id' => auth()->user()->etablissement_id,
@@ -312,7 +322,8 @@ class CreateOrder extends Component
                     'client_telephone' => $this->clientPhone,
                     'client_adresse' => $this->clientAddress,
                     'user_id' => auth()->id(),
-                    'caisse_id' => auth()->user()->caisse_id,
+                    'caisse_id' => $activeSession?->caisse_id ?? auth()->user()->caisse_id,
+                    'session_caisse_id' => $activeSession?->id,
                     'statut' => 'en_attente',
                     'sous_total' => $this->subtotal,
                     'montant_taxes' => $this->taxes,

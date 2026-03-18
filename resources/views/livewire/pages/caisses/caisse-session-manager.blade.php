@@ -32,46 +32,88 @@
             </div>
         </div>
     @else
+        @php
+            $devise = auth()->user()->etablissement->devise_display ?? 'FCFA';
+            $fmt = fn($v) => number_format((float)$v, 0, ',', ' ') . ' ' . $devise;
+        @endphp
         <div class="row g-4">
-            <div class="col-md-4">
+            <!-- Rapport de fermeture -->
+            <div class="col-md-5">
                 <div class="card border-0 shadow-sm rounded-4 h-100">
                     <div class="card-body p-4">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h5 class="fw-bold mb-0">Session Active</h5>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold mb-0">Rapport de Caisse</h5>
                             <span class="badge bg-success">OUVERTE</span>
                         </div>
-                        <div class="d-flex flex-column gap-3">
-                            <div class="d-flex justify-content-between">
-                                <span class="text-muted">Ouverte par :</span>
-                                <span class="fw-bold">{{ $currentSession->user->name }}</span>
+                        <small class="text-muted d-block mb-3">
+                            <i class="fas fa-user me-1"></i> {{ $currentSession->user->name }}
+                            &nbsp;|&nbsp;
+                            <i class="fas fa-clock me-1"></i> {{ $currentSession->date_ouverture->format('d/m/Y H:i') }}
+                        </small>
+
+                        {{-- Grille du rapport --}}
+                        <div class="rounded-3 p-3 mb-3" style="background:#f8f9fa;">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted small"><i class="fas fa-wallet me-1"></i> Fond de caisse</span>
+                                <span class="fw-bold">{{ $fmt($currentSession->montant_ouverture) }}</span>
                             </div>
-                            <div class="d-flex justify-content-between">
-                                <span class="text-muted">Date d'ouverture :</span>
-                                <span class="fw-bold">{{ $currentSession->date_ouverture->format('d/m/Y H:i') }}</span>
+                            <hr class="my-2">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted small fw-semibold">Total des ventes</span>
+                                <span class="fw-bold text-success">{{ $fmt($stats['total_ventes'] ?? 0) }}</span>
                             </div>
-                            <div class="d-flex justify-content-between">
-                                <span class="text-muted">Montant initial :</span>
-                                <span class="fw-bold">{{ number_format($currentSession->montant_ouverture, 0, ',', ' ') }}
-                                    {{ auth()->user()->etablissement->devise_display }}</span>
+                            {{-- Détail par mode de paiement --}}
+                            <div class="ps-3 mb-2">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="text-muted small"><i class="fas fa-money-bill-wave me-1"></i> Cash</span>
+                                    <span class="small">{{ $fmt($stats['par_mode']['especes'] ?? 0) }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="text-muted small"><i class="fas fa-mobile-alt me-1"></i> Mobile Money</span>
+                                    <span class="small">{{ $fmt($stats['par_mode']['mobile_money'] ?? 0) }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted small"><i class="fas fa-credit-card me-1"></i> Carte</span>
+                                    <span class="small">{{ $fmt($stats['par_mode']['carte'] ?? 0) }}</span>
+                                </div>
+                            </div>
+                            <hr class="my-2">
+                            <div class="d-flex justify-content-between fw-bold">
+                                <span class="small">Montant attendu (total ventes)</span>
+                                <span class="text-primary">{{ $fmt($stats['montant_attendu'] ?? 0) }}</span>
                             </div>
                         </div>
 
-                        <hr class="my-4">
-
+                        {{-- Formulaire de fermeture --}}
                         <form wire:submit.prevent="fermerSession">
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Montant réel en caisse</label>
-                                <input type="number" wire:model="montant_fermeture_reel"
+                            <div class="mb-2">
+                                <label class="form-label fw-bold">Montant réel compté</label>
+                                <input type="number" wire:model.live="montant_fermeture_reel"
                                     class="form-control form-control-lg" placeholder="Comptez les espèces...">
-                                @error('montant_fermeture_reel') <div class="text-danger small">{{ $message }}</div>
-                                @enderror
+                                @error('montant_fermeture_reel') <div class="text-danger small">{{ $message }}</div> @enderror
                             </div>
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">Notes / Observations</label>
+
+                            {{-- Aperçu de l'écart en temps réel --}}
+                            @if($montant_fermeture_reel !== null && $montant_fermeture_reel !== '')
+                                @php
+                                    $ecartVal = (float)$montant_fermeture_reel - (float)($stats['montant_attendu'] ?? 0);
+                                    $ecartClass = $ecartVal < 0 ? 'danger' : ($ecartVal > 0 ? 'warning' : 'success');
+                                    $ecartLabel = $ecartVal < 0 ? 'Manquant' : ($ecartVal > 0 ? 'Excédent' : 'Parfait ✓');
+                                @endphp
+                                <div class="alert alert-{{ $ecartClass }} py-2 px-3 mb-2">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="fw-bold">Écart : {{ $ecartLabel }}</span>
+                                        <span class="fw-bold">{{ $fmt(abs($ecartVal)) }}</span>
+                                    </div>
+                                </div>
+                            @endif
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small">Notes / Observations</label>
                                 <textarea wire:model="notes" class="form-control" rows="2"></textarea>
                             </div>
                             <button type="submit" class="btn btn-danger w-100 btn-lg">
-                                Fermer la Caisse
+                                <i class="fas fa-lock me-2"></i> Fermer la Caisse
                             </button>
                         </form>
                     </div>

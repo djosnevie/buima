@@ -12,6 +12,7 @@ class Commande extends Model
         'etablissement_id',
         'table_id',
         'caisse_id',
+        'session_caisse_id',
         'numero_commande',
         'type_commande',
         'client_nom',
@@ -51,6 +52,11 @@ class Commande extends Model
     public function caisse(): BelongsTo
     {
         return $this->belongsTo(Caisse::class);
+    }
+
+    public function sessionCaisse(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\SessionCaisse::class, 'session_caisse_id');
     }
 
     public function etablissement(): BelongsTo

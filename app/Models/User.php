@@ -98,9 +98,32 @@ class User extends Authenticatable
         return $this->role === 'admin' || $this->isManager();
     }
 
+    public function isCaissier(): bool
+    {
+        // 'caissier' replaces the old 'user'/'employe' role for POS staff
+        return $this->role === 'caissier' || $this->role === 'user';
+    }
+
     public function isUser(): bool
     {
-        return $this->role === 'user';
+        return $this->isCaissier();
+    }
+
+    /**
+     * Whether the user has a currently open cash session.
+     */
+    public function hasOpenSession(): bool
+    {
+        return $this->activeSession() !== null;
+    }
+
+    /**
+     * Whether the user can manage (create/edit/delete) other admins.
+     * Only super_admin can manage admins.
+     */
+    public function canManageAdmins(): bool
+    {
+        return $this->isSuperAdmin();
     }
 
     public function ownedEstablishments(): \Illuminate\Database\Eloquent\Relations\HasMany

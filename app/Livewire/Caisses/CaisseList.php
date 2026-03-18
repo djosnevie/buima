@@ -18,6 +18,11 @@ class CaisseList extends Component
 
     public function save()
     {
+        if (!auth()->user()->isAdmin()) {
+            session()->flash('error', 'Seul un administrateur peut ajouter ou modifier une caisse.');
+            return;
+        }
+
         $this->validate($this->editingCaisseId ? [
             'nom' => 'required|string|max:255',
             'code' => 'required|string|max:50|unique:caisses,code,' . $this->editingCaisseId,
@@ -42,6 +47,11 @@ class CaisseList extends Component
 
     public function edit($id)
     {
+        if (!auth()->user()->isAdmin()) {
+            session()->flash('error', 'Seul un administrateur peut modifier une caisse.');
+            return;
+        }
+
         $caisse = Caisse::findOrFail($id);
         $this->editingCaisseId = $caisse->id;
         $this->nom = $caisse->nom;
@@ -50,6 +60,11 @@ class CaisseList extends Component
 
     public function toggle($id)
     {
+        if (!auth()->user()->isAdmin()) {
+            session()->flash('error', 'Seul un administrateur peut activer ou désactiver une caisse.');
+            return;
+        }
+
         $caisse = Caisse::findOrFail($id);
         $caisse->active = !$caisse->active;
         $caisse->save();

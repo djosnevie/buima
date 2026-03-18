@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'is_admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
             'is_super_admin' => \App\Http\Middleware\EnsureUserIsSuperAdmin::class,
             'module' => \App\Http\Middleware\CheckModuleAccess::class,
+            'caisse_session' => \App\Http\Middleware\RequireOpenCaisseSession::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

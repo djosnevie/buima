@@ -7,6 +7,8 @@
 
 <div class="caisse-management">
     <div class="row g-4">
+        {{-- Formulaire visible uniquement pour les admins --}}
+        @if(auth()->user()->isAdmin())
         <div class="col-md-4">
             <div class="card border-0 shadow-sm rounded-4">
                 <div class="card-body p-4">
@@ -35,6 +37,7 @@
                 </div>
             </div>
         </div>
+        @endif
 
         <div class="col-md-8">
             <div class="card border-0 shadow-sm rounded-4">
@@ -66,13 +69,20 @@
                                         </td>
                                         <td class="px-4 py-3">
                                             <div class="form-check form-switch">
-                                                <input class="form-check-input" type="checkbox" role="switch"
-                                                    wire:click="toggle({{ $caisse->id }})" {{ $caisse->active ? 'checked' : '' }}>
+                                                @if(auth()->user()->isAdmin())
+                                                    <input class="form-check-input" type="checkbox" role="switch"
+                                                        wire:click="toggle({{ $caisse->id }})" {{ $caisse->active ? 'checked' : '' }}>
+                                                @else
+                                                    <input class="form-check-input" type="checkbox" role="switch"
+                                                        {{ $caisse->active ? 'checked' : '' }} disabled>
+                                                @endif
                                             </div>
                                         </td>
                                         <td class="px-4 py-3 text-end">
-                                            <button wire:click="edit({{ $caisse->id }})"
-                                                class="btn btn-sm btn-light border"><i class="fas fa-edit"></i></button>
+                                            @if(auth()->user()->isAdmin())
+                                                <button wire:click="edit({{ $caisse->id }})"
+                                                    class="btn btn-sm btn-light border"><i class="fas fa-edit"></i></button>
+                                            @endif
                                             <a href="{{ route('caisses.sessions', $caisse->id) }}"
                                                 class="btn btn-sm btn-light border"><i class="fas fa-history"></i>
                                                 Sessions</a>

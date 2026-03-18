@@ -30,6 +30,13 @@ class POS extends Component
 
     public function mount()
     {
+        // Sales are exclusively for caissiers
+        if (auth()->user()->isAdmin()) {
+            session()->flash('error', 'Les ventes sont réservées aux caissiers. Un manager ou administrateur ne peut pas vendre.');
+            $this->redirect(route('dashboard'));
+            return;
+        }
+
         $this->checkActiveSession();
     }
 
@@ -122,9 +129,13 @@ class POS extends Component
 
     public function processOrder()
     {
-        if (empty($this->cart))
-            return;
+        if (empty($this->cart)) return;
+
+        // Reload session to get the freshest state
+        $this->checkActiveSession();
+
         if (!$this->activeSession) {
+            session()->flash('error', 'Veuillez ouvrir une caisse avant de commencer les opérations de vente.');
             $this->showSessionModal = true;
             return;
         }
@@ -135,10 +146,14 @@ class POS extends Component
                 'etablissement_id' => auth()->user()->etablissement_id,
                 'user_id' => auth()->id(),
                 'caisse_id' => $this->activeSession->caisse_id,
+                'session_caisse_id' => $this->activeSession->id,
                 'statut' => 'payee',
                 'total' => $this->subtotal,
+                'sous_total' => $this->subtotal,
                 'numero_commande' => Commande::generateOrderNumber('POS'),
                 'type_commande' => $this->orderType,
+                'date_commande' => now(),
+                'heure_prise' => now(),
             ]);
 
             // Create Items
@@ -189,7 +204,6 @@ class POS extends Component
                 'statut' => 'complete',
                 'reference_id' => $commande->id,
                 'reference_type' => Commande::class,
-                'date_transaction' => now(),
             ]);
         });
 
@@ -212,6 +226,8 @@ class POS extends Component
         $caissesQuery = Caisse::where('etablissement_id', $etablissement_id)
             ->where('active', true);
 
+        // Caissiers with an assigned caisse only see their caisse
+        // Admins see all caisses
         if (!auth()->user()->isAdmin() && auth()->user()->caisse_id) {
             $caissesQuery->where('id', auth()->user()->caisse_id);
         }
