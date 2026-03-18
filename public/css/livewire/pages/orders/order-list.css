@@ -712,3 +712,40 @@
     color: white;
 }
 
+/* ========================================= */
+/* Responsive Adjustments                    */
+/* ========================================= */
+@media (max-width: 767.98px) {
+    .header-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+
+    .left-actions {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+    }
+
+    .search-box {
+        width: 100%;
+    }
+
+    .orders-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .side-panel {
+        width: 100%;
+    }
+    
+    .status-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .action-buttons {
+        grid-template-columns: 1fr;
+    }
+}
+

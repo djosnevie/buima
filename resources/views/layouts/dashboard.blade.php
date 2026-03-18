@@ -68,7 +68,10 @@
 </head>
 
 <body>
-    <div class="sidebar">
+    <!-- Mobile Sidebar Backdrop -->
+    <div class="sidebar-backdrop d-xl-none" id="sidebarBackdrop"></div>
+
+    <div class="sidebar" id="mainSidebar">
         <!-- Sidebar Profile / Brand -->
         <div class="sidebar-brand text-center">
             @php
@@ -292,8 +295,7 @@
                 @endif
 
             <div class="user-profile d-flex align-items-center gap-3">
-                <button class="btn btn-light d-lg-none" type="button" data-bs-toggle="offcanvas"
-                    data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas">
+                <button class="btn btn-light d-xl-none" type="button" id="mobileMenuBtn">
                     <i class="fas fa-bars"></i>
                 </button>
 
@@ -362,6 +364,25 @@
     @livewireScripts
     <livewire:profile.edit-profile />
     <livewire:restaurant-employees />
-</body>
 
+    <!-- Mobile Sidebar Toggle Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const sidebar = document.getElementById('mainSidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+
+            if (mobileMenuBtn && sidebar && backdrop) {
+                function toggleSidebar() {
+                    sidebar.classList.toggle('show');
+                    backdrop.classList.toggle('show');
+                    document.body.style.overflow = sidebar.classList.contains('show') ? 'hidden' : '';
+                }
+
+                mobileMenuBtn.addEventListener('click', toggleSidebar);
+                backdrop.addEventListener('click', toggleSidebar);
+            }
+        });
+    </script>
+</body>
 </html>

@@ -147,8 +147,17 @@
                 @forelse($produits as $produit)
                     <div class="product-card" wire:click="addToCart({{ $produit->id }})">
                         <div class="product-image">
-                            <img src="{{ $produit->image_url }}" alt="{{ $produit->nom }}"
-                                 onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode($produit->nom) }}&background=f8f9fa&color=bf3a29';">
+                            @php
+                                $isPlaceholder = str_contains($produit->image_url, 'ui-avatars.com') || empty($produit->image_url);
+                            @endphp
+                            @if(!$isPlaceholder)
+                                <img src="{{ $produit->image_url }}" alt="{{ $produit->nom }}"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            @endif
+                            <div class="product-placeholder" style="{{ !$isPlaceholder ? 'display: none;' : 'display: flex;' }}">
+                                <span class="placeholder-initials">{{ strtoupper(substr($produit->nom, 0, 2)) }}</span>
+                                <i class="fas fa-utensils placeholder-icon"></i>
+                            </div>
                         </div>
                         <div class="product-info">
                             <h6 class="product-title">{{ $produit->nom }}</h6>

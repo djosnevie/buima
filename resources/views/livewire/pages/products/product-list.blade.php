@@ -94,9 +94,21 @@
         @forelse($produits as $produit)
             <div class="product-card">
                 <div class="product-image">
-                    <img src="{{ $produit->image_url }}"
-                        onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode($produit->nom) }}&background=f8f9fa&color=bf3a29';"
-                        alt="{{ $produit->nom }}">
+                    @php
+                        // Check if image_url is basically a placeholder string
+                        $isPlaceholder = str_contains($produit->image_url, 'ui-avatars.com') || empty($produit->image_url);
+                    @endphp
+                    @if(!$isPlaceholder)
+                        <img src="{{ $produit->image_url }}"
+                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                            alt="{{ $produit->nom }}">
+                    @endif
+                    
+                    <div class="product-placeholder" style="{{ !$isPlaceholder ? 'display: none;' : 'display: flex;' }}">
+                        <span class="placeholder-initials">{{ strtoupper(substr($produit->nom, 0, 2)) }}</span>
+                        <i class="fas fa-utensils placeholder-icon"></i>
+                    </div>
+                    
                     <div class="category-badge">{{ $produit->categorie->nom ?? 'Sans catégorie' }}</div>
                 </div>
 

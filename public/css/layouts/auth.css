@@ -133,3 +133,53 @@ body {
     transform: translateY(-2px);
     box-shadow: 0 15px 25px rgba(255, 159, 67, 0.4);
 }
+
+/* ========================================= */
+/* Responsive Adjustments                    */
+/* ========================================= */
+@media (max-width: 767.98px) {
+    body {
+        height: auto;
+        overflow: auto;
+    }
+    
+    .auth-container {
+        flex-direction: column;
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .left-panel {
+        width: 100%;
+        height: 35vh;
+        min-height: 250px;
+    }
+
+    .right-panel {
+        width: 100%;
+        height: auto;
+        flex: 1;
+        padding: 2rem 0;
+        align-items: flex-start;
+    }
+
+    .auth-form-wrapper {
+        padding: 1.5rem;
+        margin-top: 1rem;
+    }
+
+    .toggle-pill {
+        top: auto;
+        bottom: -25px;
+        right: 50%;
+        transform: translateX(50%);
+        flex-direction: row;
+        padding: 5px 10px;
+    }
+
+    .toggle-btn {
+        writing-mode: horizontal-tb;
+        transform: none;
+        padding: 10px 15px;
+    }
+}
