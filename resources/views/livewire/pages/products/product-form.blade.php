@@ -135,7 +135,7 @@
                                 Catégorie
                                 <a href="{{ route('categories.index') }}" target="_blank" class="small text-decoration-none text-primary" title="Gérer les catégories"><i class="fas fa-external-link-alt"></i></a>
                             </label>
-                            <select wire:model="categorie_id" class="form-select form-select-lg bg-light border-0 shadow-sm">
+                            <select wire:model.live="categorie_id" class="form-select form-select-lg bg-light border-0 shadow-sm">
                                 <option value="">--- Sélectionner ---</option>
                                 @foreach($categories as $category)
                                     <option value="{{ $category->id }}">{{ $category->nom }}</option>

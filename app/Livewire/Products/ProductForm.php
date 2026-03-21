@@ -41,6 +41,16 @@ class ProductForm extends Component
         }
     }
 
+    public function updatedCategorieId($value)
+    {
+        if ($value) {
+            $cat = Categorie::find($value);
+            if ($cat && $cat->type) {
+                $this->type = $cat->type;
+            }
+        }
+    }
+
     protected function rules()
     {
         return [
