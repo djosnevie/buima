@@ -51,6 +51,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/products', \App\Livewire\Products\ProductList::class)->name('products.index');
         Route::get('/products/create', \App\Livewire\Products\ProductForm::class)->name('products.create');
         Route::get('/products/{produit}/edit', \App\Livewire\Products\ProductForm::class)->name('products.edit');
+        Route::get('/categories', \App\Livewire\Products\CategoryManager::class)->name('categories.index');
     });
 
     // Tables

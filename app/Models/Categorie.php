@@ -13,6 +13,8 @@ class Categorie extends Model
     protected $fillable = [
         'etablissement_id',
         'nom',
+        'type',
+        'couleur',
         'description',
         'ordre',
         'actif',

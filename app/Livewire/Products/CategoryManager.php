@@ -20,7 +20,7 @@ class CategoryManager extends Component
 
     protected $rules = [
         'nom' => 'required|min:2|max:50',
-        'type' => 'required|in:entree,plat,dessert,boisson',
+        'type' => 'required|in:entree,plat,dessert,boisson,accompagnement,autre',
         'couleur' => 'required|regex:/^#[a-fA-F0-9]{6}$/',
     ];
 
@@ -149,6 +149,6 @@ class CategoryManager extends Component
 
     public function render()
     {
-        return view('livewire.pages.products.category-manager');
+        return view('livewire.pages.products.category-manager')->layout('layouts.dashboard');
     }
 }

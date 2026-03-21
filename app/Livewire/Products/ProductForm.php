@@ -15,6 +15,10 @@ class ProductForm extends Component
     public $nom;
     public $description;
     public $prix_vente;
+    public $prix_achat;
+    public $tva;
+    public $gestion_stock = false;
+    public $type = 'plat';
     public $categorie_id;
     public $image;
     public $newImage;
@@ -27,6 +31,10 @@ class ProductForm extends Component
             $this->nom = $this->produit->nom;
             $this->description = $this->produit->description;
             $this->prix_vente = $this->produit->prix_vente;
+            $this->prix_achat = $this->produit->prix_achat;
+            $this->tva = $this->produit->tva;
+            $this->type = $this->produit->type ?? 'plat';
+            $this->gestion_stock = $this->produit->gestion_stock;
             $this->categorie_id = $this->produit->categorie_id;
             $this->image = $this->produit->image;
             $this->disponible = $this->produit->disponible;
@@ -39,9 +47,13 @@ class ProductForm extends Component
             'nom' => 'required|min:3',
             'description' => 'nullable',
             'prix_vente' => 'required|numeric|min:0',
+            'prix_achat' => 'nullable|numeric|min:0',
+            'tva' => 'nullable|numeric|min:0|max:100',
+            'type' => 'required|in:entree,plat,dessert,boisson,accompagnement,autre',
             'categorie_id' => 'nullable|exists:categories,id',
-            'newImage' => 'nullable|image|max:1024', // 1MB Max
+            'newImage' => 'nullable|image|max:2048', // 2MB Max
             'disponible' => 'boolean',
+            'gestion_stock' => 'boolean',
         ];
     }
 
@@ -57,6 +69,10 @@ class ProductForm extends Component
             'nom' => $this->nom,
             'description' => $this->description,
             'prix_vente' => $this->prix_vente,
+            'prix_achat' => $this->prix_achat ?: 0,
+            'tva' => $this->tva ?: 0,
+            'type' => $this->type,
+            'gestion_stock' => $this->gestion_stock,
             'categorie_id' => $this->categorie_id ?: null,
             'disponible' => $this->disponible,
             'etablissement_id' => auth()->user()->etablissement_id,
@@ -80,7 +96,7 @@ class ProductForm extends Component
     public function render()
     {
         return view('livewire.pages.products.product-form', [
-            'categories' => Categorie::where('etablissement_id', auth()->user()->etablissement_id)->get()
+            'categories' => Categorie::where('etablissement_id', auth()->user()->etablissement_id)->orderBy('nom')->get()
         ])->layout('layouts.dashboard');
     }
 }

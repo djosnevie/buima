@@ -145,6 +145,13 @@
                             <span>Produits</span>
                         </a>
                     </div>
+                    <div class="nav-item">
+                        <a href="{{ route('categories.index') }}"
+                            class="nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}">
+                            <i class="fas fa-tags"></i>
+                            <span>Catégories</span>
+                        </a>
+                    </div>
                 @endif
                 @if(auth()->user()->etablissement->hasModule('tables'))
                     <div class="nav-item">
