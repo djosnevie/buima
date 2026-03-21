@@ -107,16 +107,20 @@
 
 <body>
     @php
+        $typeFilter = request()->query('type'); // 'cuisine', 'bar', ou null
+        
         $etablissement = auth()->user()->etablissement ?? $commande->etablissement;
         
         $foodItems = $commande->items->filter(fn($item) => $item->produit->type !== 'boisson');
         $drinkItems = $commande->items->filter(fn($item) => $item->produit->type === 'boisson');
         
         $tickets = [];
-        if ($foodItems->count() > 0) {
+        // Si c'est pour la cuisine ou si aucun filtre n'est appliqué
+        if ($foodItems->count() > 0 && ($typeFilter === 'cuisine' || !$typeFilter)) {
             $tickets[] = ['title' => 'CUISINE', 'items' => $foodItems];
         }
-        if ($drinkItems->count() > 0) {
+        // Si c'est pour le bar ou si aucun filtre n'est appliqué
+        if ($drinkItems->count() > 0 && ($typeFilter === 'bar' || !$typeFilter)) {
             $tickets[] = ['title' => 'BAR', 'items' => $drinkItems];
         }
     @endphp

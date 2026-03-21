@@ -160,10 +160,16 @@
                                 <i class="fas fa-euro-sign"></i>
                             </button>
                         @endif
+                        @php
+                            $hasFood = $commande->items->contains(fn($i) => $i->produit && $i->produit->type !== 'boisson');
+                            $hasDrink = $commande->items->contains(fn($i) => $i->produit && $i->produit->type === 'boisson');
+                            $cuisineUrl = $hasFood ? route('orders.kitchen-ticket', $commande->id) . '?type=cuisine' : '';
+                            $barUrl = $hasDrink ? route('orders.kitchen-ticket', $commande->id) . '?type=bar' : '';
+                        @endphp
                         @if(in_array($commande->statut, ['en_attente', 'servie', 'payee']))
                             <button
-                                onclick="printInvoice('{{ route('orders.kitchen-ticket', $commande->id) }}'); event.stopPropagation();"
-                                class="btn-action btn-print text-warning" title="Imprimer le bon cuisine">
+                                onclick="printSplitTickets('{{ $cuisineUrl }}', '{{ $barUrl }}'); event.stopPropagation();"
+                                class="btn-action btn-print text-warning" title="Imprimer le(s) bon(s) préparation">
                                 <i class="fas fa-receipt"></i>
                             </button>
                         @endif
@@ -449,9 +455,15 @@
                         </div>
 
                         <div class="action-buttons">
+                            @php
+                                $hasFoodPanel = $selectedOrder->items->contains(fn($i) => $i->produit && $i->produit->type !== 'boisson');
+                                $hasDrinkPanel = $selectedOrder->items->contains(fn($i) => $i->produit && $i->produit->type === 'boisson');
+                                $cuisineUrlPanel = $hasFoodPanel ? route('orders.kitchen-ticket', $selectedOrder->id) . '?type=cuisine' : '';
+                                $barUrlPanel = $hasDrinkPanel ? route('orders.kitchen-ticket', $selectedOrder->id) . '?type=bar' : '';
+                            @endphp
                             @if(in_array($selectedOrder->statut, ['en_attente', 'servie', 'payee']))
-                                <button onclick="printInvoice('{{ route('orders.kitchen-ticket', $selectedOrder->id) }}')" class="btn-panel btn-warning text-dark">
-                                    <i class="fas fa-receipt"></i> Bon Cuisine
+                                <button onclick="printSplitTickets('{{ $cuisineUrlPanel }}', '{{ $barUrlPanel }}')" class="btn-panel btn-warning text-dark">
+                                    <i class="fas fa-receipt"></i> Bon Préparation
                                 </button>
                             @endif
                             @if(in_array($selectedOrder->statut, ['servie', 'payee']))
@@ -471,11 +483,27 @@
         </div>
     @endif
     
-    <iframe id="printFrame" style="display:none;"></iframe>
+    <iframe id="printFrameCuisine" style="display:none;"></iframe>
+    <iframe id="printFrameBar" style="display:none;"></iframe>
     <script>
         function printInvoice(url) {
-            const frame = document.getElementById('printFrame');
+            const frame = document.getElementById('printFrameCuisine');
             frame.src = url;
+        }
+
+        function printSplitTickets(cuisineUrl, barUrl) {
+            if (cuisineUrl && barUrl) {
+                // Lance la première impression
+                document.getElementById('printFrameCuisine').src = cuisineUrl;
+                // Attend 1.5s pour lancer la 2ème (laisse le navigateur digérer la première requête)
+                setTimeout(() => {
+                    document.getElementById('printFrameBar').src = barUrl;
+                }, 1500);
+            } else if (cuisineUrl) {
+                document.getElementById('printFrameCuisine').src = cuisineUrl;
+            } else if (barUrl) {
+                document.getElementById('printFrameBar').src = barUrl;
+            }
         }
     </script>
     <!-- Manager Validation Modal -->
