@@ -236,10 +236,6 @@ class OrderList extends Component
             }
         }
 
-        if ($newStatus === 'payee') {
-            $this->dispatch('print-invoice', url: route('orders.invoice', $commande->id));
-        }
-
         session()->flash('success', 'Statut mis à jour.');
     }
 
@@ -309,13 +305,8 @@ class OrderList extends Component
         } else {
             // Employee / Admin View
             $query->where('etablissement_id', $user->etablissement_id);
-            if (!$user->isAdmin()) { // If not an admin, further filter by user_id or caisse_id
-                $query->where(function ($q) use ($user) {
-                    $q->where('user_id', $user->id);
-                    if ($user->caisse_id) {
-                        $q->orWhere('caisse_id', $user->caisse_id);
-                    }
-                });
+            if (!$user->isAdmin()) { // Si ce n'est pas un admin, filtrer strictement par son ID utilisateur
+                $query->where('user_id', $user->id);
             }
         }
 
