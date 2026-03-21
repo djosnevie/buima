@@ -40,6 +40,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/orders/{commande}/invoice', function (\App\Models\Commande $commande) {
             return view('pages.orders.invoice', ['commande' => $commande]);
         })->name('orders.invoice');
+        
+        Route::get('/orders/{commande}/kitchen-ticket', function (\App\Models\Commande $commande) {
+            return view('pages.orders.kitchen-ticket', ['commande' => $commande]);
+        })->name('orders.kitchen-ticket');
     });
 
     // Products
@@ -127,4 +131,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/dashboard', \App\Livewire\Admin\Dashboard\SuperAdminDashboard::class)
         ->middleware(['is_super_admin'])
         ->name('super_admin.dashboard');
+
+    // Super Admin – Manager Management
+    Route::get('/admin/managers', \App\Livewire\Admin\Dashboard\ManagerManager::class)
+        ->middleware(['is_super_admin'])
+        ->name('super_admin.managers');
 });

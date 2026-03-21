@@ -160,10 +160,17 @@
                                 <i class="fas fa-euro-sign"></i>
                             </button>
                         @endif
+                        @if(in_array($commande->statut, ['en_attente', 'servie', 'payee']))
+                            <button
+                                onclick="printInvoice('{{ route('orders.kitchen-ticket', $commande->id) }}'); event.stopPropagation();"
+                                class="btn-action btn-print text-warning" title="Imprimer le bon cuisine">
+                                <i class="fas fa-receipt"></i>
+                            </button>
+                        @endif
                         @if(in_array($commande->statut, ['servie', 'payee']))
                             <button
                                 onclick="printInvoice('{{ route('orders.invoice', $commande->id) }}'); event.stopPropagation();"
-                                class="btn-action btn-print" title="Imprimer la facture">
+                                class="btn-action btn-print text-primary" title="Imprimer la facture">
                                 <i class="fas fa-print"></i>
                             </button>
                         @endif
@@ -442,6 +449,11 @@
                         </div>
 
                         <div class="action-buttons">
+                            @if(in_array($selectedOrder->statut, ['en_attente', 'servie', 'payee']))
+                                <button onclick="printInvoice('{{ route('orders.kitchen-ticket', $selectedOrder->id) }}')" class="btn-panel btn-warning text-dark">
+                                    <i class="fas fa-receipt"></i> Bon Cuisine
+                                </button>
+                            @endif
                             @if(in_array($selectedOrder->statut, ['servie', 'payee']))
                                 <button onclick="printInvoice('{{ route('orders.invoice', $selectedOrder->id) }}')" class="btn-panel btn-print">
                                     <i class="fas fa-print"></i> Imprimer Facture

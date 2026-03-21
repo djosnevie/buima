@@ -140,7 +140,7 @@ class POS extends Component
             return;
         }
 
-        \DB::transaction(function () {
+        $commande = \DB::transaction(function () {
             // Create Commande
             $commande = Commande::create([
                 'etablissement_id' => auth()->user()->etablissement_id,
@@ -205,6 +205,8 @@ class POS extends Component
                 'reference_id' => $commande->id,
                 'reference_type' => Commande::class,
             ]);
+
+            return $commande;
         });
 
         $this->cart = [];

@@ -210,6 +210,20 @@
                         <span>Restaurants</span>
                     </a>
                 </div>
+                <div class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('super_admin.managers') ? 'active' : '' }}"
+                        href="{{ route('super_admin.managers') }}">
+                        <i class="fas fa-user-tie"></i>
+                        <span>Managers</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('settings.users') ? 'active' : '' }}"
+                        href="{{ route('settings.users') }}">
+                        <i class="fas fa-users"></i>
+                        <span>Tous les utilisateurs</span>
+                    </a>
+                </div>
             @endif
 
             @if(auth()->user()->isManager() && !auth()->user()->isSuperAdmin() && auth()->user()->etablissement->hasModule('pos'))
@@ -381,6 +395,19 @@
 
                 mobileMenuBtn.addEventListener('click', toggleSidebar);
                 backdrop.addEventListener('click', toggleSidebar);
+            }
+        });
+
+        // Listen for print events from Livewire
+        window.addEventListener('print-invoice', event => {
+            if(event.detail && event.detail.url) {
+                window.open(event.detail.url, '_blank', 'width=400,height=600');
+            }
+        });
+
+        window.addEventListener('print-ticket', event => {
+            if(event.detail && event.detail.url) {
+                window.open(event.detail.url, '_blank', 'width=400,height=600');
             }
         });
     </script>
