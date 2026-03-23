@@ -23,6 +23,7 @@ class ProductForm extends Component
     public $image;
     public $newImage;
     public $disponible = true;
+    public $quantite_minimum = 1;
 
     public function mount($produit = null)
     {
@@ -35,6 +36,7 @@ class ProductForm extends Component
             $this->tva = $this->produit->tva;
             $this->type = $this->produit->type ?? 'plat';
             $this->gestion_stock = $this->produit->gestion_stock;
+            $this->quantite_minimum = $this->produit->quantite_minimum ?? 1;
             $this->categorie_id = $this->produit->categorie_id;
             $this->image = $this->produit->image;
             $this->disponible = $this->produit->disponible;
@@ -60,6 +62,7 @@ class ProductForm extends Component
             'prix_achat' => 'nullable|numeric|min:0',
             'tva' => 'nullable|numeric|min:0|max:100',
             'type' => 'required|in:entree,plat,dessert,boisson,accompagnement,autre',
+            'quantite_minimum' => 'required|integer|min:1',
             'categorie_id' => 'nullable|exists:categories,id',
             'newImage' => 'nullable|image|max:2048', // 2MB Max
             'disponible' => 'boolean',
@@ -83,6 +86,7 @@ class ProductForm extends Component
             'tva' => $this->tva ?: 0,
             'type' => $this->type,
             'gestion_stock' => $this->gestion_stock,
+            'quantite_minimum' => $this->quantite_minimum,
             'categorie_id' => $this->categorie_id ?: null,
             'disponible' => $this->disponible,
             'etablissement_id' => auth()->user()->etablissement_id,

@@ -108,13 +108,23 @@
                                 @error('prix_achat') <div class="text-danger mt-1 small"><i class="fas fa-info-circle"></i> {{ $message }}</div> @enderror
                             </div>
 
-                            <div class="col-md-4">
-                                <label class="form-label text-muted fw-semibold">TVA appliquable</label>
-                                <div class="input-group input-group-lg shadow-sm rounded-3">
-                                    <input type="number" step="0.01" wire:model="tva" class="form-control border-0 bg-light" placeholder="0.00">
-                                    <span class="input-group-text border-0 bg-light text-muted">%</span>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label text-muted fw-semibold">TVA (%) <span class="text-secondary fw-normal">(Optionnel)</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0 text-muted">%</span>
+                                    <input type="number" wire:model="tva" class="form-control bg-light border-start-0 ps-0" step="0.01" min="0" max="100" placeholder="Ex: 20">
                                 </div>
                                 @error('tva') <div class="text-danger mt-1 small"><i class="fas fa-info-circle"></i> {{ $message }}</div> @enderror
+                            </div>
+                            
+                            <!-- NOUVEAU : Quantité Minimum -->
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label text-muted fw-semibold">Quantité Min. Commande <span class="text-secondary fw-normal">(Par défaut: 1)</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="fas fa-boxes"></i></span>
+                                    <input type="number" wire:model="quantite_minimum" class="form-control bg-light border-start-0 ps-0" min="1" step="1" placeholder="Ex: 5">
+                                </div>
+                                @error('quantite_minimum') <div class="text-danger mt-1 small"><i class="fas fa-info-circle"></i> {{ $message }}</div> @enderror
                             </div>
                         </div>
                     </div>

@@ -106,7 +106,7 @@ class CreateOrder extends Component
                 'produit_id' => $produit->id,
                 'nom' => $produit->nom,
                 'prix_unitaire' => $produit->prix_vente,
-                'quantite' => 1,
+                'quantite' => max(1, $produit->quantite_minimum ?? 1),
             ];
         }
     }
@@ -136,7 +136,9 @@ class CreateOrder extends Component
                 return;
             }
 
-            if ($this->cart[$produitId]['quantite'] > 1) {
+            $minQty = \App\Models\Produit::find($produitId)->quantite_minimum ?? 1;
+
+            if ($this->cart[$produitId]['quantite'] > $minQty) {
                 $this->cart[$produitId]['quantite']--;
             } else {
                 unset($this->cart[$produitId]);

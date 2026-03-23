@@ -23,6 +23,7 @@ class Produit extends Model
         'type',
         'disponible',
         'gestion_stock',
+        'quantite_minimum',
     ];
 
     protected $casts = [

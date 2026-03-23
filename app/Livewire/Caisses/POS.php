@@ -95,7 +95,7 @@ class POS extends Component
                 'id' => $produit->id,
                 'nom' => $produit->nom,
                 'prix' => $produit->prix_vente,
-                'quantite' => 1,
+                'quantite' => max(1, $produit->quantite_minimum ?? 1),
             ];
         }
     }
@@ -109,8 +109,10 @@ class POS extends Component
     {
         if (isset($this->cart[$produitId])) {
             $newQty = $this->cart[$produitId]['quantite'] + $delta;
-            if ($newQty > 0) {
-                $produit = Produit::find($produitId);
+            $produit = Produit::find($produitId);
+            $minQty = $produit->quantite_minimum ?? 1;
+
+            if ($newQty >= $minQty) {
                 if ($delta > 0 && !$produit->hasSufficientStock($newQty)) {
                     $this->dispatch('notify', ['type' => 'error', 'message' => 'Stock insuffisant.']);
                     return;
