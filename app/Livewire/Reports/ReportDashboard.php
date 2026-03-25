@@ -229,14 +229,46 @@ class ReportDashboard extends Component
 
             case 'caisse_sessions':
                 $data['title'] = 'Rapport des Sessions de Caisse';
-                $data['sessions'] = DB::table('sessions_caisse')
+                $sessionsList = DB::table('sessions_caisse')
                     ->join('caisses', 'sessions_caisse.caisse_id', '=', 'caisses.id')
                     ->join('users', 'sessions_caisse.user_id', '=', 'users.id')
                     ->where('caisses.etablissement_id', $etablissementId)
                     ->whereBetween('sessions_caisse.date_ouverture', [$start, $end])
+                    ->when(!$isGlobal, fn($q) => $q->where('sessions_caisse.user_id', $user->id))
                     ->select('sessions_caisse.*', 'caisses.nom as caisse_nom', 'users.name as caissier')
                     ->orderBy('sessions_caisse.date_ouverture', 'desc')
                     ->get();
+
+                // Enrich each session with Food/Drinks breakdown and per-server totals
+                foreach ($sessionsList as $sess) {
+                    $sess->food_total = DB::table('commande_items')
+                        ->join('commandes', 'commande_items.commande_id', '=', 'commandes.id')
+                        ->join('produits', 'commande_items.produit_id', '=', 'produits.id')
+                        ->where('commandes.session_caisse_id', $sess->id)
+                        ->where('commandes.statut', 'payee')
+                        ->where('produits.type', '!=', 'boisson')
+                        ->sum('commande_items.sous_total');
+
+                    $sess->drinks_total = DB::table('commande_items')
+                        ->join('commandes', 'commande_items.commande_id', '=', 'commandes.id')
+                        ->join('produits', 'commande_items.produit_id', '=', 'produits.id')
+                        ->where('commandes.session_caisse_id', $sess->id)
+                        ->where('commandes.statut', 'payee')
+                        ->where('produits.type', 'boisson')
+                        ->sum('commande_items.sous_total');
+
+                    $sess->ca_total = $sess->food_total + $sess->drinks_total;
+
+                    $sess->servers = DB::table('commandes')
+                        ->join('users', 'commandes.user_id', '=', 'users.id')
+                        ->where('commandes.session_caisse_id', $sess->id)
+                        ->where('commandes.statut', 'payee')
+                        ->select('users.name', DB::raw('SUM(commandes.total) as total'))
+                        ->groupBy('users.name')
+                        ->get();
+                }
+
+                $data['sessions'] = $sessionsList;
                 break;
 
             case 'stock_valuation':

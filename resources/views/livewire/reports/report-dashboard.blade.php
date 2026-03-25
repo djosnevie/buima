@@ -232,32 +232,92 @@
                                 </tbody>
                             </table>
                         @elseif($previewType === 'caisse_sessions')
-                            <table class="table table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>Caisse</th>
-                                        <th>Caissier</th>
-                                        <th>Ouverture</th>
-                                        <th class="text-end">Fermeture Réel</th>
-                                        <th class="text-end">Écart</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($previewData['sessions'] as $sess)
-                                        <tr>
-                                            <td>{{ $sess->caisse_nom }}</td>
-                                            <td>{{ $sess->caissier }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($sess->date_ouverture)->format('d/m H:i') }}</td>
-                                            <td class="text-end">{{ number_format($sess->montant_fermeture_reel, 0, ',', ' ') }}</td>
-                                            <td class="text-end">
-                                                <span class="badge {{ ($sess->montant_fermeture_reel - $sess->montant_fermeture_theorique) >= 0 ? 'bg-success' : 'bg-danger' }}">
-                                                    {{ number_format($sess->montant_fermeture_reel - $sess->montant_fermeture_theorique, 0, ',', ' ') }}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                            @php $devise = auth()->user()->etablissement->devise_display ?? 'FC'; @endphp
+                            @foreach($previewData['sessions'] as $sess)
+                                @php
+                                    $statut = $sess->statut;
+                                    $ecart = ($sess->montant_fermeture_reel ?? 0) - ($sess->montant_fermeture_theorique ?? 0);
+                                @endphp
+                                <div class="card mb-3 border-0 shadow-sm rounded-3">
+                                    <div class="card-header d-flex justify-content-between align-items-center py-2 bg-light rounded-top-3">
+                                        <div>
+                                            <span class="fw-bold me-2"><i class="fas fa-cash-register me-1 text-primary"></i>{{ $sess->caisse_nom }}</span>
+                                            <span class="text-muted small me-2"><i class="fas fa-user me-1"></i>{{ $sess->caissier }}</span>
+                                            <span class="text-muted small"><i class="fas fa-clock me-1"></i>{{ \Carbon\Carbon::parse($sess->date_ouverture)->format('d/m/Y H:i') }}</span>
+                                            @if($sess->date_fermeture)
+                                                <span class="text-muted small"> → {{ \Carbon\Carbon::parse($sess->date_fermeture)->format('d/m/Y H:i') }}</span>
+                                            @endif
+                                        </div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="badge {{ $statut === 'ouverte' ? 'bg-success' : 'bg-secondary' }}">{{ strtoupper($statut) }}</span>
+                                            <a href="{{ route('caisses.sessions.print-global', $sess->id) }}" target="_blank" class="btn btn-sm btn-outline-primary" title="Imprimer Global"><i class="fas fa-print"></i> Global</a>
+                                            <a href="{{ route('caisses.sessions.print-food', $sess->id) }}" target="_blank" class="btn btn-sm btn-outline-warning" title="Imprimer Food"><i class="fas fa-hamburger"></i> Food</a>
+                                            <a href="{{ route('caisses.sessions.print-drinks', $sess->id) }}" target="_blank" class="btn btn-sm btn-outline-info" title="Imprimer Boissons"><i class="fas fa-glass-martini"></i> Boissons</a>
+                                        </div>
+                                    </div>
+                                    <div class="card-body py-3">
+                                        <div class="row g-3">
+                                            {{-- KPIs --}}
+                                            <div class="col-md-7">
+                                                <div class="row g-2 text-center">
+                                                    <div class="col-4">
+                                                        <div class="rounded-3 p-2 h-100" style="background:#f0fdf4;">
+                                                            <div class="small text-muted">Food</div>
+                                                            <div class="fw-bold text-success">{{ number_format($sess->food_total, 0, ',', ' ') }} <small>{{ $devise }}</small></div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-4">
+                                                        <div class="rounded-3 p-2 h-100" style="background:#eff6ff;">
+                                                            <div class="small text-muted">Boissons</div>
+                                                            <div class="fw-bold text-info">{{ number_format($sess->drinks_total, 0, ',', ' ') }} <small>{{ $devise }}</small></div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-4">
+                                                        <div class="rounded-3 p-2 h-100" style="background:#fef9c3;">
+                                                            <div class="small text-muted">CA Total</div>
+                                                            <div class="fw-bold text-warning">{{ number_format($sess->ca_total, 0, ',', ' ') }} <small>{{ $devise }}</small></div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-4">
+                                                        <div class="rounded-3 p-2 h-100" style="background:#f8f9fa;">
+                                                            <div class="small text-muted">Fond d'ouverture</div>
+                                                            <div class="fw-bold">{{ number_format($sess->montant_ouverture, 0, ',', ' ') }} <small>{{ $devise }}</small></div>
+                                                        </div>
+                                                    </div>
+                                                    @if($sess->date_fermeture)
+                                                    <div class="col-4">
+                                                        <div class="rounded-3 p-2 h-100" style="background:#f8f9fa;">
+                                                            <div class="small text-muted">Réel Compté</div>
+                                                            <div class="fw-bold">{{ number_format($sess->montant_fermeture_reel, 0, ',', ' ') }} <small>{{ $devise }}</small></div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-4">
+                                                        <div class="rounded-3 p-2 h-100" style="background: {{ $ecart >= 0 ? '#f0fdf4' : '#fff1f2' }}">
+                                                            <div class="small text-muted">Écart</div>
+                                                            <div class="fw-bold {{ $ecart >= 0 ? 'text-success' : 'text-danger' }}">
+                                                                {{ $ecart >= 0 ? '+' : '' }}{{ number_format($ecart, 0, ',', ' ') }} <small>{{ $devise }}</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            {{-- Per-server breakdown --}}
+                                            <div class="col-md-5">
+                                                <div class="small text-muted fw-semibold mb-1"><i class="fas fa-users me-1"></i>Ventes par Serveur</div>
+                                                @forelse($sess->servers as $srv)
+                                                    <div class="d-flex justify-content-between align-items-center py-1 border-bottom">
+                                                        <span class="small">{{ $srv->name }}</span>
+                                                        <span class="fw-bold small">{{ number_format($srv->total, 0, ',', ' ') }} {{ $devise }}</span>
+                                                    </div>
+                                                @empty
+                                                    <div class="text-muted small fst-italic">Aucune vente enregistrée.</div>
+                                                @endforelse
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
                         @elseif($previewType === 'stock_valuation')
                             <div class="alert alert-info py-2 mb-3">
                                 Total Valorisation: <strong>{{ number_format($previewData['total_valuation'], 0, ',', ' ') }} {{ auth()->user()->etablissement->devise }}</strong>

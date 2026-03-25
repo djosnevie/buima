@@ -7,10 +7,10 @@
     <style>
         body {
             font-family: 'Courier New', Courier, monospace;
-            font-size: 16px;
-            max-width: 320px;
+            font-size: 13px;
+            max-width: 350px;
             margin: 0 auto;
-            padding: 10px;
+            padding: 8px;
         }
 
         .header {
@@ -127,15 +127,13 @@
     @endphp
 
     <div class="header">
-        <div style="font-size: 12px; text-align: right; margin-bottom: 10px;">
-            {{ now()->format('d/m/Y') }}<br>
-            {{ now()->format('H:i:s') }}
+        <div style="font-size: 12px; text-align: right; margin-bottom: 5px;">
+            Édité le {{ now()->format('d/m/Y H:i:s') }}
         </div>
         <h3>Vente journalière</h3>
-        
-        <div class="date-range">
-            <div>{{ $session->date_ouverture->format('d/m/Y') }}</div>
-            <div>{{ $session->date_fermeture ? $session->date_fermeture->format('d/m/Y') : now()->format('d/m/Y') }}</div>
+        <div style="font-size: 12px; margin-top: 6px; text-align: left;">
+            <div><strong>Ouverture :</strong> {{ $session->date_ouverture->format('d/m/Y H:i') }}</div>
+            <div><strong>Fermeture :</strong> {{ $session->date_fermeture ? $session->date_fermeture->format('d/m/Y H:i') : 'En cours' }}</div>
         </div>
 
         <div class="info">
@@ -240,6 +238,9 @@
     <script>
         window.onload = function () {
             window.print();
+        }
+        window.onafterprint = function () {
+            window.close();
         }
     </script>
 </body>
