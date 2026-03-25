@@ -73,6 +73,9 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['module:caisses'])->group(function () {
         Route::get('/caisses', \App\Livewire\Caisses\CaisseList::class)->name('caisses.index');
         Route::get('/caisses/{id}/sessions', \App\Livewire\Caisses\CaisseSessionManager::class)->name('caisses.sessions');
+        Route::get('/caisses/sessions/{session}/print-global', [\App\Http\Controllers\CaisseSessionPrintController::class, 'printGlobal'])->name('caisses.sessions.print-global');
+        Route::get('/caisses/sessions/{session}/print-food', [\App\Http\Controllers\CaisseSessionPrintController::class, 'printFood'])->name('caisses.sessions.print-food');
+        Route::get('/caisses/sessions/{session}/print-drinks', [\App\Http\Controllers\CaisseSessionPrintController::class, 'printDrinks'])->name('caisses.sessions.print-drinks');
     });
 
     // POS

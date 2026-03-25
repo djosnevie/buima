@@ -45,11 +45,24 @@
                             <h5 class="fw-bold mb-0">Rapport de Caisse</h5>
                             <span class="badge bg-success">OUVERTE</span>
                         </div>
-                        <small class="text-muted d-block mb-3">
-                            <i class="fas fa-user me-1"></i> {{ $currentSession->user->name }}
-                            &nbsp;|&nbsp;
-                            <i class="fas fa-clock me-1"></i> {{ $currentSession->date_ouverture->format('d/m/Y H:i') }}
-                        </small>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <small class="text-muted">
+                                <i class="fas fa-user me-1"></i> {{ $currentSession->user->name }}
+                                &nbsp;|&nbsp;
+                                <i class="fas fa-clock me-1"></i> {{ $currentSession->date_ouverture->format('d/m/Y H:i') }}
+                            </small>
+                        </div>
+                        <div class="d-flex gap-2 mb-3">
+                            <a href="{{ route('caisses.sessions.print-global', $currentSession->id) }}" target="_blank" class="btn btn-sm btn-outline-primary flex-fill" title="Imprimer Vente Journalière" style="border-width: 2px;">
+                                <i class="fas fa-print"></i> Global
+                            </a>
+                            <a href="{{ route('caisses.sessions.print-food', $currentSession->id) }}" target="_blank" class="btn btn-sm btn-outline-warning flex-fill" title="Imprimer Vente FOOD" style="border-width: 2px;">
+                                <i class="fas fa-print"></i> Food
+                            </a>
+                            <a href="{{ route('caisses.sessions.print-drinks', $currentSession->id) }}" target="_blank" class="btn btn-sm btn-outline-info flex-fill" title="Imprimer Vente BOISSONS" style="border-width: 2px;">
+                                <i class="fas fa-print"></i> Boissons
+                            </a>
+                        </div>
 
                         {{-- Grille du rapport --}}
                         <div class="rounded-3 p-3 mb-3" style="background:#f8f9fa;">
@@ -132,6 +145,7 @@
                                         <th>Fermeture</th>
                                         <th>Responsable</th>
                                         <th class="text-end">Écart</th>
+                                        <th class="text-end">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -144,6 +158,13 @@
                                             <td
                                                 class="text-end fw-bold {{ $sess->ecart < 0 ? 'text-danger' : ($sess->ecart > 0 ? 'text-warning' : 'text-success') }}">
                                                 {{ $sess->date_fermeture ? number_format($sess->ecart, 0, ',', ' ') : '-' }}
+                                            </td>
+                                            <td class="text-end">
+                                                <div class="btn-group btn-group-sm">
+                                                    <a href="{{ route('caisses.sessions.print-global', $sess->id) }}" target="_blank" class="btn btn-outline-primary" title="Global"><i class="fas fa-print"></i></a>
+                                                    <a href="{{ route('caisses.sessions.print-food', $sess->id) }}" target="_blank" class="btn btn-outline-warning" title="Food"><i class="fas fa-hamburger"></i></a>
+                                                    <a href="{{ route('caisses.sessions.print-drinks', $sess->id) }}" target="_blank" class="btn btn-outline-info" title="Boissons"><i class="fas fa-glass-martini"></i></a>
+                                                </div>
                                             </td>
                                         </tr>
                                     @endforeach
