@@ -111,7 +111,10 @@ class CaisseSessionManager extends Component
     public function render()
     {
         $currentSession = $this->caisse->currentSession();
-        $history = SessionCaisse::where('caisse_id', $this->caisseId)->latest()->paginate(10);
+        $history = SessionCaisse::where('caisse_id', $this->caisseId)
+            ->when(!auth()->user()->isAdmin(), fn($q) => $q->where('user_id', auth()->id()))
+            ->latest()
+            ->paginate(10);
 
         // Live stats for the active session
         $stats = [];
