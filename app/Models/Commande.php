@@ -96,7 +96,32 @@ class Commande extends Model
     public static function generateOrderNumber(string $prefix = 'CMD'): string
     {
         $todayStr = now()->format('Ymd');
+        
+        // Find the most recent order for today
+        $lastOrder = static::whereDate('date_commande', today())
+                           ->orWhereDate('created_at', today())
+                           ->orderBy('id', 'desc')
+                           ->first();
+        
+        $count = clone static::query();
         $count = static::whereDate('created_at', today())->count() + 1;
-        return $prefix . '-' . $todayStr . '-' . str_pad($count, 4, '0', STR_PAD_LEFT);
+        
+        if ($lastOrder && preg_match('/(\d{4})$/', $lastOrder->numero_commande, $matches)) {
+            $latestCount = (int) $matches[1] + 1;
+            if ($latestCount > $count) {
+                $count = $latestCount;
+            }
+        }
+        
+        // Ensure uniqueness unconditionally
+        do {
+            $numero = $prefix . '-' . $todayStr . '-' . str_pad($count, 4, '0', STR_PAD_LEFT);
+            $exists = static::where('numero_commande', $numero)->exists();
+            if ($exists) {
+                $count++;
+            }
+        } while ($exists);
+
+        return $numero;
     }
 }
