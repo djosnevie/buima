@@ -111,8 +111,10 @@
         
         $etablissement = auth()->user()->etablissement ?? $commande->etablissement;
         
-        $foodItems = $commande->items->filter(fn($item) => $item->produit->type !== 'boisson');
-        $drinkItems = $commande->items->filter(fn($item) => $item->produit->type === 'boisson');
+        $sourceItems = isset($itemsToPrint) ? $itemsToPrint : $commande->items;
+        
+        $foodItems = $sourceItems->filter(fn($item) => $item->produit->type !== 'boisson');
+        $drinkItems = $sourceItems->filter(fn($item) => $item->produit->type === 'boisson');
         
         $tickets = [];
         // Si c'est pour la cuisine ou si aucun filtre n'est appliqué
@@ -129,6 +131,9 @@
         <div class="ticket-section">
             <div class="header">
                 <div class="title">BON DE PRÉPARATION</div>
+                @if(isset($isReprint) && $isReprint)
+                    <div style="font-size: 14px; font-weight: bold; background: #000; color: #fff; display: inline-block; padding: 2px 5px; margin-bottom: 5px;">RÉIMPRESSION</div>
+                @endif
                 <div style="font-size: 22px; font-weight: bold; text-decoration: underline; margin-bottom: 5px;">{{ $ticket['title'] }}</div>
                 <div style="font-size: 14px;">{{ $etablissement->nom ?? 'OMENU' }}</div>
             </div>
@@ -164,7 +169,7 @@
                 <tbody>
                     @foreach($ticket['items'] as $item)
                         <tr>
-                            <td class="qty">{{ $item->quantite }}x</td>
+                            <td class="qty">{{ $item->quantite_a_imprimer ?? $item->quantite }}x</td>
                             <td>{{ $item->produit->nom }}</td>
                         </tr>
                     @endforeach

@@ -106,8 +106,9 @@
                                 Annulée
                             @endif
                         </span>
-                        <div class="order-time">
-                            {{ $commande->created_at->format('H:i') }}
+                        <div class="order-time text-end" style="line-height: 1.2;">
+                            <span class="d-block small" style="font-size: 0.75rem;">{{ $commande->created_at->format('d/m/Y') }}</span>
+                            <span class="d-block fw-bold">{{ $commande->created_at->format('H:i') }}</span>
                         </div>
                     </div>
                 </div>
@@ -130,6 +131,10 @@
                             <span>{{ $commande->client_nom }}</span>
                         </div>
                     @endif
+                    <div class="info-row text-secondary mt-1" style="font-size: 0.85rem;">
+                        <i class="fas fa-user-tag"></i>
+                        <span>{{ $commande->user->name ?? 'N/A' }}</span>
+                    </div>
                 </div>
 
                 <div class="order-items">
@@ -199,7 +204,7 @@
     <!-- Side Panel for Details -->
     @if($selectedOrder)
         <div class="side-panel-overlay" wire:click="closeSideView">
-            <div class="side-panel" wire:click.stop>
+            <div class="side-panel" x-on:click.stop>
                 <div class="panel-header">
                     <div class="panel-title">
                         <span class="hash">#</span>{{ substr($selectedOrder->numero_commande, -4) }}
@@ -354,6 +359,10 @@
                                 <span class="detail-value status-text-{{ $selectedOrder->statut }}">
                                     {{ ucfirst(str_replace('_', ' ', $selectedOrder->statut)) }}
                                 </span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Caissier:</span>
+                                <span class="detail-value">{{ $selectedOrder->user->name ?? 'N/A' }}</span>
                             </div>
                             <div class="detail-row">
                                 <span class="detail-label">Date:</span>

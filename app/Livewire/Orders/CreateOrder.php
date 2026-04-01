@@ -129,7 +129,8 @@ class CreateOrder extends Component
     public function decrementQuantity($produitId)
     {
         if (isset($this->cart[$produitId])) {
-            if (!auth()->user()->isManager() && !auth()->user()->isAdmin()) {
+            // Apply restriction only if it's an already created order
+            if ($this->existingOrderId !== null && !auth()->user()->isManager() && !auth()->user()->isAdmin()) {
                 $this->pendingReductionProduitId = $produitId;
                 $this->pendingRemovalProduitId = null;
                 $this->showManagerPinModal = true;
@@ -148,7 +149,8 @@ class CreateOrder extends Component
 
     public function removeFromCart($produitId)
     {
-        if (!auth()->user()->isManager() && !auth()->user()->isAdmin()) {
+        // Apply restriction only if it's an already created order
+        if ($this->existingOrderId !== null && !auth()->user()->isManager() && !auth()->user()->isAdmin()) {
             $this->pendingRemovalProduitId = $produitId;
             $this->pendingReductionProduitId = null;
             $this->showManagerPinModal = true;
@@ -244,12 +246,11 @@ class CreateOrder extends Component
             'orderType' => 'required|in:sur_place,emporter,livraison',
             'selectedTable' => 'required_if:orderType,sur_place',
             'clientName' => 'required_if:orderType,emporter,livraison|max:255',
-            'clientPhone' => 'required_if:orderType,emporter,livraison|max:20',
+            'clientPhone' => 'nullable|max:20',
             'cart' => 'required|array|min:1',
         ], [
             'selectedTable.required_if' => 'Veuillez sélectionner une table',
             'clientName.required_if' => 'Le nom du client est requis',
-            'clientPhone.required_if' => 'Le téléphone du client est requis',
             'cart.required' => 'Le panier est vide',
             'cart.min' => 'Ajoutez au moins un produit',
         ]);
@@ -259,6 +260,7 @@ class CreateOrder extends Component
         try {
             $isEditing = $this->existingOrderId !== null;
             $commande = null;
+            $printedQuantities = [];
 
             if ($isEditing) {
                 $commande = Commande::find($this->existingOrderId);
@@ -292,6 +294,11 @@ class CreateOrder extends Component
                             ]);
                         }
                     }
+                }
+
+                // Memorize printed quantities
+                foreach ($commande->items as $oldItem) {
+                    $printedQuantities[$oldItem->produit_id] = $oldItem->quantite_imprimee;
                 }
 
                 // Delete old items
@@ -373,12 +380,21 @@ class CreateOrder extends Component
 
             // Create order items
             foreach ($this->cart as $item) {
+                // Restore printed quantity or fallback to 0
+                $qtyImprimee = $printedQuantities[$item['produit_id']] ?? 0;
+                
+                // Cap to new quantity to avoid over-printed tracking if quantity was reduced
+                if ($qtyImprimee > $item['quantite']) {
+                    $qtyImprimee = $item['quantite'];
+                }
+
                 CommandeItem::create([
                     'commande_id' => $commande->id,
                     'produit_id' => $item['produit_id'],
                     'quantite' => $item['quantite'],
                     'prix_unitaire' => $item['prix_unitaire'],
                     'statut' => 'en_attente',
+                    'quantite_imprimee' => $qtyImprimee,
                 ]);
             }
 

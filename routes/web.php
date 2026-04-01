@@ -42,7 +42,55 @@ Route::middleware(['auth'])->group(function () {
         })->name('orders.invoice');
         
         Route::get('/orders/{commande}/kitchen-ticket', function (\App\Models\Commande $commande) {
-            return view('pages.orders.kitchen-ticket', ['commande' => $commande]);
+            $type = request('type');
+            $itemsToPrint = [];
+
+            foreach ($commande->items as $item) {
+                if ($item->quantite > $item->quantite_imprimee) {
+                    // Vérifier le filtre de type (cuisine = pas boisson, bar = boisson)
+                    $produitType = $item->produit->type ?? 'autre';
+                    $isBar = $produitType === 'boisson';
+                    
+                    if ($type === 'cuisine' && $isBar) continue;
+                    if ($type === 'bar' && !$isBar) continue;
+
+                    // Calcul du delta
+                    $delta = $item->quantite - $item->quantite_imprimee;
+
+                    // Marquer comme imprimé D'ABORD, pour ne pas injecter quantite_a_imprimer dans le SQL
+                    $item->update(['quantite_imprimee' => $item->quantite]);
+                    
+                    // Ensuite on attache la propriété pour la vue
+                    $item->quantite_a_imprimer = $delta;
+                    $itemsToPrint[] = $item;
+                }
+            }
+
+            $isReprint = false;
+
+            if (empty($itemsToPrint)) {
+                $isReprint = true;
+                foreach ($commande->items as $item) {
+                    $produitType = $item->produit->type ?? 'autre';
+                    $isBar = $produitType === 'boisson';
+                    
+                    if ($type === 'cuisine' && $isBar) continue;
+                    if ($type === 'bar' && !$isBar) continue;
+
+                    $item->quantite_a_imprimer = $item->quantite;
+                    $itemsToPrint[] = $item;
+                }
+                
+                if (empty($itemsToPrint)) {
+                    return '<script>window.close();</script>';
+                }
+            }
+
+            return view('pages.orders.kitchen-ticket', [
+                'commande' => $commande,
+                'itemsToPrint' => collect($itemsToPrint),
+                'isReprint' => $isReprint
+            ]);
         })->name('orders.kitchen-ticket');
     });
 

@@ -291,7 +291,7 @@ class OrderList extends Component
         $user = auth()->user();
         $accessibleIds = $user->getAccessibleEtablissementIds();
 
-        $query = Commande::with(['table', 'items.produit']);
+        $query = Commande::with(['table', 'items.produit', 'user']);
 
         if ($user->isManager()) {
             $contextSiteId = session('manager_view_site_id');
@@ -325,7 +325,7 @@ class OrderList extends Component
 
         return view('livewire.pages.orders.order-list', [
             'commandes' => $query->paginate(8),
-            'selectedOrder' => $this->selectedOrderId ? Commande::with(['items.produit', 'table'])->find($this->selectedOrderId) : null,
+            'selectedOrder' => $this->selectedOrderId ? Commande::with(['items.produit', 'table', 'user'])->find($this->selectedOrderId) : null,
             'tables' => \App\Models\Table::whereIn('etablissement_id', $accessibleIds)->get(),
         ])->layout('layouts.dashboard');
     }

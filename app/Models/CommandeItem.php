@@ -15,6 +15,7 @@ class CommandeItem extends Model
         'sous_total',
         'notes',
         'statut',
+        'quantite_imprimee',
     ];
 
     protected $casts = [
