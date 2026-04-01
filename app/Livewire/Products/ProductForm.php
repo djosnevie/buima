@@ -61,9 +61,8 @@ class ProductForm extends Component
             'prix_vente' => 'required|numeric|min:0',
             'prix_achat' => 'nullable|numeric|min:0',
             'tva' => 'nullable|numeric|min:0|max:100',
-            'type' => 'required|in:entree,plat,dessert,boisson,accompagnement,autre',
             'quantite_minimum' => 'required|integer|min:1',
-            'categorie_id' => 'nullable|exists:categories,id',
+            'categorie_id' => 'required|exists:categories,id',
             'newImage' => 'nullable|image|max:2048', // 2MB Max
             'disponible' => 'boolean',
             'gestion_stock' => 'boolean',
@@ -78,6 +77,11 @@ class ProductForm extends Component
 
         $this->validate();
 
+        $cat = Categorie::find($this->categorie_id);
+        if ($cat) {
+            $this->type = $cat->type ?? 'autre';
+        }
+
         $data = [
             'nom' => $this->nom,
             'description' => $this->description,
@@ -87,7 +91,7 @@ class ProductForm extends Component
             'type' => $this->type,
             'gestion_stock' => $this->gestion_stock,
             'quantite_minimum' => $this->quantite_minimum,
-            'categorie_id' => $this->categorie_id ?: null,
+            'categorie_id' => $this->categorie_id,
             'disponible' => $this->disponible,
             'etablissement_id' => auth()->user()->etablissement_id,
         ];

@@ -142,7 +142,7 @@
                     <div class="card-body p-4">
                         <div class="mb-4">
                             <label class="form-label text-muted fw-semibold d-flex justify-content-between align-items-center">
-                                Catégorie
+                                <span>Catégorie <span class="text-danger">*</span></span>
                                 <a href="{{ route('categories.index') }}" target="_blank" class="small text-decoration-none text-primary" title="Gérer les catégories"><i class="fas fa-external-link-alt"></i></a>
                             </label>
                             <select wire:model.live="categorie_id" class="form-select form-select-lg bg-light border-0 shadow-sm">
@@ -152,47 +152,6 @@
                                 @endforeach
                             </select>
                             @error('categorie_id') <div class="text-danger mt-1 small"><i class="fas fa-info-circle"></i> {{ $message }}</div> @enderror
-                        </div>
-
-                        <div>
-                            <label class="form-label text-muted fw-semibold">Type de Produit <span class="text-danger">*</span></label>
-                            <div class="row g-2">
-                                <div class="col-6">
-                                    <input type="radio" class="btn-check" name="typeR" id="typePlat" value="plat" wire:model="type" autocomplete="off">
-                                    <label class="btn btn-outline-secondary w-100 p-3 rounded-3 hover-lift border-0 bg-light text-dark fw-bold" for="typePlat" style="transition: all 0.2s;">
-                                        <i class="fas fa-utensils fs-4 d-block mb-2 text-warning"></i> Plat
-                                    </label>
-                                </div>
-                                <div class="col-6">
-                                    <input type="radio" class="btn-check" name="typeR" id="typeBoisson" value="boisson" wire:model="type" autocomplete="off">
-                                    <label class="btn btn-outline-secondary w-100 p-3 rounded-3 hover-lift border-0 bg-light text-dark fw-bold" for="typeBoisson" style="transition: all 0.2s;">
-                                        <i class="fas fa-glass-martini-alt fs-4 d-block mb-2 text-info"></i> Boisson
-                                    </label>
-                                </div>
-                                <div class="col-6">
-                                    <input type="radio" class="btn-check" name="typeR" id="typeEntree" value="entree" wire:model="type" autocomplete="off">
-                                    <label class="btn btn-outline-secondary w-100 p-3 rounded-3 hover-lift border-0 bg-light text-dark fw-bold" for="typeEntree" style="transition: all 0.2s;">
-                                        <i class="fas fa-seedling fs-4 d-block mb-2 text-success"></i> Entrée
-                                    </label>
-                                </div>
-                                <div class="col-6">
-                                    <input type="radio" class="btn-check" name="typeR" id="typeAccomp" value="accompagnement" wire:model="type" autocomplete="off">
-                                    <label class="btn btn-outline-secondary w-100 p-3 rounded-3 hover-lift border-0 bg-light text-dark fw-bold" for="typeAccomp" style="transition: all 0.2s;">
-                                        <i class="fas fa-bread-slice fs-4 d-block mb-2 text-warning"></i> Accomp.
-                                    </label>
-                                </div>
-                                <div class="col-12 mt-2">
-                                    <select wire:model="type" class="form-select bg-light border-0 shadow-sm mt-1">
-                                        <option value="plat">Plat Principal</option>
-                                        <option value="boisson">Boisson</option>
-                                        <option value="entree">Entrée</option>
-                                        <option value="dessert">Dessert</option>
-                                        <option value="accompagnement">Accompagnement</option>
-                                        <option value="autre">Autre usage</option>
-                                    </select>
-                                </div>
-                            </div>
-                            @error('type') <div class="text-danger mt-1 small"><i class="fas fa-info-circle"></i> {{ $message }}</div> @enderror
                         </div>
                     </div>
                 </div>
